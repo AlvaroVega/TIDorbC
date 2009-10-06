@@ -1,0 +1,19 @@
+This release of TIDorbC++ was built on a machine with kernel:
+Linux dacha 2.6.21-2-686 #1 SMP Wed Jul 11 03:53:02 UTC 2007 i686 GNU/Linux
+
+using the compiler:
+gcc version 3.4.6 (Debian 3.4.6-6)
+
+kernel source package used:
+linux-image-2.6.21-2-686
+
+applied kernel patches:
+
+
+using the following libraries:
+gcc-3.4.6-6
+make-3.81-5
+binutils-2.18.1~cvs20080103-7
+glibc-2.7-13 
+glibc-devel-2.3.4-2.41
+TIDIdlc_1.3.8

@@ -1,0 +1,42 @@
+/********************************************************************************
+
+		Unreliable Multicast Inter-ORB Protocol		
+
+*********************************************************************************/
+
+#ifndef _PORTABLE_GROUP_IDL_
+#define _PORTABLE_GROUP_IDL_
+
+#include <orb.idl>
+#include <PortableServer.idl>
+
+
+#pragma prefix "omg.org"
+
+module PortableGroup {
+
+  exception NotAGroupObject {};
+  typedef sequence <PortableServer::ObjectId> IDs;
+
+  local interface GOA : PortableServer::POA {
+
+    PortableServer::ObjectId create_id_for_reference(in Object the_ref)
+      raises(NotAGroupObject);
+
+    IDs reference_to_ids(in Object the_ref)
+      raises(NotAGroupObject);
+      
+    void associate_reference_with_id(in Object the_ref,
+                                     in PortableServer::ObjectId oid)
+      raises(NotAGroupObject);
+
+    void disassociate_reference_with_id(in Object the_ref,
+                                        in PortableServer::ObjectId oid)
+      raises(NotAGroupObject);
+
+  };
+
+};
+
+#endif // _PORTABLE_GROUP_IDL_
+
