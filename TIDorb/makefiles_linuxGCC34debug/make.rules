@@ -1,0 +1,626 @@
+###############################################################################
+# make.rules
+# Contiene variables genericas
+###############################################################################
+
+
+# Comandos de UNIX
+#==================
+AR=/usr/bin/ar
+AWK=awk
+CHMOD=chmod
+CP=cp
+ECHO=echo
+FIND=find
+GREP=grep
+KSH=ksh
+LN=ln
+MKDIR=mkdir
+MV=mv
+RANLIB=true
+RM=rm
+RMDIR=rmdir
+SORT=sort
+STRIP=/usr/bin/strip
+LS=ls
+CHATR=chatr
+# GNU
+M4=/usr/bin/m4
+
+
+# FUENTES
+#=========
+FUENTES_C:=$(wildcard *.c)
+FUENTES_CXX:=$(wildcard *.C)
+FUENTES_IDL:=$(wildcard *.idl)
+
+FUENTES=$(FUENTES_IDL) $(FUENTES_C) $(FUENTES_CXX) 
+
+# OBJETOS
+#=========
+OBJETOS_C:=$(FUENTES_C:%.c=_$(TARGET).O/%.o)
+OBJETOS_CXX:=$(FUENTES_CXX:%.C=_$(TARGET).O/%.o)
+OBJETOS_IDL:=$(FUENTES_IDL:%.idl=_$(TARGET).O/%.o)
+
+OBJETOS=$(OBJETOS_IDL) $(OBJETOS_C) $(OBJETOS_CXX)  
+
+# DIRECTORIOS
+#=============
+
+DIR=$(MYDIR)
+
+DIRECTORIOS=$(DIR)
+
+DIR_MK:=$(DIR:%=%.dir_mk)
+DIR_LOAD:=$(DIR:%=%.dir_load)
+DIR_CLEAN:=$(DIR:%=%.dir_clean)
+DIR_INSTALL:=$(DIR:%=%.dir_install)
+DIR_DEPEN:=$(DIR:%=%.dir_depen)
+DIR_ENLACES:=$(DIR:%=%.dir_enlaces)
+
+# DEPENDENCIAS
+#==============
+DEPEN_C:=$(FUENTES_C:%.c=%.dependencia)
+DEPEN_CXX:=$(FUENTES_CXX:%.C=%.dependencia)
+DEPEN_IDL:=$(FUENTES_IDL:%.idl=%.dependencia)
+
+DEPENDENCIAS:=$(DEPEN_IDL) $(DEPEN_C) $(DEPEN_CXX) 
+
+# VARIABLES PARA LIBRERIAS
+# ========================
+
+LIBNAME_GEN:=$(shell basename `pwd` | cut -f1 -d".")
+LIBNAME:=$(LIBNAME_GEN)
+
+ARCHIVE=_$(TARGET).O/lib$(LIBNAME_GEN).a
+ARCHIVE_INS=$(DES_LIBS)/lib$(LIBNAME).a
+SL_ARCHIVE=_$(TARGET).O/lib$(LIBNAME_GEN).so
+SL_ARCHIVE_INS=$(DES_LIBS)/lib$(LIBNAME).so
+
+DES_LIBS=$(DESTINO)/lib
+
+# VARIABLES PARA EJECUTABLES
+# ==========================
+
+P_NAME_GEN:=$(shell basename `pwd` | cut -f1 -d".")
+P_NAME=$(P_NAME_GEN)
+
+DES_BINS=$(DESTINO)/bin/$(MYDESBIN)
+
+# DESTINOS GENERALES
+# ==================
+
+# Raiz para el destino
+DESTINO=$(TIDORBC_PATH)
+
+# Destino para ficheros de configuracion
+DES_CONFIG=$(DESTINO)/config
+
+
+###############################################################################
+###############################################################################
+
+# Reglas generales (mk, load, clean, depen, ...)
+#################################################
+
+ini:ayuda
+
+all: $(DIR_ALL) mk install
+
+mk: $(DIR_MK)
+
+clean: $(DIR_CLEAN)
+
+depen: $(DIR_DEPEN)
+
+enlaces: $(DIR_ENLACES)
+
+install: $(DIR_INSTALL)
+
+info:
+	@echo "=============================================================================="
+	@echo "#                  V A L O R E S   D E   V A R I A B L E S                   #"
+	@echo "=============================================================================="
+	@echo " TARGET = $(TARGET)"
+	@echo " ORACLE_HOME = $(ORACLE_HOME)"
+	@echo " ACC_CMD = $(ACC_CMD)"
+	@echo " CXX_CMD = $(CXX_CMD)"
+	@echo " PCC = $(PCC)"
+	@echo
+	@echo " FUENTES_C = $(FUENTES_C)"
+	@echo " OBJETOS_C = $(OBJETOS_C)"
+	@echo " FUENTES_CXX = $(FUENTES_CXX)"
+	@echo " OBJETOS_CXX = $(OBJETOS_CXX)"
+	@echo " OBJETOS = $(OBJETOS)"
+	@echo
+	@echo " DIRECTORIOS = $(DIRECTORIOS)"
+	@echo " LLAMAR_MAKEFILE = $(LLAMAR_MAKEFILE)"
+	@echo " LIBNAME = $(LIBNAME)"
+	@echo " ARCHIVE = $(ARCHIVE)"
+	@echo " VARIABLE = $(VARIABLE)"
+	@echo " DIR_CLEAN = $(DIR_CLEAN)"
+	@echo "=============================================================================="
+
+
+###############################################################################	
+###############################################################################	
+
+# REGLAS DE COMPILACION ESPECIFICAS
+
+# Variables genericas de compilacion
+
+# Genera codigo reubicable
+PIC_FLAGS=
+
+# Optimizacion de nivel 2 por defecto
+MYOPTIM_FLAG=
+#MYOPTIM_FLAG=+O2
+OPTIM_FLAG=$(MYOPTIM_FLAG)
+
+# Para buscar en la base comun
+
+INCLUDES=$(MYINCLUDES) \
+ $(CMG_INCLUDES) \
+ -I. \
+ -I./include \
+ -I../include \
+ -I../../include \
+ -I../../../include \
+ -I../../../../include \
+ -I../../../../../include \
+ -I../../../../../../include \
+ -I$(HDRS_IDL_DES) \
+ -I$(DES_HDRS) \
+ $(MYPOST_INCLUDES)
+
+DEFINES= $(MYDEFINES) 
+
+LD_DIR_LIB=$(MYLD_DIR_LIB) \
+ -L$(DES_LIBS) 
+
+##########################################################
+# Compilacion IDL
+##########################################################
+
+
+HDRS_IDL_DES=$(DESTINO)/include
+
+MYIDL_FLAGS=
+INCLUDES_IDL=$(MYINCLUDES_IDL)
+IDL_CMD=$(TIDIDLC_HOME)/bin/idl2cpp $(IDL_FLAGS) -I.
+IDL_FLAGS=$(MYIDL_FLAGS) $(INCLUDES_IDL) \
+          -output_h _$(TARGET).O/include -output _$(TARGET).O/source -CORBA_IDL 
+CC_IDL_FLAGS=-I$(HDRS_IDL_DES) -I.
+
+_$(TARGET).O/%.o : %.idl
+	@$(KSH) -c '\
+	$(MKDIR) -p _$(TARGET).O;\
+        cd _$(TARGET).O || exit 1;\
+	if [ ! -d include ]; then \
+	    $(MKDIR) include || { $(ECHO) no puedo crear dir include; exit 1; }; \
+	fi ; \
+	if [ ! -d source ]; then \
+	    $(MKDIR) source || { $(ECHO) no puedo crear dir source; exit 1; }; \
+	fi ; \
+	cd ..; \
+	export JDK_HOME=$(JDK_HOME); \
+	export TIDIDLC_HOME=$(TIDIDLC_HOME); \
+	$(ECHO) === Compilando $< desde el directorio `pwd`;\
+	$(ECHO) $(IDL_CMD) $< ; \
+	$(IDL_CMD) $< || { cd ..; exit 1; };\
+	$(ECHO) === Borrando ficheros $(MY_DELETE_FILES);\
+	cd _$(TARGET).O;$(RM) -rf $(MY_DELETE_FILES);\
+	cd ..;\
+	if [ -d extra ]; then\
+	    $(ECHO) PROCESANDO DIRECTORIO EXTRA;\
+	    cd extra;\
+	    for files in `$(FIND) . -name \\*.h -print`; do\
+	        $(ECHO) $$files > ./mysedfile1;\
+	        dir=`sed -e s/\\\/[^\\/]*\\.h//g ./mysedfile1`;\
+		if [ ! -d  ../_$(TARGET).O/include/$$dir ]; then\
+	            $(ECHO) $(MKDIR) -p ../_$(TARGET).O/include/$$dir; \
+		    $(MKDIR) -p ../_$(TARGET).O/include/$$dir 2>/dev/null;\
+		fi;\
+		cat $$files > ../_$(TARGET).O/include/$$files;\
+	    done;\
+	    $(RM) -fr ./mysed*;\
+	    cd ..;\
+	fi;\
+        '
+	@$(KSH) -c '\
+	cd _$(TARGET).O; \
+	cd source; lista_C=`$(FIND) . -name \\*.[cC] -print`; cd ..;\
+	cd include;   lista_h=`$(FIND) . -name \\*.[hH] -print`; cd ..;\
+	$(ECHO) $(CP) -fr include/* $(HDRS_IDL_DES);\
+	$(CP) -fr include/* $(HDRS_IDL_DES) || { \
+	    $(RM) -fr include source; cd ..; exit 1; \
+        };\
+	cd source;\
+	for fuente in $$lista_C; do\
+	    fuente_t=`$(ECHO) $${fuente#./} | tr "/" ","`;\
+	    objeto_t=$${fuente_t%.C}.o;\
+	    $(ECHO) $(CXX_CMD) $$fuente -o ../$$objeto_t;\
+	    $(CXX_CMD) $$fuente -o ../$$objeto_t;\
+        done;\
+	'
+
+# Compilacion de .c 
+####################
+
+# preprocesador para depedencias de .pc , .idl y .ilr
+DCPP=/usr/ccs/lbin/cpp
+
+# Compilador de ANSI C
+ACC=/opt/ansic/bin/cc
+
+#  Optimizacion ? Depuracion
+#MYCFLAGS=
+MYDEBUG_FLAGS=-g -Wall
+MYCFLAGS=
+#MYDEBUG_FLAGS=-O3
+
+CFLAGS=+DAportable $(INCLUDES) $(DEFINES) $(PIC_FLAGS) $(MYCFLAGS) $(MYDEBUG_FLAGS)
+
+# Linea de comandos
+ACC_CMD=$(ACC) -c $(CFLAGS)
+
+# Regla de compilacion
+_$(TARGET).O/%.o : %.c
+	@echo "\n===> COMPILANDO: " $< "<===\n"
+	-@$(MKDIR) -p _$(TARGET).O
+	cd _$(TARGET).O; $(ACC_CMD) ../$<
+	@echo "\n***** " $@ " -GENERADO OK- *****"
+
+# Compilacion de .C (C++)
+##########################
+
+ifeq ("$(TARGET)","hp11sinAA")
+ NO_COMPILAR_AA=
+else
+ NO_COMPILAR_AA=-AA
+endif
+
+# Compilador de C++
+CXX_SYS_INCLUDE=
+
+MYCXXFLAGS=
+
+CXXDEFINES=-D_GNU_SOURCE -D$(TARGET) -std=gnu++98 -pipe -fPIC -D_REENTRANT 
+
+
+CXXFLAGS=$(MYDEBUG_FLAGS) $(CXXDEFINES) $(DEFINES) $(MYCXXFLAGS) $(INCLUDES)
+
+# Linea de comandos
+CXX_CMD=$(CXX) -c $(CXXFLAGS)
+
+# Regla de compilacion
+_$(TARGET).O/%.o : %.C
+	@echo "\n===> COMPILANDO: " $< "<===\n"
+	-@$(MKDIR) -p _$(TARGET).O
+	cd _$(TARGET).O; $(CXX_CMD) ../$<
+	@echo "\n***** " $@ " -GENERADO OK- *****"	
+
+
+
+
+
+###############################################################################
+###############################################################################
+# Creacion de librerias (libros/sublibros de librerias b)
+##########################################################
+
+AR_CMD=$(AR_CMD_NO) 
+
+SL_FLAGS=-shared -g 
+#SL_FLAGS=-shared -O3
+LD_LIBFLAGS=$(PIC_FLAGS) $(OPTIM_FLAG) $(MYDEBUG_FLAGS) $(MYCXXFLAGS) $(MYLDFLAGS) $(LD_DIR_LIB)
+PRE_AR=@$(RM) -f $(ARCHIVE); $(MKDIR) -p $(DES_LIBS)
+PRE_SL=@$(RM) -f $(SL_ARCHIVE); $(MKDIR) -p $(DES_LIBS)
+AR_CMD_NO=@$(ECHO) "\n ==> No se genera la libreria estatica\n"
+AR_CMD_SI=@$(ECHO) "\n== Generando libreria estatica\n" ;\
+	$(ECHO) "\n$(AR) crv $(ARCHIVE) $(OBJETOS) $(IDL_OBJS) $(DO_OBJS) \n" ;\
+	$(AR) crv $(ARCHIVE) $(OBJETOS) $(IDL_OBJS) $(DO_OBJS) || \
+	(rm -f $(ARCHIVE); exit 1) 
+SL_CMD=@$(ECHO) "\n== Generando libreria dinamica\n" ;\
+	$(ECHO) "\n $(CXX) $(SL_FLAGS) \
+	$(LD_LIBFLAGS) $(LIBS) -o $(SL_ARCHIVE) $(OBJETOS) $(IDL_OBJS) $(DO_OBJS) " ;\
+	$(CXX) $(SL_FLAGS) \
+	$(LD_LIBFLAGS) $(LIBS) -o $(SL_ARCHIVE) $(OBJETOS) $(IDL_OBJS) $(DO_OBJS) || \
+	(rm -f $(SL_ARCHIVE); exit 1)
+POST_AR=
+EXT_MEMPROC_SIZE=""
+POST_SL=@$(KSH) -c '\
+	$(ECHO) "$(CHATR) +s enable +b disable $(SL_ARCHIVE)" ;\
+	$(CHATR) +s enable +b disable $(SL_ARCHIVE) >/dev/null ;\
+	$(ECHO) "$(CHATR) +dbg enable $(SL_ARCHIVE)" ;\
+	$(CHATR) +dbg enable $(SL_ARCHIVE) >/dev/null ;\
+	if [[ $(EXT_MEMPROC_SIZE) = "SI" ]] ;\
+	then \
+	 $(ECHO) "$(CHATR) +q3p enable $(SL_ARCHIVE)" ;\
+	 $(CHATR) +q3p enable $(SL_ARCHIVE) >/dev/null ;\
+	 $(ECHO) "$(CHATR) +q4p enable $(SL_ARCHIVE)" ;\
+	 $(CHATR) +q4p enable $(SL_ARCHIVE) >/dev/null ;\
+	fi ;\
+	'
+
+##########################################################
+# Creacion de ejecutables
+##########################################################
+
+PLDFLAGS=$(PIC_FLAGS) $(OPTIM_FLAG) -L/opt/aCC $(NO_COMPILAR_AA) $(MYDEBUG_FLAGS) $(MYCXXFLAGS) $(MYPLDFLAGS)
+MYLIBS=
+LIBS=$(MYLIBS) -lpthread -lm -lz
+LIBFLAGS=$(MYLDFLAGS) $(LD_DIR_LIB) $(LIBS)
+PRE_PLD=@$(ECHO) "\nLinkando proceso\n" ;\
+	$(ECHO) "\n$(RM) -f _$(TARGET).O/$(P_NAME_GEN)\n" ;\
+	$(RM) -f _$(TARGET).O/$(P_NAME_GEN)
+PLD_CMD=$(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o _$(TARGET).O/$(P_NAME_GEN) $(OBJETOS) $(IDL_OBJS) $(DO_OBJS) $(LIBFLAGS) $(CMG_LIBS) || (rm -f _$(TARGET).O/$(P_NAME_GEN);exit 1)
+POS_PLD=@$(KSH) -c '\
+	$(ECHO) "\nHabilitando SHLIB_PATH\n" ;\
+	$(ECHO) "$(CHATR) +s enable +b disable _$(TARGET).O/$(P_NAME_GEN)" ;\
+	$(CHATR) +s enable +b disable _$(TARGET).O/$(P_NAME_GEN) >/dev/null ;\
+	$(ECHO) "$(CHATR) +dbg _$(TARGET).O/$(P_NAME_GEN)" ;\
+	$(CHATR) +dbg _$(TARGET).O/$(P_NAME_GEN) >/dev/null ;\
+	if [[ $(EXT_MEMPROC_SIZE) = "SI" ]] ;\
+	then \
+	 $(ECHO) "$(CHATR) +q3p enable _$(TARGET).O/$(P_NAME_GEN)" ;\
+	 $(CHATR) +q3p enable _$(TARGET).O/$(P_NAME_GEN) >/dev/null ;\
+	 $(ECHO) "$(CHATR) +q4p enable _$(TARGET).O/$(P_NAME_GEN)" ;\
+	 $(CHATR) +q4p enable _$(TARGET).O/$(P_NAME_GEN) >/dev/null ;\
+	fi ;\
+	'
+
+##########################################################
+# Creacion de ejecutables multicondicionales Servants
+##########################################################
+
+PRE_PDLD=@$(KSH) -c '\
+  for i in $(MYDEFINES_MULTI) ;\
+  do \
+    $(ECHO) $(RM) -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) ;\
+    $(RM) -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) ;\
+    serv_files=`$(LS) $(DIR_SERVANT)/*.C` ;\
+    for j in $$serv_files ;\
+    do \
+      $(ECHO) ;\
+      $(ECHO) "Linkando SERVANTS a $${i\#*-D}" ;\
+      sleep 1 ;\
+      $(LN) -fs $$j _$(TARGET).O/$${i\#*-D} ;\
+      $(ECHO) ;\
+      $(ECHO) "Compilando $$j para $$i" ;\
+      $(ECHO) cd _$(TARGET).O/$${i\#*-D}; $(ECHO) $(CXX_CMD) $$j ;\
+      cd _$(TARGET).O/$${i\#*-D}; $(CXX_CMD) $$j ;\
+      cd - ;\
+    done ;\
+  done'
+
+PDLD_CMD=@$(KSH) -c '\
+  for i in $(MYDEFINES_MULTI) ;\
+  do \
+    $(ECHO) ;\
+    $(ECHO) "Generando $(P_NAME_GEN) para $${i\#*-D}" ;\
+    $(ECHO) ;\
+    $(ECHO) $(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) _$(TARGET).O/$${i\#*-D}/*.o $(LIBFLAGS) $(CMG_LIBS) || (rm -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN);exit 1) ;\
+    $(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) _$(TARGET).O/$${i\#*-D}/*.o $(LIBFLAGS) $(CMG_LIBS) || (rm -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN);exit 1) ;\
+  done'
+
+POS_PDLD=@$(KSH) -c '\
+  for i in $(MYDEFINES_MULTI) ;\
+  do \
+    $(LN) -fs $(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) _$(TARGET).O ;\
+    $(ECHO) ;\
+    $(ECHO) "\nHabilitando SHLIB_PATH\n" ;\
+    $(ECHO) "$(CHATR) +s enable +b disable _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN)" ;\
+    $(CHATR) +s enable +b disable _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) >/dev/null ;\
+    $(ECHO) "$(CHATR) +dbg _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN)" ;\
+    $(CHATR) +dbg _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) >/dev/null ;\
+    if [[ $(EXT_MEMPROC_SIZE) = "SI" ]] ;\
+     then \
+      $(ECHO) "$(CHATR) +q3p enable _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN)" ;\
+      $(CHATR) +q3p enable _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) >/dev/null ;\
+      $(ECHO) "$(CHATR) +q4p enable _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN)" ;\
+      $(CHATR) +q4p enable _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) >/dev/null ;\
+     fi ;\
+  done'
+
+##########################################################
+# Creacion de ejecutables multicondicionales
+##########################################################
+
+PRE_DPLD=@$(KSH) -c '\
+  for i in $(MYDEFINES_MULTI) ;\
+  do \
+    $(ECHO) $(RM) -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) ;\
+    $(RM) -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) ;\
+  done'
+
+DPLD_CMD=@$(KSH) -c '\
+  for i in $(MYDEFINES_MULTI) ;\
+  do \
+    echo ======= $$i =======${LIBS_MULTI[`echo $i`]} ;\
+    $(ECHO) ;\
+    $(ECHO) "Generando $(P_NAME_GEN) para $${i\#*-D}" ;\
+    $(ECHO) ;\
+    $(ECHO) $(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) _$(TARGET).O/$${i\#*-D}/*.o $(LIBFLAGS) $(CMG_LIBS) || (rm -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN);exit 1) ;\
+    $(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN) _$(TARGET).O/$${i\#*-D}/*.o $(LIBFLAGS) $(CMG_LIBS) || (rm -f _$(TARGET).O/$${i\#*-D}/$(P_NAME_GEN);exit 1) ;\
+  done'
+
+##########################################################
+# Para libros multiproceso
+##########################################################
+
+PRE_SPS=@$(ECHO) "\nLinkando procesos\n"
+SPS_CMD=@$(KSH) -c '\
+  [ -z "$(OBJETOS)" ] && exit 0 ;\
+  ofiles="$(OBJETOS)" ;\
+  for F in $$ofiles ;\
+    do \
+      nombre=`basename $$F .o` ;\
+      xeq=_$(TARGET).O/$$nombre ;\
+      [ $$xeq -nt $$F ] && continue ;\
+      echo "\\t$(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o $$xeq $$F $(LIBFLAGS) $(CMG_LIBS)" ;\
+      $(PURE) $(COVER) $(QUANTI) $(CXX) $(PLDFLAGS) -o $$xeq $$F $(LIBFLAGS) $(CMG_LIBS) ;\
+      $(ECHO) "\nHabilitando SHLIB_PATH\n" ;\
+      $(ECHO) "$(CHATR) +s enable +b disable $$xeq" ;\
+      $(CHATR) +s enable +b disable $$xeq >/dev/null ;\
+      $(ECHO) "$(CHATR) +dbg $$xeq" ;\
+      $(CHATR) +dbg $$xeq >/dev/null ;\
+      if [[ $(EXT_MEMPROC_SIZE) = "SI" ]] ;\
+      then \
+       $(ECHO) "$(CHATR) +q3p enable $$xeq" ;\
+       $(CHATR) +q3p enable $$xeq >/dev/null ;\
+       $(ECHO) "$(CHATR) +q4p enable $$xeq" ;\
+       $(CHATR) +q4p enable $$xeq >/dev/null ;\
+      fi ;\
+    done ;\
+   '
+
+POS_SPS=@$(KSH) -c '\
+  [ -z "$(OBJETOS)" ] && exit 0 ;\
+  ofiles="$(OBJETOS)" ;\
+  for F in $$ofiles ;\
+  do \
+    nombre=`basename $$F .o` ;\
+    xeq=$$nombre ;\
+    if [[ _$(TARGET).O/$$xeq -nt $(DES_BINS)/$$xeq ]] ;\
+    then \
+      $(ECHO) "$(CP) -f _$(TARGET).O/$$xeq $(DES_BINS)" ;\
+      $(CP) -f _$(TARGET).O/$$xeq $(DES_BINS) ;\
+    else \
+      $(ECHO) "\tEl ejecutable $$xeq ya estÃ¡ actualizado" ;\
+    fi ;\
+  done ;\
+'
+
+##########################################################
+# Para libros de copia ascii y binarios
+##########################################################
+
+CP_MK=cp_mk
+CP_CLEAN=cp_clean
+CP_DESTINO=$(DESTINO)/Malascopias
+CP_CON_EXT=SI
+CP_PERMISOS=644
+CP_COMANDO=cp
+CP_MYPREFIX=
+CP_MYEXT=
+
+##########################################################
+# Para libros de headers exportados
+##########################################################
+
+HG_MK=hg_mk
+HG_CLEAN=hg_clean
+DES_HDRS=$(DESTINO)/include
+
+
+###############################################################################
+###############################################################################
+
+# Reglas para el procesamiento de directorios
+##############################################
+%.dir_mk : %/
+	@echo "=d_mk=> `pwd`/"$< " <==="
+	@cd $<; $(MAKE) -f makefile mk
+
+%.dir_clean : %/
+	@echo "=d_clean=> `pwd`/"$< " <==="
+	@cd $<; $(MAKE) -f makefile clean
+
+%.dir_depen : %/
+	@echo "=d_depen=> `pwd`/"$< " <==="
+	@cd $<; $(MAKE) -f makefile depen
+
+%.dir_enlaces : %/
+	@echo "=d_enlaces=> `pwd`/"$< " <==="
+	@cd $<; $(MAKE) -f makefile enlaces
+
+%.dir_install : %/
+	@echo "=d_install=> `pwd`/"$< " <==="
+	@cd $<; $(MAKE) -f makefile install
+
+%.dir_all : %/
+	@echo "=d_all=> `pwd`/"$< " <==="
+	@cd $<; $(MAKE) -f makefile all
+
+ayuda:
+	@echo "Ejecutar make "
+	@echo "     mk      : para generar"
+	@echo "     clean   : para eliminar ficheros generados"
+	@echo "     depen   : para generar dependencias"
+	@echo "     install : para llevar ficheros a destino"
+	@echo "     all     : make mk y make install consecutivos"
+	@echo "     show    : para mostrar informacion de los niveles"
+	@echo "     ayuda   : este mensaje"
+
+###############################################################################
+
+# Creación de las dependencias
+
+# valor del PID auxiliar
+PID:=$(shell echo $$$$)
+
+DEPEN_FILE=_$(TARGET).O/_$(TARGET).imk
+
+$(DEPEN_FILE):
+	@$(MKDIR) -p _$(TARGET).O
+	@> $(DEPEN_FILE)
+
+borra_fdepen:
+	$(RM) -f $(DEPEN_FILE)
+
+%.dependencia : %.c $(DEPEN_FILE)
+	cd _$(TARGET).O ; $(ACC_CMD) -E -w -Wp,-M $(INCLUDES) $(DEFINES) ../$< \
+	>/dev/null 2>/tmp/depen$(PID) || { exit 0 ; }
+	sed -e '/^.*.o :/ s/\.\.\///g' \
+	    -e '/\.\.\/.*.c/ s/\.\.\///g' \
+	    -e '/^.*.o :/ s/^/_$(TARGET).O\//' </tmp/depen$(PID) >>$(DEPEN_FILE)
+	$(RM) /tmp/depen$(PID)
+
+%.dependencia : %.C $(DEPEN_FILE)
+	@$(ECHO) $(CXX) -E +Make $(NO_COMPILAR_AA) $(INCLUDES) $(DEFINES) $< 
+	@$(CXX) -E +Make $(NO_COMPILAR_AA) $(INCLUDES) $(DEFINES) $< |\
+	sed -e '/^.*.o:/ s/^/_$(TARGET).O\//' |\
+	grep -v "vector" |\
+	sed -e '$$ s/ \\/ /' >> $(DEPEN_FILE)
+
+#
+#%.dependencia : %.pc $(DEPEN_FILE)
+#	$(DCPP) $(INCLUDES) -I$(PCC_INCLUDES) $(DEFINES) -M $<  >/dev/null 2>/tmp/depen$(PID) || { $(RM) /tmp/depen$(PID) ; exit 1 ; }
+#	sed -e '/^.*.pc.o :/ s/\.pc\.o/\.o/' < /tmp/depen$(PID) |\
+#	sed -e '/^.*:/ s/^/_$(TARGET).O\//' >> $(DEPEN_FILE)
+#	$(RM) /tmp/depen$(PID)
+#
+
+%.dependencia : %.pc $(DEPEN_FILE)
+	 $(ACC_CMD) -E -w -Wp,-M $(INCLUDES) -I$(PCC_INCLUDES) $(DEFINES) $<  >/dev/null 2>/tmp/depen$(PID) || { exit 0 ; }
+	sed -e '/^.*.o :/ s/\.\.\///g' \
+	   -e '/\.\.\/.*.pc/ s/\.\.\///g' \
+	   -e '/^.*.pc.o :/ s/\.pc\.o/\.o/' \
+	   -e '/^.*.o :/ s/^/_$(TARGET).O\//' </tmp/depen$(PID) >> $(DEPEN_FILE)
+	$(RM) /tmp/depen$(PID)
+
+%.dependencia : %.PC $(DEPEN_FILE)
+	@cd _$(TARGET).O; $(RM) -f $*.C $*.PC $*.PC.C
+	@$(CP) -f $< _$(TARGET).O/$*.PC.C
+	$(CPPXX_PCCMD_DEP) -c _$(TARGET).O/$*.PC.C |\
+	sed -e '/^.*:/ s/_$(TARGET).O\///'  \
+	    -e '/^.*:/ s/^/_$(TARGET).O\//' \
+	    -e '/\.PC\.o:/ s/\.PC.o:/\.o:/' \
+	    -e '/: .*.C/ s/\.C//' \
+	    -e '/\/usr\/include.*\\/ d'   \
+	    -e '/\/opt\/aCC\/include.*\\/ d' >> $(DEPEN_FILE)
+	@cd _$(TARGET).O; $(RM) -f $*.C $*.PC $*.PC.C
+
+%.dependencia : %.idl $(DEPEN_FILE)
+	$(DCPP) $(INCLUDES) $(INCLUDES_IDL) -M $<  >/dev/null 2>/tmp/depen$(PID) || { $(RM) /tmp/depen$(PID) ; exit 1 ; }
+	sed -e '/^.*.pc.o :/ s/\.pc\.o/\.o/' < /tmp/depen$(PID) \
+	    -e 's/\.idl\.o/\.o/' \
+	    -e '/^.*:/ s/^/_$(TARGET).O\//' >> $(DEPEN_FILE)
+	$(RM) /tmp/depen$(PID)
+
+%.dependencia : %.idlp $(DEPEN_FILE)
+	$(DCPP) $(INCLUDES) $(INCLUDES_IDL) -M $<  >/dev/null 2>/tmp/depen$(PID) || { $(RM) /tmp/depen$(PID) ; exit 1 ; }
+	sed -e 's/\.idlp\.o/\.o/' < /tmp/depen$(PID) \
+	    -e '/^.*:/ s/^/_$(TARGET).O\//' >> $(DEPEN_FILE)
+	$(RM) /tmp/depen$(PID)

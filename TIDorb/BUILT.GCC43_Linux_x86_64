@@ -1,0 +1,19 @@
+This release of TIDorbC++ was built on a machine with kernel:
+Linux jack.hi.inet 2.6.9-89.ELsmp #1 SMP Mon Apr 20 10:33:05 EDT 2009 \
+x86_64 x86_64 x86_64 GNU/Linux
+
+using the compiler:
+gcc version 4.3.3 (GCC)
+
+kernel source package used:
+linux-source-2.6.9 x86_64
+
+applied kernel patches:
+2.6.9-89.ELsmp
+
+using the following libraries:
+make-3.80-7.EL4
+binutils-2.15.92.0.2-25
+glibc-2.3.4-2.41
+glibc-devel-2.3.4-2.41
+TIDIdlc_1.3.8

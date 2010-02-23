@@ -1,0 +1,23 @@
+####################################################
+#    VARIABLES DE ENTORNO DE TIDORBC
+####################################################
+
+export TIDORBC_PATH=/export/home/avega/morfeo/TIDorbC
+export TIDORBC_HOME=$TIDORBC_PATH
+#export TIDIDLC_HOME=
+export DIRMAKE=$TIDORBC_PATH/makefiles_sun210GCC34debug
+#export TARGET=sun210GCC34debug
+
+
+# HOME de JAVA
+#export JDK_HOME=/MORFEO/home/util/j2sdk1.4.2_05
+#export JAVA_HOME=/MORFEO/home/util/j2sdk1.4.2_05
+
+# Compilador de C++
+#export CXX=/usr/local/bin/g++
+#export PATH=/usr/local/bin:/MORFEO/home/util/INTEOCtools:$JDK_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$TIDORBC_PATH/lib_$TARGET:$LD_LIBRARY_PATH
+
+# display de irina cambiar convenientemente
+#export DISPLAY=irina.hi.inet:0.0
+alias cscope='/MORFEO/home/util/SC5.3/WS6U2/bin/cscope  -I hdrs `find . -name "*.[Ccyl]" && find . -name "*.def" -print && find . -name "*.idl" -print`'

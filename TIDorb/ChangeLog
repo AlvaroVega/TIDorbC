@@ -1,0 +1,233 @@
+2009-08-05 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.3.2 released.
+	
+	Fix bug [#1050] Invalid memory access in DynValueImpl::_write
+	Fix bug [#1034] Object::_set_policy_overrides doesn't leave current 
+	object reference without changes
+	
+2009-07-02 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.3.1 released.
+	
+	Fix bug [#1026] Unable to retrieve the factory of a custom compressor 
+	previously registered
+	Task [#639] Improve access to ORB configuration 
+	Aligned with GIOP Compression (FTF Beta 2, May 2009): changes in the
+	way of obtain 'min_ratio' value
+	Fix bug [#982] Memory leaks using ZIOPCompressorLevelIdListPolicy
+	Fix bug [#781] MARSHAL with Fixed into a Structured type
+	Fix bug [#960] Incorrect internal representation of some Fixed values 
+	(ej. -123.234)
+	Fix bug [#782] CORE: infinite loop in BigInt management
+
+2009-04-08 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.3.0 released.
+	
+	Fix bug [#945] Core dump at POAImpl::etherealizeAllObject with 
+	ServantActivator
+	Feature [#342] GIOP Compression with a Zlib compressor
+	Fix bug [#771] Impossible recreate RootPOA after destroy it
+	Fix bug [#758] Object::_non_exists() over a reference raises 
+	OBJECT_NOT_EXIST after deactivate a LocalObject
+	Fix bug [#756] _is_equivalent between references obtained from the same
+	object doesn't work
+	Fix bug [#937] Core dump calling method set_as_string of DynEnum 
+	created from an alias TypeCode
+	Feature [#841] Set TAG_ORB_TYPE requested to OMG
+
+2008-10-03 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.21 released.
+	
+	Fix bug [#791] DynValue not initialized correctly when is created from
+	a Typecode.
+	Fix bug [#775] MARSHAL dispatching a LocateRequest
+	
+2008-09-15 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.20 released.
+	
+	Fix bug [#773] NVList::add_value doesn't set properly internal 
+	typecode into value
+	Fix bug [#757] register_value_factory doesn't return previous value
+	Fix bug [#772] get_policy _overrides doesn't work with an empty type 
+	sequence
+	Fix bug [#763] Expected BAD_INV_ORDER is not obtained after 
+	ORB::shutdown
+	Fix bug [#768] CORE: bucle of local invocations: POA::destroy() vs 
+	finishing 
+	request execution
+	Fix bug [#738] Invalid behaviour of DynUnion::seek() with a negative 
+	value
+	Fix bug [#740] DynUnion::component_count() always return 0
+	Fix bug [#742] DynUnion::is_set_to_default_member() not implemented
+	Fix bug [#767] DynUnionImpl::member_kind() raises InvalidValue when 
+	union has an active member
+	Fix bug [#752] Inconsistent ORB obtained with init() after destroy()
+	Fix bug [#753] Inconsistent orb_identifier obtained with id()
+	Fix bug [#766] InconsistentTypeCode creating dynany from a TC of a 
+	valuetype
+	Fix bug [#734] Memory problems in management of WString type
+	Implemented [#733] Create DynAny for Fixed and Value
+	Implemented [#723] Implement System Exceptions: BAD_QOS, 
+	TRANSACTION_MODE, TRANSACTION_UNAVAILABLE, REBIND, CODESET_INCOMPATIBLE
+	Implemented feature [#725] create_dyn_any_from_typecodes: _tc_null, 
+	tc_void
+	Implemented feature [#676] LongDouble type
+
+
+2008-09-11 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.19 released.
+
+	Fix bug [#765] ORB argument -ORB_poa_max_queued_request changed to 
+	-ORB_poa_max_queued_requests
+	Fix bug [#764] MARSHAL receiving MIOP messages from a different endian
+
+	
+2008-09-08 Alvaro Polo Valdenebro  <apv@tid.es>
+
+	* TIDorbC version 6.2.18 released.
+
+	Fix bug [#748] Memory leak with Unions
+	
+	
+2008-06-20 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.17 released.
+
+	Fix bug [#476] BAD_PARAM resolving a corbaname
+	Fix bug [#527] After a COMM_FAILURE client doesn't retry connection with a 
+	restarted server
+	
+2008-06-10 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.16 released.
+			
+	Fix bug [#442] Core dump inserting a Any into a structure created from a DynAny
+	
+2008-06-03 Alvaro Vega Garcia  <avega@tid.es>
+	
+	* TIDorbC version 6.2.15 released.
+	
+	Fix bug [#440] TIDorb close socket connection after obtain MARSHAL processing 
+	a completed MIOP packet
+
+2008-05-16 Alvaro Vega Garcia  <avega@tid.es>
+	
+	* TIDorbC version 6.2.14 released.
+	
+	Add feature [#434] Add Option to disable QoS overhead
+	Fix bug [#433] Incorrect timeout returned by QoS::CheckRequestTime
+
+
+2008-05-08 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.13 released.
+	
+	Fix bug [#431] CDR alignment problem with some valuetypes: FormatMisMatch raised
+	
+2008-04-24 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.12 released.
+	
+	Fix bug [#423] TIDorb close socket connection after receive a bad MIOP header
+	Fix bug [#324] Incorrect internal representation of TimeT in QoS module
+	
+2008-03-14 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.11 released.
+
+	Fix bug [#408] MIOP Interoperability issues between TAO and TIDorb
+
+2008-02-18 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.10 released.
+
+	Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter 
+	out/return of an invocation
+	Fix bug [#403] tk_longdouble is ignored in Any management
+	
+2008-02-18 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.9 released.
+
+	Fix bug [#392] Any::type(tc) reset any value
+	
+2008-02-15 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.8 released.
+
+	Fix bug [#393] Error processing a return of DII invocation
+	
+2008-01-29 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.7 released.
+	
+	Fix bug [#387] TranslateURLEscapes::translate_unicode erase a character 
+	from a string
+	Fix bug [#388] Corbaname::to_string doesn't include kind field of Name
+
+2008-01-24 Alvaro Vega Garcia  <avega@tid.es>
+	
+	Fix bug [#385] Memory leak about requests that are not queued
+	
+2007-11-30 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.6 released.
+
+	Add feature [#344] Support for corbalocs with more than one address and 
+	protocol
+	Fix bug [#365] Incorrect extraction of a SystemException from a CORBA::Any
+	Fix bug [#353] OBJECT_NOT_EXISTS dispaching request with corbaloc 
+	instead of POAkey
+	
+2007-11-19 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.5 released.
+	
+	* source/TIDorbC/core/messagin/QoS.C:
+	  Fix bug [#352] Core dump with RequestEndTimePolicy
+
+2007-10-30 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.4 released.
+
+	Fix bug [#338] Unexpected exception on POAImpl::trueRemoveObject()
+	Fix bug [#343] Server listeners sockets doesn't set SO_REUSEADDR socket 
+	option at initializing
+	
+2007-10-11 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.3 released.
+
+	More fiexed related with bug [#323] Some errors with corbaloc:iiop and 
+	corbanames
+	
+2007-10-10 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.2 released.
+	
+	More fiexed related with bug [#323] Some errors with corbaloc:iiop and 
+	corbanames
+
+2007-10-08 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.2.1 released.
+
+	Fix bug [#323] Some errors with corbaloc:iiop and corbanames
+	
+2007-08-23 Alvaro Vega Garcia  <avega@tid.es>
+	
+	* TIDorbC version 6.2.0 released.
+
+	Addd new improvement performances
+	QoS review: QoS policies was not propagated in SendingContext
+
+
+
+	
+
+

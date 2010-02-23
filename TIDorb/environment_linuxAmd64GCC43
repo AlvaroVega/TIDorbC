@@ -1,0 +1,20 @@
+####################################################
+#    VARIABLES DE ENTORNO DE TIDORBC
+####################################################
+
+export TIDORBC_PATH=/home/avega/morfeo/TIDorbC_SACTA
+export TIDORBC_HOME=/home/avega/morfeo/TIDorbC_SACTA
+export TIDIDLC_HOME=/home/avega/morfeo/TIDIdlc_SACTA/dist
+export DIRMAKE=$TIDORBC_PATH/makefiles_linuxAmd64GCC43debug
+export TARGET=linuxAmd64GCC43
+
+
+# HOME de JAVA
+export JDK_HOME=/usr/java/jdk1.5.0_08
+export JAVA_HOME=/usr/java/jdk1.5.0_08
+
+# Compilador de C++
+export CXX=g++-4.3
+export PATH=$JDK_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$TIDORBC_PATH/lib_$TARGET:$LD_LIBRARY_PATH
+
