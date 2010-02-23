@@ -123,13 +123,14 @@ TIDorb::core::messaging::QoS::checkRequestTime(TIDorb::core::TIDORB* orb,
   
   if (requestTimeout < 0) {
 
+    TIDorb::util::StringBuffer msg;
+    msg << "QoS RequestEndTimePolicy/RelativeRountripTimeoutPolicy ";
+    msg << "exceeded in " << requestTimeout << " ms" << endl; 
+
     if (orb->trace != NULL){
-      TIDorb::util::StringBuffer msg;
-      msg << "QoS RequestEndTimePolicy/RelativeRountripTimeoutPolicy ";
-      msg << "exceeded in " << requestTimeout << " ms" << endl; 
       orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data());
     }
-    throw CORBA::TIMEOUT();
+    throw CORBA::TIMEOUT(msg.str().data());
   } else {
     return requestTimeout;
   }

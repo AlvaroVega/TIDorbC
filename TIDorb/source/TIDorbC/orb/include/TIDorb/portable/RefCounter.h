@@ -36,6 +36,8 @@
 //
 /////////////////////////////////////////////////////////////////////////*/
 
+#include "TIDorb/portable.h"
+
 #ifndef _TIDORB_PORTABLE_REFCOUNTER_H_
 #define _TIDORB_PORTABLE_REFCOUNTER_H_
 

@@ -407,9 +407,5 @@ bool TIDorb::core::comm::LocalCommLayer::accepts(const TIDorb::core::iop::IOR& i
 TIDorb::core::ObjectDelegateImpl* 
     TIDorb::core::comm::LocalCommLayer::createDelegate(TIDorb::core::iop::IOR* ior)
 {
-    if(accepts(*ior)) {
-        return new TIDorb::core::ObjectDelegateImpl(_orb, ior, this);
-    } else {
-        throw CORBA::INV_OBJREF();
-    }
+  return new TIDorb::core::ObjectDelegateImpl(_orb, ior, this);
 }

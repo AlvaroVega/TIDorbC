@@ -1,0 +1,89 @@
+dnl Autoconf and automake initialization
+AC_INIT([TIDorbC], [6.3.2], [tidorbc-bugs@lists.morfeo-project.org])
+AC_CONFIG_SRCDIR([source/TIDorbC/orb/TIDorb/core/TIDORB.C])
+AM_INIT_AUTOMAKE([-Wall foreign 1.9 tar-ustar])
+
+dnl Check for programs
+AC_PROG_CXX
+
+dnl Check for Libtool
+AC_PROG_LIBTOOL
+
+AC_CONFIG_MACRO_DIR([m4])
+
+dnl Check for C++ compiler version
+TID_CPP_VERSION(3.4.0)
+
+dnl Check for OS family
+TID_CHECK_OS
+
+dnl Check for POSIX headers
+TID_CHECK_POSIX
+
+dnl Check for C++ STL library
+TID_CHECK_STL
+
+dnl Check for Java Runtime Environment
+TID_CHECK_JRE(1.4)
+
+dnl Check for TIDIdlC
+TID_CHECK_TIDIDLC
+
+dnl Check for debugging feature
+dnl TID_CHECK_DEBUG
+
+dnl Check Compressors
+TID_CHECK_COMPRESSORS
+
+dnl Makefile generation output
+AC_OUTPUT(
+  Makefile \
+  source/Makefile \
+  source/TIDThr/Makefile \
+  source/TIDThr/tidthr/Makefile \
+  source/TIDThr/tidthr/include/Makefile \
+  source/TIDThr/tidthr/include/TIDThr/Makefile \
+  source/TIDThr/tidthr/tidthr/Makefile \
+  source/TIDSocket/Makefile \
+  source/TIDSocket/tidsocket/Makefile \
+  source/TIDSocket/tidsocket/tidsocket/Makefile \
+  source/TIDSocket/tidsocket/tidsocket/include/Makefile \
+  source/TIDSocket/tidsocket/include/Makefile \
+  source/TIDSocket/tidsocket/include/TIDSocket/Makefile \
+  source/TIDorbC/Makefile \
+  source/TIDorbC/orb/Makefile \
+  source/TIDorbC/orb/IDL/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/Contained/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/Container/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/InterfaceDef/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/ORB/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/ServiceDetail/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/ServiceInformation/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/TypeCode/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/CORBA/ValueDef/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/POA_CORBA/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/PortableServer/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/PortableServer/Current/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/PortableServer/POA/Makefile \
+  source/TIDorbC/orb/IDL/01_orb/PortableServer/POAManager/Makefile \
+  source/TIDorbC/orb/IDL/02_comm/Makefile \
+  source/TIDorbC/orb/IDL/03_sending_context/Makefile \
+  source/TIDorbC/orb/IDL/04_bidir_policy/Makefile \
+  source/TIDorbC/orb/IDL/05_cos_naming/Makefile \
+  source/TIDorbC/orb/IDL/06_dynamic_any/Makefile \
+  source/TIDorbC/orb/IDL/07_TimeBase/Makefile \
+  source/TIDorbC/orb/IDL/08_FT/Makefile \
+  source/TIDorbC/orb/IDL/09_PortableGroup/Makefile \
+  source/TIDorbC/orb/IDL/10_Messaging/Makefile \
+  source/TIDorbC/orb/IDL/11_Compression/Makefile \
+  source/TIDorbC/orb/TIDorb/Makefile \
+  source/TIDorbC/orb/include/Makefile \
+  source/TIDorbC/orb/include/TIDorb/Makefile \
+  source/TIDorbC/orb/include/TIDorb/dynAny/Makefile \
+  source/TIDorbC/orb/include/TIDorb/portable/Makefile \
+  source/TIDorbC/orb/include/TIDorb/templates/Makefile \
+  source/TIDorbC/orb/include/TIDorb/types/Makefile \
+  source/TIDorbC/orb/include/TIDorb/util/Makefile \
+)

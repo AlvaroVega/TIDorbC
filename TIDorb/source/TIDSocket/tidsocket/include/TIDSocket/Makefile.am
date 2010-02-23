@@ -1,0 +1,47 @@
+instdir=$(includedir)/TIDSocket
+
+inst_HEADERS = \
+        config.h \
+        AlreadyConnectedException.h \
+        AsynchronousCloseException.h \
+        ClosedByInterruptException.h \
+        ClosedChannelException.h \
+        ConnectionPendingException.h \
+        DatagramChannel.h \
+        DatagramPacket.h \
+        DatagramSocket.h \
+        DatagramSocketImplFactory.h \
+        DatagramSocketImpl.h \
+        Exception.h \
+        FileDescriptor.h \
+        IllegalArgumentException.h \
+        IllegalBlockingModeException.h \
+        IndexOutOfBoundsException.h \
+        InetAddress.h \
+        InetSocketAddress.h \
+        InputStream.h \
+        IOException.h \
+        MulticastSocket.h \
+        NetworkInterface.h \
+        NoConnectionPendingException.h \
+        NotYetBoundException.h \
+        NotYetConnectedException.h \
+        OutputStream.h \
+        PortUnreachableException.h \
+        SelectableChannel.h \
+        SelectionKey.h \
+        Selector.h \
+        ServerSocketChannel.h \
+        ServerSocket.h \
+        SocketAddress.h \
+        SocketChannel.h \
+        SocketException.h \
+        Socket.h \
+        SocketImplFactory.h \
+        SocketImpl.h \
+        SocketOptions.h \
+        SocketTimeoutException.h \
+        UnknownHostException.h \
+        UnresolvedAddressException.h \
+        UnsupportedAddressTypeException.h
+
