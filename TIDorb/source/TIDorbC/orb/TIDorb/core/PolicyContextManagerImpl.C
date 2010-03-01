@@ -43,6 +43,7 @@ namespace core {
 
 
 PolicyContextManagerImpl::PolicyContextManagerImpl(TIDorb::core::TIDORB* orb)
+  throw (TIDThr::SystemException)
 {
   m_orb = orb;
   
@@ -51,6 +52,7 @@ PolicyContextManagerImpl::PolicyContextManagerImpl(TIDorb::core::TIDORB* orb)
 }
   
 PolicyContextManagerImpl::~PolicyContextManagerImpl()
+  throw (TIDThr::SystemException)
 {
   ThreadContextMapT::iterator it = m_thread_contexts.begin();
   ThreadContextMapT::iterator end = m_thread_contexts.end();
@@ -77,6 +79,8 @@ TIDorb::core::PolicyContext* PolicyContextManagerImpl::getThreadContext(TIDThr::
   if (it == m_thread_contexts.end()) {
     // Thread PolicyContext overrides ORB policies (that is has 
     // the ORB PolicyContext as father
+    TIDThr::Synchronized sync(*this);
+
     TIDorb::core::ConfORB& conf = const_cast<TIDorb::core::ConfORB&>(m_orb->conf());
     context = new PolicyContext(conf.getPolicyContext());
     m_thread_contexts[th] = context;
@@ -101,16 +105,29 @@ TIDorb::core::PolicyContext* PolicyContextManagerImpl::tryToGetThreadContext(TID
 
 void PolicyContextManagerImpl::clear_contexts()
 {
+  if (m_orb->trace != NULL){
+    TIDorb::util::StringBuffer msg;
+    msg << "PolicyContextManagerImp clearing_context()" << flush;
+    m_orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
+  }
+
   ThreadContextMapT::iterator it = m_thread_contexts.begin();
   ThreadContextMapT::iterator end = m_thread_contexts.end();
 
   while (it != end){
-    if (!(*it).first->isAlive()){
+    // Check if already was removed
+    if ((*it).first == NULL) {
       m_thread_contexts.erase(it);
       it = m_thread_contexts.begin();
     }
-    else
-      it++;
+    else {
+      if (!(*it).first->isAlive()){
+        m_thread_contexts.erase(it);
+        it = m_thread_contexts.begin();
+      }
+      else
+        it++;
+    }
   }
 }
 

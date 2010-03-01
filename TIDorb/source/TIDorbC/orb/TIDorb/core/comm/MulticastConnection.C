@@ -114,13 +114,13 @@ const char* TIDorb::core::comm::MulticastConnection::toString()
     TIDorb::util::StringBuffer buffer;
     switch(mode) {
       case CLIENT_MODE:
-        buffer << "Multicast client";
+        buffer << "Multicast client" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
         break;
       case SERVER_MODE:
-        buffer << "Multicast server";
+        buffer << "Multicast server" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
         break;
       default:
-        buffer << "Invalid multicast"; /*unreachable*/
+        buffer << "Invalid multicast" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")"; /*unreachable*/
     }
     //PRA
     //buffer << " connection at " << my_port; /*pra@tid.es socket->getLocalPort();*/

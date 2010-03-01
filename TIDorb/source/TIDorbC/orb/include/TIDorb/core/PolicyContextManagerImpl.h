@@ -57,7 +57,7 @@
 namespace TIDorb {
 namespace core {
 
-class PolicyContextManagerImpl 
+class PolicyContextManagerImpl: public virtual TIDThr::Mutex
 {
 protected:
   TIDorb::core::TIDORB* m_orb;
@@ -73,9 +73,11 @@ protected:
 
 public:
  
-  PolicyContextManagerImpl(TIDorb::core::TIDORB* orb);
+  PolicyContextManagerImpl(TIDorb::core::TIDORB* orb)
+    throw (TIDThr::SystemException);
 
-  ~PolicyContextManagerImpl();
+  ~PolicyContextManagerImpl()
+    throw (TIDThr::SystemException);
 
   TIDorb::core::PolicyContext* getThreadContext(TIDThr::Thread* th);
 

@@ -54,7 +54,7 @@ LockList::LockList(LockPool& pool)
     
 Lock& LockList::activate_lock(RequestId id)
 {
-    TIDThr::Synchronized (*this);
+    TIDThr::Synchronized synchro(mutex);
     
     if(destroyed) {
         throw CORBA::COMM_FAILURE("Destroying connection");
@@ -78,7 +78,7 @@ Lock& LockList::activate_lock(RequestId id)
 bool LockList::put_reply(RequestId id,
                          GIOPFragmentedMessage* message)
 {
-    TIDThr::Synchronized (*this);
+    TIDThr::Synchronized synchro(mutex);
     
     LockTable::iterator it = active_locks.find(id);
     
@@ -93,7 +93,7 @@ bool LockList::put_reply(RequestId id,
 	
 void LockList::deactivate_lock(RequestId id)
 {
-    TIDThr::Synchronized (*this);
+    TIDThr::Synchronized synchro(mutex);
     
     LockTable::iterator it = active_locks.find(id);
     
@@ -114,13 +114,12 @@ void LockList::deactivate_lock(RequestId id)
 	
 size_t LockList::size()
 {
-    TIDThr::Synchronized (*this);
 	return active_locks.size();
 }
  
 void LockList::destroy() 
 {
-  TIDThr::Synchronized (*this);
+  TIDThr::Synchronized synchro(mutex);
   
   if(!destroyed) {
       destroyed = true; 

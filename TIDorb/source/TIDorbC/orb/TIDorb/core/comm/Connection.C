@@ -961,7 +961,7 @@ bool TIDorb::core::comm::Connection::send_locate_request
   
   if (_orb->trace != NULL) {
     TIDorb::util::StringBuffer msg;
-    msg << toString() << ": Sending LocationRequest " << id;
+    msg << toString() << ": Sending LocationRequest " << id << " lock " << &lock;;
     _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
   }
 
@@ -1032,7 +1032,7 @@ bool TIDorb::core::comm::Connection::send_locate_request
       case ConnectionState::ERROR_STATE:
         state.get_error()->_raise();
       default:
-        throw CORBA::NO_RESPONSE();
+        throw CORBA::NO_RESPONSE("OPEN_STATE");
     }
   }
 
@@ -1124,29 +1124,28 @@ void TIDorb::core::comm::Connection::send_oneway_request_async
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_oneway_request_async catch CORBA::SystemException: ";
-      msg << ex.what();
+      msg << ex._name() << " " << ex.what();
       _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
     }
     throw;
   } catch (const TIDThr::SystemException& threx) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected TIDThr exception: " << threx.what();
-      msg << " at Connection::send_oneway_request_sync";
+      msg << "Connection::send_oneway_request_async catch TIDThr SystemException: ";
+      msg << threx.getName() << " " << threx.what();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
   } catch (const exception& ex) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected exception: " << ex.what();
-      msg << " at Connection::send_oneway_request_sync";
+      msg << "Connection::send_oneway_request_async catch exception: ";
+      msg << ex.what();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
   } catch (...) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected exception raised.";
-      msg << " at Connection::send_oneway_request_sync";
+      msg << "Connection::send_oneway_request_async catch unexpected exception. ";
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
   }
@@ -1260,10 +1259,16 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
         
         lock_list.deactivate_lock(id);
 
-    if (fragmented_message.get() == NULL)
-      throw CORBA::INTERNAL("No Reply message");
-    if (fragmented_message->getHeader().getMsgType() != TIDorb::core::comm::iiop::Reply) {        
-        throw CORBA::MARSHAL("No LocateReply message received");
+    if (fragmented_message.get() == NULL) {
+      TIDorb::util::StringBuffer msg;
+      msg << toString() << " NULL LocateReply message with id " << id << " lock " << (&lock);
+      throw CORBA::INTERNAL(msg.str().data());
+    }
+    if (fragmented_message->getHeader().getMsgType() != TIDorb::core::comm::iiop::Reply) { 
+      TIDorb::util::StringBuffer msg;
+      msg << toString() << " No LocateReply message received with id " << id << " lock " << (&lock);
+      msg << " message type: " << fragmented_message->getHeader().getMsgType(); 
+      throw CORBA::MARSHAL(msg.str().data());
     }
 
 //MLG
@@ -1289,6 +1294,12 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
   }
 
   } catch (const TIDorb::core::comm::RECOVERABLE_COMM_FAILURE& ex ) {
+    if (_orb->trace != NULL) {
+      TIDorb::util::StringBuffer msg;
+      msg << "Connection::send_oneway_request_async catch ";
+      msg << " TIDorb::core::comm::RECOVERABLE_COMM_FAILURE: " << ex.what();
+      _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
+    }
     throw;
   } catch (const TIDorb::core::ForwardRequest& ex ) {
     if (_orb->trace != NULL) {
@@ -1302,29 +1313,28 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_oneway_request_sync catch CORBA::SystemException: ";
-      msg << ex.what();
+      msg << ex._name() << " " << ex.what();
       _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
     }
     throw;
   } catch (const TIDThr::SystemException& threx) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected TIDThr exception: " << threx.what();
-      msg << " at Connection::send_oneway_request_sync";
+      msg << "Connection::send_oneway_request_sync catch TIDThr Systemexception: ";
+      msg << threx.getName() << " " << threx.what();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
   } catch (const exception& ex) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected exception: " << ex.what();
-      msg << " at Connection::send_oneway_request_sync";
+      msg << "Connection::send_oneway_request_sync catch exception: ";
+      msg << ex.what();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
   } catch (...) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected exception raised.";
-      msg << " at Connection::send_oneway_request_sync";
+      msg << "Connection::send_oneway_request_sync catch unexpected exception ";
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
   }
@@ -1353,11 +1363,6 @@ void TIDorb::core::comm::Connection::send_request
               TIDorb::core::ForwardRequest,CORBA::SystemException)
 {
   try {
-
-  TIDThr::Synchronized sync(*this);
-
-
-
 
   // verify if the request can be sent
   state.verify_request();
@@ -1401,7 +1406,7 @@ void TIDorb::core::comm::Connection::send_request
   if (_orb->trace != NULL) {
     TIDorb::util::StringBuffer msg;
     msg << toString() << ": Sending request id(" << id
-        << ") operation \"" << request->operation() << "\"";
+        << ") operation \"" << request->operation() << "\"" << " lock " << &lock;
     _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
   }
 
@@ -1455,10 +1460,21 @@ void TIDorb::core::comm::Connection::send_request
     lock_list.deactivate_lock(id);
     
     if(fragmented_message.get() == NULL) {
-      throw CORBA::INTERNAL("No Reply message");
+      TIDorb::util::StringBuffer msg;
+      msg << toString() << " NULL Reply message with id " << id << " lock " << (&lock);
+      if (_orb->trace != NULL) {
+        _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
+      }
+      throw CORBA::INTERNAL(msg.str().data());
     }
     if(fragmented_message->getHeader().getMsgType() != TIDorb::core::comm::iiop::Reply) {
-      throw CORBA::MARSHAL("No Reply message received");
+      TIDorb::util::StringBuffer msg;
+      msg << toString() << " No Reply message received with id " << id << " lock " << (&lock);
+      msg << " message type: " << fragmented_message->getHeader().getMsgType();
+      if (_orb->trace != NULL) {
+        _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
+      }
+      throw CORBA::MARSHAL(msg.str().data());
     }
 //MLG
     TIDorb::core::comm::iiop::GIOPReplyMessage* reply_message =
@@ -1491,7 +1507,15 @@ void TIDorb::core::comm::Connection::send_request
 
   } else {
     
-      lock_list.deactivate_lock(id);
+    lock_list.deactivate_lock(id);
+
+    if (_orb->trace != NULL) {
+      TIDorb::util::StringBuffer msg;
+      msg << toString() << ": No response ready for request id(" << id
+          << ") operation \"" << request->operation() << "\""
+          << " connection_state(" << state.get_value() << ")";
+      _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
+    }
 
     switch(state.get_value()) {
       case ConnectionState::CLOSING_STATE:
@@ -1500,35 +1524,75 @@ void TIDorb::core::comm::Connection::send_request
       case ConnectionState::ERROR_STATE:
         state.get_error()->_raise();
       default:
-        throw CORBA::NO_RESPONSE();
+        throw CORBA::NO_RESPONSE("OPEN_STATE");
     }
   }
 
   } catch (const TIDorb::core::comm::RECOVERABLE_COMM_FAILURE& ex ) {
+   if (_orb->trace != NULL) {
+      TIDorb::util::StringBuffer msg;
+      msg << "Connection::send_request catch TIDorb::core::comm::RECOVERABLE_COMM_FAILURE: ";
+      msg << ex.what();
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
+      _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
+    }
     throw;
   } catch (const TIDorb::core::ForwardRequest& ex ) {
-    if (_orb->trace != NULL) {
+   if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_request catch TIDorb::core::ForwardRequest: ";
       msg << ex.what();
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
       _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
     }
     throw;
   } catch (const CORBA::SystemException& ex) {
-    if (_orb->trace != NULL) {
+   if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_request catch CORBA::SystemException: ";
-      msg << ex.what();
+      msg << ex._name() << " " << ex.what();
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
       _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
     }
     throw;
+  } catch (const TIDorb::core::util::OnlyOneThreadCanWait& ex) {
+    if (_orb->trace != NULL) {
+      TIDorb::util::StringBuffer msg;
+      msg << "Connection::send_request catch OnlyOneThreadCanWait: ";
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
+      _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
+    }
+    throw CORBA::INTERNAL("OnlyOneThreadCanWait");
+  } catch (const TIDThr::InterruptedException& ex) {
+    if (_orb->trace != NULL) {
+      TIDorb::util::StringBuffer msg;
+      msg << "Connection::send_request catch TIDThr InterruptedException: ";
+      msg << ex.what();
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
+      _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
+    }
+    throw CORBA::INTERNAL("TIDThr::InterruptedException");
   } catch (const TIDThr::SystemException& threx) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected TIDThr exception: " << threx.what();
-      msg << " at Connection::send_request";
+      msg << "Connection::send_request catch TIDThr SystemException: ";
+      msg << threx.getName() << " " << threx.what();
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
+    throw CORBA::INTERNAL("TIDThr::SystemException");
   } catch (const exception& ex) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
@@ -1536,6 +1600,7 @@ void TIDorb::core::comm::Connection::send_request
       msg << " at Connection::send_request";
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
+    throw CORBA::INTERNAL("exception");
   } catch (...) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
@@ -1543,6 +1608,7 @@ void TIDorb::core::comm::Connection::send_request
       msg << " at Connection::send_request";
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
+    throw;
   }
 
 }

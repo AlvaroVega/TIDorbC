@@ -129,7 +129,7 @@ const char* TIDorb::core::comm::TCPConnection::toString()
         }
       case SERVER_MODE:
         {
-          buffer << "Server";
+          buffer << "Server" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
           TIDSocket::InetSocketAddress* addr = 
             (TIDSocket::InetSocketAddress*)(socket->getRemoteSocketAddress());
           buffer << " connection at ListenPoint(" << *addr << ")" << ends;
@@ -138,7 +138,7 @@ const char* TIDorb::core::comm::TCPConnection::toString()
         }
       default:        
         {
-          buffer << "Bidirectional";
+          buffer << "Bidirectional" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
           buffer << " connection at " << initial_point.toString() << ends;
         }
     }

@@ -134,13 +134,13 @@ const char* TIDorb::core::comm::UDPConnection::toString()
     TIDorb::util::StringBuffer buffer;
     switch(mode) {
       case CLIENT_MODE:
-        buffer << "UDP client";
+        buffer << "UDP client" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
         break;
       case SERVER_MODE:
-        buffer << "UDP server";
+        buffer << "UDP server" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
         break;
       default:
-        buffer << "Invalid UDP"; /*unreachable*/
+        buffer << "Invalid UDP" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")"; /*unreachable*/
     }
     //PRA
     //buffer << " connection at " << my_port; /*pra@tid.es socket->getLocalPort();*/
