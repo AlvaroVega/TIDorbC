@@ -1,0 +1,2 @@
+SUBDIRS = IDL TIDorb include .
+
