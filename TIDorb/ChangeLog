@@ -1,3 +1,11 @@
+2010-03-03 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.3.3 released.
+	
+	Fix bug [#1129] OnlyOneThreadCanWait exception at client side 
+	Fix bug [#1119] NULL reference to Thread in PolicyManagerContext
+	Fix bug [#1113] INTERNAL exception catched procesing a reply
+	
 2009-08-05 Alvaro Vega Garcia  <avega@tid.es>
 
 	* TIDorbC version 6.3.2 released.

@@ -59,7 +59,6 @@ class LockList : public virtual TIDThr::Monitor {
      LockPool& lock_pool;
      
      bool destroyed;
-     TIDThr::RecursiveMutex mutex;	
 
 	public:
 	 

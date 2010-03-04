@@ -77,7 +77,7 @@ TIDorb::core::TIDORB::ORBTable TIDorb::core::TIDORB::st_orb_instances;
 TIDThr::RecursiveMutex* TIDorb::core::TIDORB::st_init_mutex =
   TIDorb::core::TIDORB::create_init_mutex();
 
-const char* TIDorb::core::TIDORB::st_version = "6.3.1";
+const char* TIDorb::core::TIDORB::st_version = "6.3.3_ose";
 
 
 TIDThr::RecursiveMutex* TIDorb::core::TIDORB::create_init_mutex()

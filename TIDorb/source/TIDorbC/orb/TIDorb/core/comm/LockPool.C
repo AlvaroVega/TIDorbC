@@ -44,8 +44,7 @@ namespace comm {
     
 Lock* LockPool::get_lock()
 {
-    // TIDThr::Synchronized (*this);
-    TIDThr::Synchronized synchro(mutex);
+    TIDThr::Synchronized synchro(*this);
     
     Lock* lock = NULL;
     
@@ -64,8 +63,7 @@ void LockPool::put_lock(Lock* lock)
 {
     lock->clear();
     {
-        // TIDThr::Synchronized (*this);
-        TIDThr::Synchronized synchro(mutex);    
+        TIDThr::Synchronized synchro(*this);
         locks.push(lock);  
     }    
 }

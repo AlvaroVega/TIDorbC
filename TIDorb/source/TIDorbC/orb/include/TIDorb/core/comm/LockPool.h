@@ -44,14 +44,13 @@ namespace TIDorb {
 namespace core {
 namespace comm {
 
-class LockPool /*: public virtual TIDThr::RecursiveMutex*/ {	
+class LockPool: public virtual TIDThr::RecursiveMutex {	
   
   protected:
                   
      typedef  stack<TIDorb::core::comm::Lock*> LockStack;          
 	 
      LockStack locks;
-     TIDThr::RecursiveMutex mutex;
 	 	
 	public:
 	 LockPool() throw (TIDThr::SystemException) {}
