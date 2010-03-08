@@ -1,5 +1,11 @@
 dnl Autoconf and automake initialization
-AC_INIT([TIDorbC], [6.3.3], [tidorbc-bugs@lists.morfeo-project.org])
+define([TIDORBC_VERSION], patsubst(esyscmd(cat VERSION | awk '{print $1}'), [
+]))
+
+AC_INIT([TIDorbC], 
+        TIDORBC_VERSION, 
+        [tidorbc-bugs@lists.morfeo-project.org],
+        [TIDorbC])
 AC_CONFIG_SRCDIR([source/TIDorbC/orb/TIDorb/core/TIDORB.C])
 AM_INIT_AUTOMAKE([-Wall foreign 1.9 tar-ustar])
 

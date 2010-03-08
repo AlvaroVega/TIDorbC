@@ -45,6 +45,6 @@ libTIDorbIdl_la_LIBADD = \
    $(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/libTIDorbIdl_Compression.la
 
 libTIDorbIdl_la_LDFLAGS = \
-	-release $(VERSION)
+	-avoid-version
 
 

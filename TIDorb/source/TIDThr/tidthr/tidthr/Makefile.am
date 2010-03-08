@@ -26,5 +26,5 @@ libtidthr_la_LIBADD = \
 	$(PTHREAD_LIB)
 
 libtidthr_la_LDFLAGS = \
-	-release $(VERSION)
+	-avoid-version
 

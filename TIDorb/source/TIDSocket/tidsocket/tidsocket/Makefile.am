@@ -35,4 +35,4 @@ libtidsocket_la_SOURCES = \
 
 
 libtidsocket_la_LDFLAGS = \
-	-release $(VERSION)
+	-avoid-version

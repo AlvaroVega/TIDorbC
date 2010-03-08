@@ -264,4 +264,4 @@ libTIDorb_la_LIBADD = \
 
 libTIDorb_la_LDFLAGS= \
 	-L$(top_builddir)/source/TIDorbC/orb/IDL/.libs \
-	-release $(VERSION)
+	-avoid-version
