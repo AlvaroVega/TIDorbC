@@ -38,7 +38,6 @@
 
 #include "TIDorb/core/comm/iiop/GIOPCancelRequestMessage.h"
 
-//MLG
 void* TIDorb::core::comm::iiop::GIOPCancelRequestMessage::_impl()
 {
 	return this;
@@ -49,7 +48,6 @@ const char* TIDorb::core::comm::iiop::GIOPCancelRequestMessage::_typeid()
 	//return CORBA::string_dup("GIOPCancelRequestMessage");
 	return "GIOPCancelRequestMessage";
 }
-//EMLG
 
 TIDorb::core::comm::iiop::GIOPCancelRequestMessage::GIOPCancelRequestMessage
   (const TIDorb::core::comm::iiop::Version& version,
@@ -94,11 +92,9 @@ void TIDorb::core::comm::iiop::GIOPCancelRequestMessage::receive_body
 {
         TIDorb::core::comm::iiop::GIOPMessage::receive_body(conn, header_buffer);
 
-        //TIDorb::core::cdr::CDRInputStream* id_in = new CDRInputStream(null, message_buffer);
         TIDorb::core::cdr::CDRInputStream id_in(NULL, _message_buffer);
         id_in.set_byte_order(_header.getByteOrder());
 
-        //request_id = new RequestId(id_in->read_ulong());
         id_in.read_ulong(request_id);
 }
 
@@ -112,27 +108,16 @@ TIDorb::core::comm::iiop::GIOPCancelRequestMessage::get_message_buffer()
   {
     if (_header.getVersion() >= TIDorb::core::comm::iiop::Version::VERSION_1_2)
     {
-      //_message_buffer =
-      //        new BufferCDR(new char[TIDorb::core::comm::iiop::GIOPHeader::HEADER_SIZE +
-      //                                TIDorb::core::cdr::CDR::ULONG_SIZE]);
-
       _message_buffer =
         new TIDorb::core::cdr::BufferCDR(TIDorb::core::comm::iiop::GIOPHeader::HEADER_SIZE +
                                          TIDorb::core::cdr::CDR::ULONG_SIZE);
 
       // write header
-      //TIDorb::core::cdr::CDROutputStream* out = new CDROutputStream(null,message_buffer);
       TIDorb::core::cdr::CDROutputStream out(NULL,_message_buffer);
       _header.write(out);
 
       //write
       out.write_ulong(request_id);
-
-      //MCPG- No se necesita el m?todo close en el destructor ya se cierra
-      /*try {
-
-      out.close();
-      } catch(CORBA::Exception& e){ }*/
 
       out = NULL;
       _message_completed = true;

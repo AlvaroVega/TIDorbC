@@ -299,7 +299,6 @@ void TIDorb::core::comm::miop::ProfileMIOP::partial_write(TIDorb::core::cdr::CDR
 
         // write profile data
         if (_profile_data == NULL) {
-                //TIDorb::core::cdr::CDROutputStream encapsulation(dynamic_cast<TIDorb::core::TIDORB*> (out.orb()));
           TIDorb::core::cdr::CDROutputStream encapsulation((TIDorb::core::TIDORB*) (out.orb()));
 
                 encapsulation.write_boolean(encapsulation.get_byte_order());
@@ -313,9 +312,6 @@ void TIDorb::core::comm::miop::ProfileMIOP::partial_write(TIDorb::core::cdr::CDR
                         _components[i]->write(encapsulation);
                 }
 
-//                 ((ProfileMIOP*) this)->_profile_data =
-//                         dynamic_cast <TIDorb::core::cdr::CDRInputStream*>
-//                         (encapsulation.create_input_stream());
                 ((ProfileMIOP*) this)->_profile_data = (TIDorb::core::cdr::CDRInputStream*)
                   (encapsulation.create_input_stream());
         }
@@ -345,37 +341,4 @@ char* TIDorb::core::comm::miop::ProfileMIOP::toString() const
   return CORBA::string_dup(buffer.str().data());
 }
 
-
-/*
-char* TIDorb::core::comm::miop::ProfileMIOP::toString() const
-{
-        ((ProfileMIOP*) this)->extract_members();
-
-        TIDorb::util::StringBuffer buffer;
-
-        buffer << ("Profile: {") << getVersion().toString() << ", "
-               << getListenPoint().toString();
-
-        for(int i = 0; i <_components.size(); i++) {
-                if (_components[i]->_tag == TIDorb::core::iop::TAG_GROUP) {
-                        TIDorb::core::comm::miop::GroupInfo* group =
-                                dynamic_cast<TIDorb::core::comm::miop::GroupInfo*>
-                                (((ProfileMIOP*) this)->_components[i].getT());
-
-			buffer << ", " << group->toString();
-		} else if (_components[i]->_tag == TIDorb::core::iop::TAG_GROUP_IIOP) {
-                        TIDorb::core::comm::miop::GroupIIOPProfile* profile =
-                                dynamic_cast<TIDorb::core::comm::miop::GroupIIOPProfile*>
-                                (((ProfileMIOP*) this)->_components[i].getT());
-
-			char* profile_string = profile->toString();
-			buffer << ", " << profile_string;
-			CORBA::string_free(profile_string);
-		}
-        }
-
-        buffer << '}';
-        return CORBA::string_dup(buffer.str().data());
-}
-*/
 

@@ -41,10 +41,8 @@
 #define _TIDORB_CORE_POA_AbstractIIOPRequest_H_
 
 
-//PRA
 #include "TIDorb/core/comm/ConnectionState.h"
 #include "TIDorb/core/comm/Connection.h"
-//EPRA
 
 
 namespace TIDorb {
@@ -64,10 +62,9 @@ class AbstractIIOPRequest : public TIDorb::core::poa::QueuedRequest
         ~AbstractIIOPRequest();
 
         TIDorb::core::comm::Connection* get_connection() const;
-// //MLG
+
 // 	virtual void* _impl();
 // 	virtual const char* _typeid();
-// //EMLG	    
 };
 
 

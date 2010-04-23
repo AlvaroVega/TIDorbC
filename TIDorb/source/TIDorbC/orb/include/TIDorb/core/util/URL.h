@@ -58,6 +58,7 @@ namespace URL {
   // pra@tid.es - MIOP extensions
   extern const char* MIOP_PROTOCOL;
   // end MIOP extensions
+  extern const char* SSLIOP_PROTOCOL;
 
 }
 

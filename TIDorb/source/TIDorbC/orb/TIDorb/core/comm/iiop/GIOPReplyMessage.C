@@ -39,7 +39,6 @@
 #include "TIDorb/core/comm/iiop/GIOPReplyMessage.h"
 #include "TIDorb/core/util/exceptions.h"
 
-//MLG
 void* TIDorb::core::comm::iiop::GIOPReplyMessage::_impl()
 {
 	return this;
@@ -50,7 +49,6 @@ const char* TIDorb::core::comm::iiop::GIOPReplyMessage::_typeid()
 	//return CORBA::string_dup("GIOPReplyMessage");
 	return "GIOPReplyMessage";
 }
-//EMLG
 
 
 TIDorb::core::comm::iiop::GIOPReplyMessage::GIOPReplyMessage
@@ -59,6 +57,7 @@ TIDorb::core::comm::iiop::GIOPReplyMessage::GIOPReplyMessage
 {
   _reply_status = TIDorb::core::comm::iiop::NO_EXCEPTION;
   _service_context_list = NULL;
+  _service_context_list_owner = false;
 }
 
 
@@ -70,6 +69,7 @@ TIDorb::core::comm::iiop::GIOPReplyMessage::GIOPReplyMessage
 {
   _reply_status = TIDorb::core::comm::iiop::NO_EXCEPTION;
   _service_context_list = NULL;
+  _service_context_list_owner = false;
 }
 
 
@@ -82,6 +82,7 @@ TIDorb::core::comm::iiop::GIOPReplyMessage::GIOPReplyMessage
 {
   _reply_status = TIDorb::core::comm::iiop::NO_EXCEPTION;
   _service_context_list = NULL;
+  _service_context_list_owner = false;
 }
 
 
@@ -89,7 +90,8 @@ TIDorb::core::comm::iiop::GIOPReplyMessage::GIOPReplyMessage
 
 TIDorb::core::comm::iiop::GIOPReplyMessage::~GIOPReplyMessage()
 {
-  delete _service_context_list;
+  if (_service_context_list_owner && _service_context_list)
+    delete _service_context_list;
 }
 
 
@@ -100,7 +102,7 @@ void TIDorb::core::comm::iiop::GIOPReplyMessage::reset()
   _reply_status = TIDorb::core::comm::iiop::NO_EXCEPTION;
   _message_completed = false;
   _headers_marshaled = false;
-  _service_context_list = NULL;
+  //_service_context_list = NULL;
 }
 
 
@@ -201,6 +203,7 @@ void TIDorb::core::comm::iiop::GIOPReplyMessage::unmarshal_reply_header_1_1()
 {
   // Service Context
   _service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
+  _service_context_list_owner = true; /// Check this!!!!!!!!!!!!
 
   // request_id
   message_buffer_in->read_ulong(_request_id);
@@ -232,7 +235,7 @@ void TIDorb::core::comm::iiop::GIOPReplyMessage::unmarshal_reply_header_1_2()
 
   // Service Context
   _service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
-
+  _service_context_list_owner = true; /// Check this!!!!!!!!!!!!
   // VERSION 1.2 alignment to 8
   try {
     //jagd OJO 
@@ -251,9 +254,10 @@ TIDorb::core::comm::iiop::ReplyStatusType TIDorb::core::comm::iiop::GIOPReplyMes
 
 
 void TIDorb::core::comm::iiop::GIOPReplyMessage::set_service_context_list
-  (TIDorb::core::comm::iiop::ServiceContextList* list)
+(TIDorb::core::comm::iiop::ServiceContextList* list, bool owner)
 {
   _service_context_list = list;
+  _service_context_list_owner = owner;
 }
 
 
@@ -299,8 +303,6 @@ void TIDorb::core::comm::iiop::GIOPReplyMessage::extract_arguments(TIDorb::core:
 
   CORBA::NVList_var list = request->arguments();
 
-  //jagd
-  //if(!CORBA::is_nil(list))
   if((list))
     TIDorb::core::NVListImpl::read_params_out(list, *message_buffer_in);
 }
@@ -317,7 +319,6 @@ TIDorb::core::comm::iiop::GIOPReplyMessage::extract_user_exception(CORBA::Except
   // lectura adelantada del repository_id de la excepcion
   message_buffer_in->fix_starting();
 
-  //char* name = message_buffer_in->read_string();
   char* name;
   message_buffer_in->read_string(name);
   message_buffer_in->rewind();

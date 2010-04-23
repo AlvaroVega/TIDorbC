@@ -1,0 +1,17 @@
+This release of TIDorbC++ was built on a machine with kernel:
+SunOS unknown 5.10 Generic_139556-08 i86pc i386 i86pc Solaris
+
+using the compiler:
+gcc version 4.4.2
+
+kernel version used:
+SunOS 5.8 5.10 Generic_139556-08
+
+
+
+using the following libraries:
+gcc-4.4.2-sol10-x86
+make-3.80-sol10-x86
+binutils-2.17-sol10-x86
+TIDIdlc_1.3.11
+

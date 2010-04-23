@@ -46,12 +46,12 @@ class ReliableOnewayThread : public TIDThr::Thread
 {
 	private:
 	
-	 IIOPCommLayer* comm;
+         CommunicationLayer* comm;
 	 TIDorb::core::RequestImpl* request;
 	 TIDorb::core::iop::IOR_ref ior;
   
 	public:
-	 ReliableOnewayThread (IIOPCommLayer* commi, 
+	 ReliableOnewayThread (CommunicationLayer* commi, 
 	                       TIDorb::core::RequestImpl* req, 
 			       TIDorb::core::iop::IOR* iori, 
 			       TIDThr::ThreadGroup* group)

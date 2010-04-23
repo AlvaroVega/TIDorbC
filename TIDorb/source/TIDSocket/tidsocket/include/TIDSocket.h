@@ -85,6 +85,32 @@
 #include "TIDSocket/DatagramSocket.h"
 #include "TIDSocket/MulticastSocket.h"
 
+#include "TIDSocket/UnknownHostException.h"
+#include "TIDSocket/UnresolvedAddressException.h"
+#include "TIDSocket/UnsupportedAddressTypeException.h"
+#include "TIDSocket/NoSuchAlgorithmException.h"
+#include "TIDSocket/KeyManagementException.h"
+
+#include "TIDSocket/SSLSocketFactory.h"
+#include "TIDSocket/SSLServerSocket.h"
+#include "TIDSocket/SSLServerSocketFactory.h"
+#include "TIDSocket/SSLSocket.h"
+#include "TIDSocket/SSLContext.h"
+#include "TIDSocket/SSLInputStream.h"
+#include "TIDSocket/SSLOutputStream.h"
+#include "TIDSocket/SSLSession.h"
+#include "TIDSocket/SSLSessionContext.h"
+
+//#include "TIDSocket/KeyManagementFactory.h"
+//#include "TIDSocket/TrustManager.h"
+
+
+#include "TIDSocket/UnknownHostException.h"
+#include "TIDSocket/UnresolvedAddressException.h"
+#include "TIDSocket/UnsupportedAddressTypeException.h"
+#include "TIDSocket/NoSuchAlgorithmException.h"
+#include "TIDSocket/KeyManagementException.h"
+
 
 namespace TIDSocket
 {
@@ -95,6 +121,7 @@ typedef TIDThr::HandleT<ServerSocket>      ServerSocket_ref;
 typedef TIDThr::HandleT<DatagramSocket>    DatagramSocket_ref;
 typedef TIDThr::HandleT<MulticastSocket>   MulticastSocket_ref;
 
+typedef string                             SessionId;
 
 } //namespace TIDSocket
 

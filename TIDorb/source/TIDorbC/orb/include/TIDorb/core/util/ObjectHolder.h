@@ -56,7 +56,7 @@ class ObjectHolder : public TIDorb::portable::Streamable {
 
     ObjectHolder()
     {
-      m_value = CORBA::Object::_nil();
+      m_value = NULL;
       m_reference_type = CORBA::TypeCode::_duplicate(CORBA::_tc_Object);
       //m_reference_type = TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(::CORBA::tk_objref);
     }

@@ -42,7 +42,7 @@
 
 
 TIDorb::core::PolicyManagerImpl::PolicyManagerImpl(TIDorb::core::TIDORB* orb)
-  : _orb(orb)
+  : m_orb(orb), m_conf(const_cast<TIDorb::core::ConfORB&>(m_orb->conf()))
 {
 }
 
@@ -52,8 +52,7 @@ TIDorb::core::PolicyManagerImpl::PolicyManagerImpl(TIDorb::core::TIDORB* orb)
 CORBA::PolicyList* TIDorb::core::PolicyManagerImpl::get_policy_overrides(
                                                               const CORBA::PolicyTypeSeq& ts)
 {
-  TIDorb::core::ConfORB& conf = const_cast<TIDorb::core::ConfORB&>(_orb->conf());
-  return conf.getPolicyContext().getPolicies(ts);
+  return m_conf.getPolicyContext().getPolicies(ts);
 }
 
 
@@ -63,14 +62,12 @@ void TIDorb::core::PolicyManagerImpl::set_policy_overrides(const CORBA::PolicyLi
                                                            CORBA::SetOverrideType set_add)
   throw (CORBA::InvalidPolicies)
 {
-  TIDorb::core::ConfORB& conf = const_cast<TIDorb::core::ConfORB&>(_orb->conf());
-  conf.getPolicyContext().setPolicies(policies, set_add);
+  m_conf.getPolicyContext().setPolicies(policies, set_add);
 }
                      
 
 
 TIDorb::core::PolicyContext& TIDorb::core::PolicyManagerImpl::getPolicyContext()
 {
-  TIDorb::core::ConfORB& conf = const_cast<TIDorb::core::ConfORB&>(_orb->conf());
-  return conf.getPolicyContext();
+  return m_conf.getPolicyContext();
 }

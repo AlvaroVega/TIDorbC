@@ -40,7 +40,6 @@
 TIDorb::core::EnvironmentImpl::EnvironmentImpl()  throw (TIDThr::SystemException)
   : m_exception(NULL) 
 {
-  //jagd 3 _count(1);
 }
 
 TIDorb::core::EnvironmentImpl::~EnvironmentImpl()  throw (TIDThr::SystemException)
@@ -51,7 +50,6 @@ TIDorb::core::EnvironmentImpl::~EnvironmentImpl()  throw (TIDThr::SystemExceptio
 void TIDorb::core::EnvironmentImpl::exception(CORBA::Exception* e)
 {
   try {
-    //jagd TIDThr::Synchronized sync(*this);
     
     if(m_exception)
       delete m_exception;
@@ -65,7 +63,6 @@ void TIDorb::core::EnvironmentImpl::exception(CORBA::Exception* e)
 void TIDorb::core::EnvironmentImpl::clear()
 {
   try {  
-   //jagd TIDThr::Synchronized sync(*this);
     
     if(m_exception)
       delete m_exception;
@@ -82,22 +79,6 @@ CORBA::Exception* TIDorb::core::EnvironmentImpl::exception() const
 
 CORBA::Environment_ptr CORBA::Environment::_duplicate(CORBA::Environment_ptr ev)
 {
-  /* jagd 3
-  try {
-   
-    //jagd 
-    //TIDorb::core::EnvironmentImpl* env = dynamic_cast<TIDorb::core::EnvironmentImpl*> (ev);
-    TIDorb::core::EnvironmentImpl* env = (TIDorb::core::EnvironmentImpl*) (ev);
-  
-    if(env)
-      env->_add_ref();
-  
-    return ev;
-    
-  } catch (const TIDThr::Exception& ex) {
-    throw CORBA::INTERNAL(0,CORBA::COMPLETED_NO);
-  }
-  */
   return ev;
   
 }
@@ -109,20 +90,7 @@ CORBA::Environment_ptr CORBA::Environment::_nil()
 
 void CORBA::release(CORBA::Environment_ptr ev)
 {
-  /*jagd 3
-  try {
-   
-    //jagd 
-    //TIDorb::core::EnvironmentImpl* env = dynamic_cast<TIDorb::core::EnvironmentImpl*> (ev);
-    TIDorb::core::EnvironmentImpl* env = (TIDorb::core::EnvironmentImpl*) (ev);
-  
-    if(env)
-      env->_remove_ref();
 
-  } catch (const TIDThr::Exception& ex) {
-    throw CORBA::INTERNAL(0,CORBA::COMPLETED_NO);
-  }
-  */
 }
 
 CORBA::Boolean CORBA::is_nil(CORBA::Environment_ptr ev)

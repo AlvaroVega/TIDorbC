@@ -45,8 +45,9 @@ class GIOPReplyMessage : public GIOPFragmentedMessage {
   friend class TIDorb::core::comm::ziop::ZIOPMessage;
 private:
 
-  TIDorb::core::comm::iiop::ReplyStatusType _reply_status;
+  TIDorb::core::comm::iiop::ReplyStatusType           _reply_status;
   const TIDorb::core::comm::iiop::ServiceContextList* _service_context_list;
+  bool                                                _service_context_list_owner;
 
 protected:
   void reset();
@@ -79,7 +80,8 @@ public:
  
   TIDorb::core::comm::iiop::ReplyStatusType reply_status() const;
 
-  void set_service_context_list(TIDorb::core::comm::iiop::ServiceContextList* list);
+  void set_service_context_list(TIDorb::core::comm::iiop::ServiceContextList* list,
+                                bool owner = false);
 
   const TIDorb::core::comm::iiop::ServiceContextList* get_service_context_list() const;
 

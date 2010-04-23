@@ -3,7 +3,7 @@
 // File:        config.h
 // Description: 
 //             
-// Rel:         01.00
+// Rel:         01.01
 // Created:     September, 2001
 // Author:      Juan A. Caceres Exposito      ( caceres@tid.es   )
 //
@@ -45,6 +45,9 @@
 #if (defined(__SUNPRO_CC) && (__SUNPRO_CC_COMPAT==5) && !defined(__SUNPRO_LIBRARY_IOSTREAM)) || \
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     (defined(__linux)) || \
+    (defined(__darwin)) || \
+    (defined(__CYGWIN__)) || \
+    (defined(__hpux)) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDTHR_HAVE_NAMESPACE_STD
 #define TIDTHR_HAVE_NAMESPACE_STD 1
@@ -56,6 +59,9 @@
 #if (defined(__SUNPRO_CC) && (__SUNPRO_CC_COMPAT==5) && !defined(__SUNPRO_LIBRARY_IOSTREAM)) || \
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__darwin)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__CYGWIN__)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__hpux)  && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDTHR_HAVE_IOSTREAM
 #define TIDTHR_HAVE_IOSTREAM 1

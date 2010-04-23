@@ -96,9 +96,6 @@ void TIDorb::core::typecode::SequenceTypeCode::remarshal_value
 
   output.write_long(length);
 
-  //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd
-  //TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type->_impl();
   TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type;
 
         for (CORBA::ULong i = 0; i < length; i++)
@@ -122,9 +119,6 @@ bool TIDorb::core::typecode::SequenceTypeCode::values_equal
   if(length_a > m_length)
     throw CORBA::MARSHAL();
 
-  //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd
-  //TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type->_impl();
   TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type;
 
         for (CORBA::ULong i = 0; i < length_a; i++) {
@@ -139,9 +133,6 @@ bool TIDorb::core::typecode::SequenceTypeCode::values_equal
 
 void TIDorb::core::typecode::SequenceTypeCode::dump (ostream& output) const
 {
-  //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd 
-  //TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type->_impl();
   TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type;
 
   output << "[TYPECODE]{ sequence <";
@@ -166,9 +157,6 @@ bool TIDorb::core::typecode::SequenceTypeCode::dump_value
   if(length > m_length)
     throw CORBA::MARSHAL();
 
-  //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd 
-  //TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type->_impl();
   TypeCodeImpl* tc_impl = (TypeCodeImpl*)m_element_type;
 
   output << "[" << length << " VALUES]{";

@@ -48,16 +48,19 @@
 #include "TIDorb/core/iop/TAG_ORB_TYPE.h"
 #include "TIDorb/core/iop/TAG_POLICIES.h"
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 #include "TIDorb/core/iop/TAG_UIPMC.h"
 #include "TIDorb/core/iop/TAG_GROUP.h"
 #include "TIDorb/core/iop/TAG_GROUP_IIOP.h"
 // end MIOP extensions
 
-// pra@tid.es - FT extensions
+// FT extensions
 #include "TIDorb/core/iop/TAG_ALTERNATE_IIOP_ADDRESS.h"
 #include "TIDorb/core/iop/TAG_FT_HEARTBEAT_ENABLED.h"
 // end FT extensions
+
+#include "TIDorb/core/iop/TAG_SSL_SEC_TRANS.h"
+#include "TIDorb/core/iop/TAG_CSI_SEC_MECH_LIST.h"
 
 #include "TIDorb/core/iop/TaggedComponentReader.h"
 #include "TIDorb/core/iop/ORBComponent.h"

@@ -40,7 +40,7 @@
 
 CORBA::AbstractBase_ptr CORBA::AbstractBase::_duplicate(CORBA::AbstractBase_ptr ab)
 {
-    //TODO jagd
+    //TODO: try to remove dynamic_cast
     CORBA::Object_ptr reference = dynamic_cast<CORBA::Object_ptr>(ab);
     CORBA::ValueBase_ptr value  = dynamic_cast<CORBA::ValueBase_ptr>(ab);
 

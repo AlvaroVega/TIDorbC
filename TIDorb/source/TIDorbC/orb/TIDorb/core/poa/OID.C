@@ -48,12 +48,10 @@ TIDorb::core::poa::OID::OID(const OID& other)
     hash_created(other.hash_created), str(CORBA::string_dup(other.str))
 {};
 
-//PRA
 TIDorb::core::poa::OID::~OID()
 {
   CORBA::string_free(str);
 };
-//EPRA
 
 const PortableServer::ObjectId& TIDorb::core::poa::OID::get_object_id() const
 {

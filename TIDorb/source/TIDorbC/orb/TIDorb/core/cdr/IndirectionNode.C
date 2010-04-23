@@ -70,19 +70,13 @@ const char*
     IndirectionNode::lookup_string (CDR::AbsolutePosition position) const
 {
   if(!m_string_table)
-    //PRA: return 0;
     throw CORBA::MARSHAL();
    
   StringPositionTable::const_iterator p = m_string_table->find(position);
   if(p == m_string_table->end())
-    //PRA: return 0;
     throw CORBA::MARSHAL();
   else
-    //PRA
-    //return CORBA::string_dup((*p).second);
-    //return CORBA::string_dup((*p).second.data());
     return p->second;
-    //EPRA
 }
 
 const ValueTypeInfo& 
@@ -90,15 +84,12 @@ const ValueTypeInfo&
 {
  
   if(!m_value_table)
-    //PRA: return 0;
     throw CORBA::MARSHAL();
    
   ValuePositionTable::const_iterator p = m_value_table->find(position);
   if(p == m_value_table->end())
-    //PRA: return 0;
     throw CORBA::MARSHAL();
   else
-    //PRA: return (ValueTypeInfo*) ((*p).second);
     return (const ValueTypeInfo&) (p->second);
 }
 

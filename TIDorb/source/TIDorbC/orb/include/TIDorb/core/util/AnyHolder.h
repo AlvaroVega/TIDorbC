@@ -53,19 +53,16 @@ namespace util {
 class AnyHolder : public TIDorb::portable::Streamable {
 
   public:
-    //jagd
     bool free; 
 
     AnyHolder()
     {
       m_value = 0;
-      //jagd 
       free=true;
     }
     
     void value(CORBA::Any* initial)
     {
-      //jagd reset_value();
       if(free)
       {
         delete m_value; 
@@ -76,7 +73,6 @@ class AnyHolder : public TIDorb::portable::Streamable {
     
     void value(const CORBA::Any& initial)
     {
-      //jagd reset_value();
       if(free)
       {
         delete m_value; 
@@ -94,7 +90,6 @@ class AnyHolder : public TIDorb::portable::Streamable {
     
     ~AnyHolder()
     {
-      //jagd reset_value();
       if(free)
         delete m_value;
 
@@ -102,7 +97,6 @@ class AnyHolder : public TIDorb::portable::Streamable {
 
     void _read(TIDorb::portable::InputStream& is) 
     {
-      //jagd reset_value();
       if(free) 
         delete m_value;
       free=true;
@@ -116,7 +110,6 @@ class AnyHolder : public TIDorb::portable::Streamable {
     }
 
     CORBA::TypeCode_ptr _type() const {
-      //return CORBA::TypeCode::_duplicate(CORBA::_tc_any);
       return TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(::CORBA::tk_any);
     }
     

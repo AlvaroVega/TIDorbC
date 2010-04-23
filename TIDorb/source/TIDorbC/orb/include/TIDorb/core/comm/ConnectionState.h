@@ -85,9 +85,9 @@ class ConnectionState: public TIDThr::Mutex
 
   public:
    ConnectionState() throw (TIDThr::SystemException);
-//MLG
+
    ~ConnectionState() throw (TIDThr::SystemException);
-//EMLG
+
    
    bool set_closing();
    bool is_open();

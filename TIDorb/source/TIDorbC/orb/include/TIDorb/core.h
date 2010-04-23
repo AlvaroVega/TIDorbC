@@ -55,6 +55,8 @@
 #include "TIDorb/core/PolicyManagerImpl.h"
 #include "TIDorb/core/PolicyCurrentImpl.h"
 #include "TIDorb/core/PolicyContextManagerImpl.h"
+#include "TIDorb/core/ConstructionPolicyImpl.h"
+#include "TIDorb/core/DomainManagerImpl.h"
 
 #include "TIDorb/core/ConfORB.h"
 #include "TIDorb/core/ORBServices.h"
@@ -100,6 +102,8 @@
 // ZIOP Compression
 #include "TIDorb/core/ziop.h"
 #include "TIDorb/core/compression.h"
+
+#include "TIDorb/core/security.h"
 
 #include "TIDorb/core/RequestCounter.h"
 

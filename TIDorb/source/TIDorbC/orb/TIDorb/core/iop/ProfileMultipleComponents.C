@@ -121,8 +121,6 @@ const TIDorb::core::iop::VectorTaggedComponent&
 bool TIDorb::core::iop::ProfileMultipleComponents::operator== (const TIDorb::core::iop::TaggedProfile& other) const
 {
 	const TIDorb::core::iop::ProfileMultipleComponents* profile =
-	        //jagd	
-                //dynamic_cast<const TIDorb::core::iop::ProfileMultipleComponents*>(&other);
 		(const TIDorb::core::iop::ProfileMultipleComponents*)(&other);
 
 	if((profile == NULL) || (_tag != profile->_tag))
@@ -138,7 +136,6 @@ bool TIDorb::core::iop::ProfileMultipleComponents::operator== (const TIDorb::cor
 
 
 
-//ATENCION -MCPG	
 void TIDorb::core::iop::ProfileMultipleComponents::partial_write(TIDorb::core::cdr::CDROutputStream& output) const
 {
   TIDThr::Synchronized synchro(*((ProfileMultipleComponents*) this));

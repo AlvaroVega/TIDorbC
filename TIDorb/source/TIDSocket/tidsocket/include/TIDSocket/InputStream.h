@@ -65,6 +65,7 @@ namespace TIDSocket
 class InputStream // caceres@tid.es 14/7/2004 : public virtual ifstream
 {
     friend class Socket;
+    friend class SSLSocket;
 
     public:
         // Constructor (timeout in milliseconds)
@@ -86,7 +87,7 @@ class InputStream // caceres@tid.es 14/7/2004 : public virtual ifstream
 
         // Closes this input stream and releases any system resources associated
         // with the stream
-        void close()
+        virtual void close()
             throw(IOException);
 
         // Marks the current position in this input stream
@@ -108,7 +109,7 @@ class InputStream // caceres@tid.es 14/7/2004 : public virtual ifstream
 
         // Reads up to len bytes of data from the input stream
         // into an array of bytes
-        ssize_t read(unsigned char* b, size_t size, size_t off, size_t len)
+        virtual ssize_t read(unsigned char* b, size_t size, size_t off, size_t len)
             throw(IOException, IllegalBlockingModeException,
                   IndexOutOfBoundsException);
 

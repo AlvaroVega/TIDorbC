@@ -84,8 +84,6 @@ void TIDorb::core::iop::ORBComponent::write(TIDorb::core::cdr::CDROutputStream& 
   
   if(!_component_data)
   {
-    //jagd
-    //TIDorb::core::cdr::CDROutputStream encapsulation (dynamic_cast<TIDorb::core::TIDORB*>(out.orb()),
     TIDorb::core::cdr::CDROutputStream encapsulation ((TIDorb::core::TIDORB*)(out.orb()),
                                                       new TIDorb::core::cdr::BufferCDR(
                                                       2 * TIDorb::core::cdr::CDR::ULONG_SIZE));
@@ -94,8 +92,6 @@ void TIDorb::core::iop::ORBComponent::write(TIDorb::core::cdr::CDROutputStream& 
     
     encapsulation.write_ulong(orb_type);
    
-    //jagd 
-    //((ORBComponent*) this)->_component_data = dynamic_cast<TIDorb::core::cdr::CDRInputStream* >
     ((ORBComponent*) this)->_component_data = (TIDorb::core::cdr::CDRInputStream* )
                                               (encapsulation.create_input_stream());
   }

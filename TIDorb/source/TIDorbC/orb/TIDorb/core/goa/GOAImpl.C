@@ -8,30 +8,13 @@
 //
 // Revised:    
 //
-// (C) Copyright 2009 Telefonica Investigacion y Desarrollo
-//     S.A.Unipersonal (Telefonica I+D)
-//
-// This file is part of Morfeo CORBA Platform.
-//
-// Morfeo CORBA Platform is free software: you can redistribute it and/or
-// modify it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the License,
-// or (at your option) any later version.
-//
-// Morfeo CORBA Platform is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with Morfeo CORBA Platform. If not, see
-//
-//   http://www.gnu.org/licenses
-//
-// Info about members and contributors of the MORFEO project
-// is available at
-//
-//   http://morfeo-project.org
+// Copyright 2002 Telefonica, I+D. Printed in Spain (Europe). All Rights
+// Reserved.
+// The copyright to the software program(s) is property of Telefonica I+D.
+// The program(s) may be used and or copied only with the express written
+// consent of Telefonica I+D or in acordance with the terms and conditions
+// stipulated in the agreement/contract under which the program(s) have
+// been supplied.
 //
 /////////////////////////////////////////////////////////////////////////
 
@@ -118,7 +101,6 @@ TIDorb::core::goa::GOAImpl::create_POA(const char* adapter_name,
   if (a_POAManager == NULL) {
     POAmgr = new TIDorb::core::poa::POAManagerImpl(orb);
   } else {
-    //POAmgr = dynamic_cast<TIDorb::core::poa::POAManagerImpl*>(a_POAManager);
     POAmgr = (TIDorb::core::poa::POAManagerImpl*)(a_POAManager);
   }
 
@@ -247,9 +229,7 @@ CORBA::Object_ptr TIDorb::core::goa::GOAImpl::id_to_reference(const PortableServ
   GroupReferencesTable::iterator pos;
   pos = _group_references_table.find(TIDorb::core::poa::OID(oid));
   if (pos != _group_references_table.end()) {
-    //PRA
     return CORBA::Object::_duplicate(pos->second);
-    //EPRA
   }
   return TIDorb::core::poa::POAImpl::id_to_reference(oid);
 }
@@ -320,9 +300,6 @@ TIDorb::core::goa::GOAImpl::get_group_object_profile(CORBA::Object_ptr the_ref)
       throw PortableGroup::NotAGroupObject();
     }
 
-    //jagd
-    //TIDorb::core::ObjectDelegateImpl* delegate =
-    //  dynamic_cast<TIDorb::core::ObjectDelegateImpl*> (stub->_get_delegate());
     TIDorb::core::ObjectDelegateImpl* delegate =
       (TIDorb::core::ObjectDelegateImpl*) (stub->_get_delegate());
 
@@ -395,8 +372,6 @@ void TIDorb::core::goa::GOAImpl::group_object_POAKeys(const string& group_object
   }
 
   // Iterate through children
-  //jagd 
-  //vector<PortableServer::POA_var>::iterator it;
   vector<TIDorb::core::poa::POAImpl*>::iterator it;
   vector<TIDorb::core::poa::POAImpl*>::const_iterator end = _children.end();
   for (it = _children.begin(); it != end; it++) {

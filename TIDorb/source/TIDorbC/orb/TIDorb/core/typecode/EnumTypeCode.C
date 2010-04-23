@@ -49,21 +49,13 @@ TIDorb::core::typecode::EnumTypeCode::EnumTypeCode()
 
 
 
-//PRA
-//TIDorb::core::typecode::EnumTypeCode::EnumTypeCode(const char* id,
-//                                                   const char* name,
-//                                                   const CORBA::EnumMemberSeq* members)
 TIDorb::core::typecode::EnumTypeCode::EnumTypeCode(const char* id,
                                                    const char* name,
                                                    CORBA::EnumMemberSeq* members)
-//EPRA
   throw (TIDThr::SystemException)
   : ComplexTypeCode(CORBA::tk_enum, id, name)
 {
-//PRA
-//m_members = new CORBA::EnumMemberSeq(*members);
   m_members = members;
-//EPRA
 }
 
 
@@ -96,7 +88,7 @@ CORBA::Boolean TIDorb::core::typecode::EnumTypeCode::equal(CORBA::TypeCode_ptr t
                 if (strcmp(member_name(i), tc->member_name(i)))
                         return false;
         }
-        // alright
+        // allright
         return true;
   } catch (const CORBA::TypeCode::BadKind& bk) {
         return false;
@@ -123,7 +115,7 @@ CORBA::Boolean TIDorb::core::typecode::EnumTypeCode::equivalent(CORBA::TypeCode_
                 if (strcmp(member_name(i), tc->member_name(i)))
                         return false;
         }
-        // alright
+        // allright
         return true;
   } catch (const CORBA::TypeCode::BadKind& bk) {
         return false;
@@ -185,15 +177,10 @@ void TIDorb::core::typecode::EnumTypeCode::read_params
 
   m_members->length(length);
 
-//FRAN
-//  TypeCodeImpl* tc =0;
-//EFRAN
   for (CORBA::ULong i = 0; i < length; i++) {
-//FRAN
     if ((*m_members)[i]) {
       CORBA::string_free((*m_members)[i]);
     }
-//EFRAN
     input.read_string((*m_members)[i]);
   }
 }
@@ -204,16 +191,8 @@ void TIDorb::core::typecode::EnumTypeCode::read_params
 bool TIDorb::core::typecode::EnumTypeCode::skip_value
   (TIDorb::core::cdr::CDRInputStream& input) const
 {
-//MLG
   input.skip_ulong();
   return true;
-//EMLG
-
-/*
-  CORBA::ULong length = m_members->length();
-  input.skip_string_array(length);
-  return true;
-*/
 }
 
 
@@ -223,7 +202,6 @@ void TIDorb::core::typecode::EnumTypeCode::remarshal_value
        (TIDorb::core::cdr::CDRInputStream& input,
         TIDorb::core::cdr::CDROutputStream& output) const
 {
-//MLG
         unsigned int value = 0;
 
         input.read_ulong(value);
@@ -233,16 +211,6 @@ void TIDorb::core::typecode::EnumTypeCode::remarshal_value
 
 
         output.write_ulong(value);
-//EMLG
-/*
-  CORBA::ULong length = m_members->length();
-  char* str;
-  for(CORBA::ULong i = 0; i < length; i++) {
-    input.read_string(str);
-    output.write_string(str);
-    CORBA::string_free(str);
-  }
-*/
 }
 
 

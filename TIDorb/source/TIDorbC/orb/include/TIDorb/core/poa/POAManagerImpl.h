@@ -81,9 +81,6 @@ private:
   TIDorb::core::poa::ThreadPool*       _pool;
   TIDorb::core::poa::RequestQueue*     _requestQueue;
   PortableServer::POAManager::State    _state;
-  //PRA
-  //TIDorb::core::poa::CompletionWaiter* _completion;
-  //EPRA
   TIDorb::core::poa::CompletionWaiter  _completion;
 
 public:

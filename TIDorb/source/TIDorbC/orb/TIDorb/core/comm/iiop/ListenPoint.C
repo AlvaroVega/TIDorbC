@@ -55,10 +55,11 @@ ListenPoint::ListenPoint()
         //_host = CORBA::string_dup("");
         _host = NULL;
         _port = 0;
+        _ssl_port = 0;
         _incoming_interface = NULL;
         _outgoing_interface = NULL;
 
-        // pra@tid.es - FT extensions
+        // FT extensions
         _heartbeat_enabled = false;
         // end FT extensions
 }
@@ -71,10 +72,11 @@ ListenPoint::ListenPoint(const char* host, CORBA::UShort port)
         _str = NULL;
         _host = CORBA::string_dup(host);
         _port = port;
+        _ssl_port = 0;
         _incoming_interface = NULL;
         _outgoing_interface = NULL;
 
-        // pra@tid.es - FT extensions
+        // FT extensions
         _heartbeat_enabled = false;
         // end FT extensions
 }
@@ -86,10 +88,11 @@ ListenPoint::ListenPoint(const char* host, CORBA::UShort port,
         _str = NULL;
         _host = CORBA::string_dup(host);
         _port = port;
+        _ssl_port = 0;
         _incoming_interface = CORBA::string_dup(incoming_interface);
         _outgoing_interface = CORBA::string_dup(outgoing_interface);
 
-        // pra@tid.es - FT extensions
+        // FT extensions
         _heartbeat_enabled = false;
         // end FT extensions
 }
@@ -100,10 +103,11 @@ ListenPoint::ListenPoint(const ListenPoint& other)
         _str = CORBA::string_dup(other._str);
         _host = CORBA::string_dup(other._host);
         _port = other._port;
+        _ssl_port = other._ssl_port;
         _incoming_interface = CORBA::string_dup(other._incoming_interface);
         _outgoing_interface = CORBA::string_dup(other._outgoing_interface);
 
-        // pra@tid.es - FT extensions
+        // FT extensions
         _heartbeat_enabled = other._heartbeat_enabled;
         // end FT extensions
 }
@@ -134,7 +138,8 @@ ListenPoint& ListenPoint::operator= (const ListenPoint& other)
   _incoming_interface = CORBA::string_dup(other._incoming_interface);
   _outgoing_interface = CORBA::string_dup(other._outgoing_interface);
   _port = other._port;
-  // pra@tid.es - FT extensions
+  _ssl_port = other._ssl_port;
+  // FT extensions
   _heartbeat_enabled = other._heartbeat_enabled;
   // end FT extensions
 
@@ -155,22 +160,18 @@ bool ListenPoint::operator== (const ListenPoint& other) const
 
 bool ListenPoint::operator< (const ListenPoint& other) const
 {
-//PRA
   return ( (_port < other._port) ||
            ((_port == other._port) && (strcmp(_host, other._host) < 0)) );
-//EPRA
 }
 
 
 
 
 /*
-PRA
 CORBA::ULong ListenPoint::hashCode()
 {
   return atol(_host) + _port;
 }
-EPRA
 */
 
 
@@ -179,11 +180,9 @@ EPRA
 void ListenPoint::read(TIDorb::core::cdr::CDRInputStream& input)
 {
   CORBA::string_free(_str);
-//FRAN
   if(_host){
     CORBA::string_free(_host);
   }
-//EFRAN
   input.read_string(_host);
   input.read_ushort(_port);
 }
@@ -193,7 +192,6 @@ void ListenPoint::read(TIDorb::core::cdr::CDRInputStream& input)
 
 void ListenPoint::write(TIDorb::core::cdr::CDROutputStream& output) const
 {
-  //jagd
   if(_host)
     output.write_string(_host);
   else
@@ -208,7 +206,6 @@ const char* ListenPoint::toString() const
 {
   if(!_str) {
     TIDorb::util::StringBuffer buffer;
-    //jagd 
     if(_host)
       buffer << "ListenPoint(" << _port << '@'<< _host << ')';
     else 

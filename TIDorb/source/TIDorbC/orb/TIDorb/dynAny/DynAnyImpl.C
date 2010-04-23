@@ -56,8 +56,6 @@ DynAnyImpl::DynAnyImpl(DynamicAny::DynAnyFactory_ptr factory,
                        TIDorb::core::TIDORB* orb)
    throw(CORBA::SystemException)
    : DynAnyBase(factory, orb), 
-     //jagd
-     //_value_delegate(dynamic_cast<TIDorb::core::AnyImpl&>(_value.delegate()))
      _value_delegate(*(TIDorb::core::AnyImpl*)(&_value.delegate()))
 {
   this->TIDThr::RefCounter::_add_ref();
@@ -72,8 +70,6 @@ DynAnyImpl::DynAnyImpl(DynamicAny::DynAnyFactory_ptr factory,
                        CORBA::TypeCode_ptr real_type)
    throw(CORBA::SystemException)
    : DynAnyBase(factory, orb, CORBA::TypeCode_var(any.type()), real_type),
-     //jagd 
-     //_value_delegate(dynamic_cast<TIDorb::core::AnyImpl&>(_value.delegate()))
      _value_delegate(*(TIDorb::core::AnyImpl*)(&_value.delegate()))
 {
    init_value(any);
@@ -89,8 +85,6 @@ DynAnyImpl::DynAnyImpl(DynamicAny::DynAnyFactory_ptr factory,
                        CORBA::TypeCode_ptr real_type)
    throw(CORBA::SystemException)
    : DynAnyBase(factory, orb, type, real_type),
-     //jagd 
-     //_value_delegate(dynamic_cast<TIDorb::core::AnyImpl&>(_value.delegate()))
      _value_delegate(*(TIDorb::core::AnyImpl*)(&_value.delegate()))
 {
    init_value();
@@ -129,8 +123,6 @@ void DynAnyImpl::_write(TIDorb::portable::OutputStream& out) const
 void DynAnyImpl::assign(DynamicAny::DynAny_ptr dyn_any)
    throw(DynamicAny::DynAny::TypeMismatch, CORBA::SystemException)
 {
-   //jagd
-   //if (CORBA::is_nil(dyn_any))
    if (!(dyn_any))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference", 0, CORBA::COMPLETED_NO);
@@ -925,8 +917,6 @@ void DynAnyImpl::insert_typecode(CORBA::TypeCode_ptr value)
    throw(DynamicAny::DynAny::TypeMismatch,
          DynamicAny::DynAny::InvalidValue, CORBA::SystemException)
 {
-   //jagd
-   //if (CORBA::is_nil(value))
    if (!(value))
    {
       throw CORBA::BAD_PARAM("Null TypeCode reference", 0, CORBA::COMPLETED_NO);
@@ -1095,8 +1085,6 @@ void DynAnyImpl::insert_dyn_any(DynamicAny::DynAny_ptr value)
    throw(DynamicAny::DynAny::TypeMismatch,
          DynamicAny::DynAny::InvalidValue, CORBA::SystemException)
 {
-   //jagd
-   //if (CORBA::is_nil(value))
    if (!(value))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference", 0, CORBA::COMPLETED_NO);
@@ -1878,8 +1866,6 @@ void DynAnyImpl::init_value()
 
       case CORBA::tk_objref:
       {
-         //jagd
-         //CORBA::Object_var obj = CORBA::Object::_nil();
          CORBA::Object_var obj = 0;
          _value_delegate.insert_Object(obj);
          return;

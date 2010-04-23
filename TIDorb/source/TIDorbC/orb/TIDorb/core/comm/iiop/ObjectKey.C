@@ -117,7 +117,6 @@ TIDorb::core::comm::iiop::ObjectKey::getMarshaledKey() const
 
     ((ObjectKey *) this)->_marshaled_key = 
       (TIDorb::core::cdr::CDRInputStream*) (encapsulation.create_input_stream());
-    //dynamic_cast <TIDorb::core::cdr::CDRInputStream* > (encapsulation.create_input_stream());
   }
   
   return _marshaled_key;

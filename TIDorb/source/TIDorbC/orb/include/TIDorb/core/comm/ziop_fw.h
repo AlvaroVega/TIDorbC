@@ -45,10 +45,6 @@ namespace ziop {
   
   typedef TIDorb::core::comm::iiop::Version Version;
 
-//   class ProfileZIOP;
-//   typedef TIDThr::HandleT<ProfileZIOP> ProfileZIOP_ref;
-
-
   class ZIOPMessage;
 
 }

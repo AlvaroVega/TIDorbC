@@ -49,7 +49,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #ifndef __darwin
+#ifndef __CYGWIN__
    #include <stropts.h>
+#endif
 #endif
 #include <unistd.h>
 #include <fcntl.h>

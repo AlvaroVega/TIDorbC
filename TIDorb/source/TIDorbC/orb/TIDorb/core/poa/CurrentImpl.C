@@ -62,19 +62,14 @@ TIDorb::core::poa::CurrentInfo* TIDorb::core::poa::CurrentImpl::getCurrentInfo()
 TIDorb::core::poa::CurrentImpl::CurrentImpl(TIDorb::core::TIDORB* orb)
 {
   _orb = orb;
-  //PRA
   orb->_add_ref();
-  //EPRA
   this->TIDThr::RefCounter::_add_ref();
 };
 
 TIDorb::core::poa::CurrentImpl::~CurrentImpl()
   throw(TIDThr::SystemException)
 {
-  //PRA
-  //delete _orb;
   CORBA::release(_orb);
-  //EPRA	
 };
 	
 PortableServer::POA* TIDorb::core::poa::CurrentImpl::get_POA() 

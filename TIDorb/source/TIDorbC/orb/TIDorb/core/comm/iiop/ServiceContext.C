@@ -62,7 +62,6 @@ TIDorb::core::comm::iiop::ServiceContext::~ServiceContext()  throw (TIDThr::Syst
 void TIDorb::core::comm::iiop::ServiceContext::write(TIDorb::core::cdr::CDROutputStream& output) const
 {
 	output.write_ulong(_context_id);
-	//MCPG
 	//output.write_encapsulation(_context_data);
 	output.write_buffer(*(_context_data->get_buffer()));
 };

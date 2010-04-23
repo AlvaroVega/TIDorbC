@@ -101,8 +101,6 @@ CORBA::ExceptionList_ptr CORBA::ExceptionList::_duplicate(CORBA::ExceptionList_p
 {
   try {
     
-    //jagd 
-    //TIDorb::core::ExceptionListImpl* list_impl = dynamic_cast<TIDorb::core::ExceptionListImpl*> (list);
     TIDorb::core::ExceptionListImpl* list_impl = (TIDorb::core::ExceptionListImpl*) (list);
   
     if(list_impl)
@@ -123,8 +121,7 @@ CORBA::ExceptionList_ptr CORBA::ExceptionList::_nil()
 void CORBA::release(CORBA::ExceptionList_ptr list)
 {
   try {
-    //jagd 
-    //TIDorb::core::ExceptionListImpl* list_impl = dynamic_cast<TIDorb::core::ExceptionListImpl*> (list);
+
     TIDorb::core::ExceptionListImpl* list_impl = (TIDorb::core::ExceptionListImpl*) (list);
   
     if(list_impl)

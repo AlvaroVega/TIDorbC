@@ -169,7 +169,7 @@ CORBA::TypeCode_ptr TIDorb::core::typecode::TypeCodeImpl::concrete_base_type() c
   throw CORBA::TypeCode::BadKind();
 }
 
-/* jagd inline
+/* inline
 bool TIDorb::core::typecode::TypeCodeImpl::isSimple() const
 {
   return true;
@@ -278,7 +278,6 @@ void TIDorb::core::typecode::TypeCodeImpl::remarshal_value
       (TIDorb::core::cdr::CDRInputStream& input,
        TIDorb::core::cdr::CDROutputStream& output) const
 {
-   //MLG: break sentence is needed
    switch (m_kind) {
     case CORBA::tk_short:
     {
@@ -376,9 +375,6 @@ void TIDorb::core::typecode::TypeCodeImpl::remarshal_value
           CORBA::TypeCode_ptr tc;
           input.read_TypeCode(tc);
 
-          //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*>(tc);
-          //jagd 
-          //TypeCodeImpl* tc_impl = (TypeCodeImpl*)tc->_impl();
           TypeCodeImpl* tc_impl = (TypeCodeImpl*)tc;
           output.write_TypeCode(tc);
           tc_impl->remarshal_value(input,output);
@@ -527,13 +523,7 @@ bool TIDorb::core::typecode::TypeCodeImpl::values_equal
           b_input.read_TypeCode(tc_b);
 
           if (tc_a->equal(tc_b)) {
-                //TypeCodeImpl* tc_impl_a = dynamic_cast<TypeCodeImpl*>((CORBA::TypeCode_ptr) tc_a);
-                //jagd
-                //TypeCodeImpl* tc_impl_a = (TypeCodeImpl*)((CORBA::TypeCode_ptr) tc_a)->_impl();
                 TypeCodeImpl* tc_impl_a = (TypeCodeImpl*)((CORBA::TypeCode_ptr) tc_a);
-                //TypeCodeImpl* tc_impl_b = dynamic_cast<TypeCodeImpl*>((CORBA::TypeCode_ptr) tc_b);
-                //jagd
-                //TypeCodeImpl* tc_impl_b = (TypeCodeImpl*)((CORBA::TypeCode_ptr) tc_b)->_impl();
                 TypeCodeImpl* tc_impl_b = (TypeCodeImpl*)((CORBA::TypeCode_ptr) tc_b);
                 return tc_impl_a->values_equal(a_input, b_input);
           } else {
@@ -755,15 +745,10 @@ bool TIDorb::core::typecode::TypeCodeImpl::dump_value(TIDorb::core::cdr::CDRInpu
         case CORBA::tk_any:
         {
                 output << "{any: ";
-                //jagd
-                //CORBA::TypeCode_ptr tc = CORBA::TypeCode::_nil();
                 CORBA::TypeCode_ptr tc = 0;
 
                 input.read_TypeCode(tc);
 
-                //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*> (tc);
-                //jagd 
-                //TypeCodeImpl* tc_impl = (TypeCodeImpl*)tc->_impl();
                 TypeCodeImpl* tc_impl = (TypeCodeImpl*)tc;
 
                 tc_impl->dump(output);
@@ -774,13 +759,9 @@ bool TIDorb::core::typecode::TypeCodeImpl::dump_value(TIDorb::core::cdr::CDRInpu
         }
         case CORBA::tk_TypeCode:
         {
-                //jagd
-                //CORBA::TypeCode_ptr tc = CORBA::TypeCode::_nil();
                 CORBA::TypeCode_ptr tc = 0;
                 input.read_TypeCode(tc);
-                //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*> (tc);
-                //jagd 
-                //TypeCodeImpl* tc_impl = (TypeCodeImpl*)tc->_impl();
+
                 TypeCodeImpl* tc_impl = (TypeCodeImpl*)tc;
 
                 output << "{typecode: ";
@@ -814,10 +795,7 @@ CORBA::TypeCode_ptr CORBA::TypeCode::_duplicate(CORBA::TypeCode_ptr tc)
 
     TIDorb::core::typecode::TypeCodeImpl* tc_impl = NULL;
     if (tc)
-        //jagd
-	//tc_impl = (TIDorb::core::typecode::TypeCodeImpl*)tc->_impl();
 	tc_impl = (TIDorb::core::typecode::TypeCodeImpl*)tc;
-      	//dynamic_cast<TIDorb::core::typecode::TypeCodeImpl*> (tc);
 
     if(tc_impl){
       tc_impl->_add_ref();
@@ -842,10 +820,7 @@ void CORBA::release(CORBA::TypeCode_ptr tc)
   try {
     TIDorb::core::typecode::TypeCodeImpl* tc_impl = NULL;
     //if (tc)
-        //jagd
     	tc_impl = (TIDorb::core::typecode::TypeCodeImpl*)tc;
-    	//tc_impl = (TIDorb::core::typecode::TypeCodeImpl*)tc->_impl();
-    //dynamic_cast<TIDorb::core::typecode::TypeCodeImpl*> (tc);
     
     if(tc_impl){
       //      cerr << "FINAL CORBA::_release _count " << tc_impl->_count() << " " << tc_impl << endl;
@@ -895,8 +870,6 @@ void CORBA::_TypeCodeHelper::write(::TIDorb::portable::OutputStream& os, const C
 
 CORBA::_TypeCodeHolder::_TypeCodeHolder()
 {
-  //jagd
-  //value = CORBA::TypeCode::_nil();
   value = 0;
 }
 
@@ -906,7 +879,6 @@ CORBA::_TypeCodeHolder::_TypeCodeHolder(const CORBA::TypeCode_ptr initial)
 }
 CORBA::TypeCode_ptr CORBA::_TypeCodeHolder::_type() const
 {
-  //return CORBA::TypeCode::_duplicate(CORBA::_tc_TypeCode);
   return TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(CORBA::tk_TypeCode);
 }
 

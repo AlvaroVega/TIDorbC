@@ -44,7 +44,7 @@ caceres@tid.es
 
 
 #include <inttypes.h>
-//jagd 
+
 #define NEXT_ALIGNED_POSITION(pos,type_size)\
                 {\
                   --type_size; \
@@ -78,7 +78,7 @@ namespace TIDorb {
       class IteratorCDR {
 
         public:
-        //jagd 4
+
         IteratorCDR(){};
 
         IteratorCDR(TIDorb::core::TIDORB* orb);
@@ -246,7 +246,6 @@ namespace TIDorb {
 		{
 		    // set the aligned position
 	
-                    //jagd 	
 		    //go_next_aligned_position(type_size);
                     GO_NEXT_ALIGNED_POSITION(type_size); 		
 
@@ -266,11 +265,10 @@ namespace TIDorb {
         */
         void go_next_aligned_position(CORBA::ULong type_size)
 		{
-                  //jagd
 		  //CDR::Addr next_position = next_aligned_position(type_size);
 		  CDR::Addr next_position ;
 		  NEXT_ALIGNED_POSITION(next_position,type_size); 
-		  //jagd if (next_position < m_chunk->get_buffer_end())
+		  // if (next_position < m_chunk->get_buffer_end())
 		  if (next_position < m_chunk->m_buffer_end)
 		  {
 		    m_next = next_position;
@@ -281,12 +279,11 @@ namespace TIDorb {
 		}
 
 
-        //jagd
         void go_next_aligned_position_sin_exception(CORBA::ULong type_size)
         {
             CDR::Addr next_position ;
             NEXT_ALIGNED_POSITION(next_position,type_size);
-            //jagd if (next_position < m_chunk->get_buffer_end())
+            //if (next_position < m_chunk->get_buffer_end())
             if (next_position < m_chunk->m_buffer_end)
             {
               m_next = next_position;
@@ -373,10 +370,8 @@ namespace TIDorb {
           return ((uintptr_t) m_chunk->get_buffer_end() >=
           ((uintptr_t) m_next + (uintptr_t) type_size));
         }
-//MLG
-        //TIDorb::core::TIDORB_ref  m_orb;
         TIDorb::core::TIDORB* m_orb;
-//EMLG        
+
         /**
         * Byte order of data in stream: big-endian if <code>true</code>, or little-endian if
         * <code>false</code>

@@ -61,15 +61,14 @@ CORBA::UnknownUserException* TIDorb::core::comm::iiop::UserSystemExceptionEncode
 TIDorb::portable::InputStream& in, CORBA::ExceptionList_ptr types)
 {
   CORBA::String_var name;
-//PRA
+
   in.read_string(name.out());
-//EPRA
 
   try {
     if (types != NULL) {
       CORBA::TypeCode_var type;
 
-      for (CORBA::ULong i = 0; i < types->count(); i++) //ATENCION -MCPG
+      for (CORBA::ULong i = 0; i < types->count(); i++) 
       {
         type = types->item(i);
         if(type->kind() != CORBA::tk_except)

@@ -1,24 +1,51 @@
-2010-03-03 Alvaro Vega Garcia  <avega@tid.es>
+2010-04-16 Alvaro Vega Garcia  <avega@tid.es>
+        
+	* TIDorbC version 6.4.2 released.
 
-	* TIDorbC version 6.3.3 released.
-	
-	Fix bug [#1129] OnlyOneThreadCanWait exception at client side 
-	Fix bug [#1119] NULL reference to Thread in PolicyManagerContext
+	Fix bug [#1176]	Unexpected BAD_PARAM
+	Fix bug [#1160] Servant reference count at POA
+	Fix bug [#1159]	Memory leak in non_existent() operation
+	Fix bug [#1150] orb->destroy does not destroy properly SSLIOP layer
+	Fix bug [#1135] TIDorb must ensure initialization of static variables
+
+2010-03-03 Alvaro Vega Garcia  <avega@tid.es>
+        
+	* TIDorbC version 6.4.1 released.
+        * TIDorbC version 6.3.3 released.
+
+	Fix bug [#1129] OnlyOneThreadCanWait exception at client side
+        Fix bug [#1119] NULL reference to Thread in PolicyManagerContext
 	Fix bug [#1113] INTERNAL exception catched procesing a reply
 	
+2010-02-12 Alvaro Vega Garcia  <avega@tid.es>
+
+	* TIDorbC version 6.4.0 released.
+
+	Task [#801] Reduce ListenPoint vector definitions
+	Task [#800] Redundant check when layer creates a Delegate for a 
+	CORBA::Object
+	Possible bug [#1057] Some core dumps with high load: improvements in 
+	error management and increase verbose level.
+	
+	Task [#776] SSL layer for TIDorb
+	Task [#777] CSIv2 support
+	Task [#778] GSSUP protocol
+	Task [#779] Security Checker
+	Task [#781] Secure corbalocs
+
 2009-08-05 Alvaro Vega Garcia  <avega@tid.es>
 
 	* TIDorbC version 6.3.2 released.
-	
+       
 	Fix bug [#1050] Invalid memory access in DynValueImpl::_write
 	Fix bug [#1034] Object::_set_policy_overrides doesn't leave current 
 	object reference without changes
-	
+        
 2009-07-02 Alvaro Vega Garcia  <avega@tid.es>
 
 	* TIDorbC version 6.3.1 released.
-	
-	Fix bug [#1026] Unable to retrieve the factory of a custom compressor 
+        
+	Fix bug [#1026] Unable to retrieve the factory of a custom compressor
 	previously registered
 	Task [#639] Improve access to ORB configuration 
 	Aligned with GIOP Compression (FTF Beta 2, May 2009): changes in the

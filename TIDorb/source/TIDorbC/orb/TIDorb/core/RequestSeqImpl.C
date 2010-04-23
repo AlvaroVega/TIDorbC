@@ -69,8 +69,6 @@ void CORBA::ORB::RequestSeq::length(CORBA::ULong v)
 		m_max_length = (v>m_max_length)? v : m_max_length;
 		allocbuf();
 		for(size_t i = 0; i < m_length; i++)
-                        //jagd 2
-			//m_buffer[i] = CORBA::Request::_nil();
 			m_buffer[i] = 0;
 		return;
 	}
@@ -87,8 +85,6 @@ void CORBA::ORB::RequestSeq::length(CORBA::ULong v)
 			m_max_length = v;
 		}
 		for(size_t i = m_length; i < v; i++)
-                        //jagd 2
-			//m_buffer[i] = CORBA::Request::_nil();
 			m_buffer[i] = 0;
 	} else if (v < m_length){
 		for(size_t i = v; i < m_length; i++) 

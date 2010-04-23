@@ -1,6 +1,6 @@
 /*//////////////////////////////////////////////////////////////////////////////////
 //
-// File:        TypeCodeHolder.h
+// File:        TIDorb/core/util/TypeCodeHolder.h
 // Description: 
 //
 // Rel:         01.00
@@ -58,7 +58,7 @@ class TypeCodeHolder : public TIDorb::portable::Streamable {
  
     TypeCodeHolder()
     {
-      value = CORBA::TypeCode::_nil();
+      value = NULL;
     }
     
     TypeCodeHolder(CORBA::TypeCode_ptr initial)
@@ -72,7 +72,7 @@ class TypeCodeHolder : public TIDorb::portable::Streamable {
      }
 
     void _read(TIDorb::portable::InputStream& is) {
-      if(!CORBA::is_nil(value)) 
+      if(value) 
         CORBA::release(value);
         
        is.read_TypeCode(value);

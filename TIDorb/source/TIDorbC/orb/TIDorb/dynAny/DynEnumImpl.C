@@ -74,9 +74,6 @@ DynEnumImpl::DynEnumImpl(DynamicAny::DynAnyFactory_ptr factory, TIDorb::core::TI
 
    any.delegate().write_value(*out);
   
-   //jagd 
-   //in = dynamic_cast<TIDorb::core::cdr::CDRInputStream*>
-   //                  (out->create_input_stream());
    in = (TIDorb::core::cdr::CDRInputStream*)
                      (out->create_input_stream());
 
@@ -228,8 +225,6 @@ void DynEnumImpl::assign(DynamicAny::DynAny_ptr dyn_any)
       throw CORBA::OBJECT_NOT_EXIST("DynAny destroyed");
    }
 
-   //jagd
-   //if (CORBA::is_nil(dyn_any))
    if (!(dyn_any))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference", 0, CORBA::COMPLETED_NO);
@@ -324,8 +319,6 @@ CORBA::Boolean DynEnumImpl::equal(DynamicAny::DynAny_ptr dyn_any)
       throw CORBA::OBJECT_NOT_EXIST("DynAny destroyed", 0, CORBA::COMPLETED_NO);
    }
 
-   //jagd
-   //if (CORBA::is_nil(dyn_any))
    if (!(dyn_any))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference", 0, CORBA::COMPLETED_NO);

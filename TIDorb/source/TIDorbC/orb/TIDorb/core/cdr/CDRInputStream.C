@@ -355,10 +355,9 @@ void CDRInputStream::read_any(::CORBA::Any& v)
 {
   CORBA::TypeCode_ptr tc;
   read_TypeCode(tc);
-  //jagd 
-  //(dynamic_cast<TIDorb::core::AnyImpl&>(v.delegate())).orb(m_orb);
+
   ((TIDorb::core::AnyImpl*)(&(v.delegate())))->orb(m_orb);
-  //v.delegate().read_value(*this, tc);
+
   v.delegate().read_value(*this, tc, true); 
   CORBA::release(tc);
 }
@@ -436,8 +435,7 @@ void CDRInputStream::skip_any()
   read_TypeCode(tc);
 
   TypeCodeImpl* type = NULL;
-  //jagd
-  //type = (TypeCodeImpl*) (tc)->_impl();
+
   type = (TypeCodeImpl*) (tc);
 
   type->skip_value(*this);
@@ -942,7 +940,7 @@ void CDRInputStream::read_TypeCode(CORBA::TypeCode_out tc)
   TypeCodeImpl* type = 0;
 
   // Test Simple or complex TypeCode
-  // jagd cambiamos el orden de obtener get_empty_TypeCode
+  // cambiamos el orden de obtener get_empty_TypeCode
   if ((kind!=CORBA::tk_struct)&&
       (kind!=CORBA::tk_objref)&&
       (kind!=CORBA::tk_union)&&
@@ -959,23 +957,14 @@ void CDRInputStream::read_TypeCode(CORBA::TypeCode_out tc)
       (kind!=CORBA::tk_native)&&
       (kind!=CORBA::tk_abstract_interface))
   {
-/*
-  type =
-  TIDorb::core::typecode::TypeCodeFactory::get_empty_TypeCode((CORBA::TCKind) kind);
 
-  // Test if the TCKind is a basic TypeCode
-  if (!type)
-  {*/
     tc = TIDorb::portable::TypeCodeFactory::get_basic_TypeCode((CORBA::TCKind) kind);
-//MLT
     if(!tc)
-//EMLG
       throw CORBA::MARSHAL(); //("Error reading typecode");
 
     return;
   }
 
-//MLG
   CORBA::Boolean is_complex = false;
 
   switch (kind)
@@ -1020,17 +1009,12 @@ void CDRInputStream::read_TypeCode(CORBA::TypeCode_out tc)
           CORBA::TypeCode_ptr paux = NULL;
           paux = cache->find(rep_id);
           if (paux) {
-            //jagd 
-            //cached_type = (TypeCodeImpl*) paux->_impl();
             cached_type = (TypeCodeImpl*) paux;
           }
         }
 
         if (cached_type) {
           skip_encapsulation();
-          /* if (type){
-             CORBA::release(type);
-             }*/
           type = cached_type;
         } else {
             type =
@@ -1054,11 +1038,8 @@ void CDRInputStream::read_TypeCode(CORBA::TypeCode_out tc)
   }
 
   // ?queremos podemos guardar el typecode aplanado para otras veces?
-//FRAN
   CORBA::release(tc);
-//EFRAN
   tc = type;
-//EMLG
 }
 
 
@@ -1069,81 +1050,6 @@ void CDRInputStream::read_Value(CORBA::ValueBase_out value)
     value = read_Value();
 }
 
-
-
-
-//
-//PRA
-//
-
-//CORBA::ValueBase_ptr CDRInputStream::read_Value()
-//{
-//    alignment(CDR::LONG_SIZE);
-//
-//    CDR::AbsolutePosition value_position = get_absolute_position();
-//
-//    ValueTypeInfo_ref value_info;
-//
-//    value_info = ValueTypeInfo::read(*this);
-//
-//    if(value_info.is_null()) {
-//        throw CORBA::MARSHAL();
-//    }
-//    if (value_info->is_null()) {
-//        return NULL;
-//    }
-//
-//    if (value_info->isIndirection()) {
-//        value_info = get_context()->lookup_value(value_position);        
-//        return value_info->get_value();
-//    }
-//
-//    const char* id = value_info->get_id();
-//
-//    if (!id) {
-//        throw CORBA::MARSHAL();
-//    }
-//
-//    if (value_info->isFragmented()) {
-//        throw  CORBA::NO_IMPLEMENT();
-//        //"Fragmented value reading not implemented"
-//    }
-//
-//    CORBA::ValueBase* value = NULL;
-//    if (m_orb)
-//       value = create_value(m_orb, (const CORBA::RepositoryId) id);
-//
-//    // create_value is a static operation from TIDorb::portable::InputStream
-//
-//    if(!value) {
-//        throw CORBA::MARSHAL();
-//    }
-//
-//    CORBA::TypeCode_var type = value->_type();
-//
-//    const char* value_rep_id = type->id();
-//
-//    if ((!value_info->is_truncable(value_rep_id))) {
-//        CORBA::remove_ref(value);
-//        throw CORBA::MARSHAL(); // "Cannot truncate value
-//    }
-
-//    // TODO: check CustomMarshal in CDRInputStream::read_Value()
-///*  CORBA::CustomMarshal* custom =
-//        dynamic_cast<CORBA::CustomMarshal*> (value);
-//
-//    if(custom) {
-//        custom->unmarshal(this);
-//    } else */  {
-//        value->_read(*this);
-//    }
-//
-//    value_info->set_value(value);
-//
-//    get_context()->put(value_position, value_info);
-//
-//    return value;
-//}
 
 
 CORBA::ValueBase_ptr CDRInputStream::read_Value()
@@ -1212,10 +1118,6 @@ CORBA::ValueBase_ptr CDRInputStream::read_Value()
     return value;
 }
 
-//
-//EPRA
-//
-
 
 
 CORBA::ValueBase_ptr CDRInputStream::read_Value(const CORBA::TypeCode_ptr type)
@@ -1280,67 +1182,10 @@ CORBA::ValueBase_ptr CDRInputStream::read_Value(const CORBA::TypeCode_ptr type)
 
 
 
-//PRA
-
 void CDRInputStream::skip_Value(CORBA::TypeCode_ptr type)
 {
         CORBA::ValueBase_var value = read_Value(type);
 }
-
-
-// void CDRInputStream::skip_Value(CORBA::TypeCode_ptr type)
-// {
-//     alignment(CDR::LONG_SIZE);
-
-//     ValueTypeInfo value_info;
-
-//     value_info.read(*this);
-    
-//     if (value_info.is_null()) {
-//         return;
-//     }
-
-//     if (value_info.isIndirection()) {
-//         return;
-//     }
-
-//     const char* id = value_info.get_id();
-
-//     if (!id) {
-//         throw CORBA::MARSHAL();
-//     }
-
-//     if (value_info.isFragmented()) {
-//         throw CORBA::NO_IMPLEMENT();
-//         //"Fragmented value reading not implemented"
-//     }
-
-//     CORBA::ValueBase* value = NULL;
-//     try {    	
-//        value = create_value(m_orb, (const CORBA::RepositoryId) id);
-//     } catch (const CORBA::MARSHAL& m) {
-//     }
-
-//     // create_value is a static operation from TIDorb::portable::InputStream
-
-//     const char* value_rep_id = type->id();
-    
-//     if ((!value_info.is_truncable(value_rep_id))) {        
-//         CORBA::remove_ref(value);
-//         throw CORBA::MARSHAL(); // "Cannot truncate value
-//     }
-    
-//     if(!value) {
-//         TIDorb::core::typecode::ValueTypeCode* value_type = dynamic_cast<TIDorb::core::typecode::ValueTypeCode*>(type);
-//         value_type->partial_skip_value(*this);
-//         return;
-//     }   
-
-//     value->_read(*this);
-//     CORBA::remove_ref(value);
-//     return;
-// }
-//EPRA
 
 
 

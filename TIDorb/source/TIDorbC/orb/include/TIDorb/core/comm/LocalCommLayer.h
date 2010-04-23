@@ -64,6 +64,9 @@ class LocalCommLayer : public CommunicationLayer
 
     void oneway_request(TIDorb::core::RequestImpl* request,
                         TIDorb::core::iop::IOR* ior);
+
+    void reliable_oneway_run(TIDorb::core::RequestImpl* request,
+                             TIDorb::core::iop::IOR* ior);
                         
     bool is_local() const { return true;}
     
@@ -84,6 +87,8 @@ class LocalCommLayer : public CommunicationLayer
     void send_request(TIDorb::core::RequestImpl* request,
                       TIDorb::core::iop::IOR* ior)
       throw(TIDorb::core::ForwardRequest,CORBA::SystemException);
+
+    void get_poa_stuff();
     
  private:
     /**
@@ -95,6 +100,9 @@ class LocalCommLayer : public CommunicationLayer
      * QoS enabled.
      */
     bool m_qos_enabled;
+
+    TIDorb::core::poa::POAImpl * pPOAImpl;
+    TIDorb::core::poa::POAManagerImpl* poaManager;
     
 };
 

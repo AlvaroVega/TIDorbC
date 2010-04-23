@@ -73,7 +73,6 @@ class CharHolder : public TIDorb::portable::Streamable {
     CORBA::TypeCode_ptr _type() const
     {
         return CORBA::TypeCode::_duplicate(CORBA::_tc_char);
-        //return TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(::CORBA::tk_char);
     }
 
 };

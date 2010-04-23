@@ -168,7 +168,7 @@ CORBA::Boolean TIDorb::core::comm::iiop::GIOPHeader::getCompressed() const
 
 void TIDorb::core::comm::iiop::GIOPHeader::write(TIDorb::core::cdr::CDROutputStream& output) const
 {
-  //jagd cambia 4 octetos por un long
+  // cambia 4 octetos por un long
    
   //output.write_octet((CORBA::Octet)'G');
   //output.write_octet((CORBA::Octet)'I');
@@ -207,19 +207,6 @@ void TIDorb::core::comm::iiop::GIOPHeader::write(TIDorb::core::cdr::CDROutputStr
 
 void TIDorb::core::comm::iiop::GIOPHeader::read(TIDorb::core::cdr::CDRInputStream& input)
 {
-  /* jagd
-  CORBA::Octet a1,a2,a3,a4;
-  input.read_octet(a1);
-  input.read_octet(a2);
-  input.read_octet(a3);
-  input.read_octet(a4);
-  if ((a1 != (CORBA::Octet)'G') ||
-      (a2 != (CORBA::Octet)'I') ||
-      (a3 != (CORBA::Octet)'O') ||
-      (a4 != (CORBA::Octet)'P'))
-    throw CORBA::MARSHAL("Bad GIOP Message header: Invalid header identifier.",
-                         0, CORBA::COMPLETED_NO);
-  */
 
   CORBA::Long giop;
   input.read_long(giop);
@@ -232,7 +219,6 @@ void TIDorb::core::comm::iiop::GIOPHeader::read(TIDorb::core::cdr::CDRInputStrea
 
   _version.read(input);
 
-  //unsigned char* flag = input.read_octet();
   CORBA::Octet flag;
   input.read_octet(flag);
 
@@ -247,9 +233,8 @@ void TIDorb::core::comm::iiop::GIOPHeader::read(TIDorb::core::cdr::CDRInputStrea
 
   CORBA::Octet tipo;
   input.read_octet(tipo);
-  _message_type = TIDorb::core::comm::iiop::MsgType_from_int((CORBA::ULong)tipo); //MCPG
+  _message_type = TIDorb::core::comm::iiop::MsgType_from_int((CORBA::ULong)tipo);
 
-  //_message_size = input.read_ulong();
   input.read_ulong(_message_size);
 }
 

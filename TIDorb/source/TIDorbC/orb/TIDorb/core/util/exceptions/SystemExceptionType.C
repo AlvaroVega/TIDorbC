@@ -47,13 +47,11 @@ TIDorb::core::util::exceptions::SystemExceptionType::create(const char* id)
     
     (*members)[0].name = (::CORBA::Identifier) CORBA::string_dup("minor");
     (*members)[0].type = TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(::CORBA::tk_ulong);
-    //jagd 
-    //(*members)[0].type_def = CORBA::IDLType::_nil();
+
     (*members)[0].type_def = 0;
     (*members)[1].name = (::CORBA::Identifier) CORBA::string_dup("completed");
-    (*members)[1].type = CORBA::TypeCode::_duplicate(CORBA::_tc_CompletionStatus);
-    //jagd 
-    //(*members)[1].type_def = CORBA::IDLType::_nil();
+    (*members)[1].type = CORBA::TypeCode::_duplicate(CORBA::_CompletionStatusHelper::type());
+
     (*members)[1].type_def = 0;
     return TIDorb::portable::TypeCodeFactory::create_exception_tc(id, "BAD_PARAM", members);
 }

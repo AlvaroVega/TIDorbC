@@ -57,7 +57,6 @@ TIDorb::core::NVListImpl::~NVListImpl()  throw (TIDThr::SystemException)
   ItemList::iterator end = m_list.end();
   
  for(i = m_list.begin(); i != end; i++)
-    // jagd3    CORBA::release(*i);
     delete (*i);
 }
 
@@ -126,15 +125,11 @@ CORBA::NamedValue_ptr TIDorb::core::NVListImpl::item(CORBA::ULong index)
   if(index >= m_list.size())
     throw CORBA::BAD_PARAM();
   
-  //jagd 3 return CORBA::NamedValue::_duplicate(m_list[index]);
   return m_list[index];
 }
 
 void TIDorb::core::NVListImpl::remove(CORBA::ULong index)
 {
-  //jagd 2
-  //TIDThr::Synchronized sync(*this);
-  
   CORBA::ULong size = m_list.size();
   
   if(index >= size)
@@ -151,11 +146,9 @@ void TIDorb::core::NVListImpl::remove(CORBA::ULong index)
 
 CORBA::NVList_ptr CORBA::NVList::_duplicate(CORBA::NVList_ptr list)
 {
-  //jagd 2
   
   try {
     
-    //TIDorb::core::NVListImpl* list_impl = dynamic_cast<TIDorb::core::NVListImpl*> (list);
     TIDorb::core::NVListImpl* list_impl = NULL;
     
     if (list)
@@ -183,7 +176,6 @@ void CORBA::release(CORBA::NVList_ptr list)
   
   try {
     
-    //TIDorb::core::NVListImpl* list_impl = dynamic_cast<TIDorb::core::NVListImpl*> (list);
     TIDorb::core::NVListImpl* list_impl = NULL;
     
     if (list)
@@ -220,9 +212,7 @@ void TIDorb::core::NVListImpl::assign_out_arguments(CORBA::NVList_ptr from_list,
     throw CORBA::MARSHAL (); //"Invalid number of out arguments.",
   //0, CompletionStatus.COMPLETED_NO);  
   
-  //jagd 3 CORBA::NamedValue_var to_nam_val;
   CORBA::NamedValue * to_nam_val;
-  //jagd 3 CORBA::NamedValue_var from_nam_val;		
   CORBA::NamedValue * from_nam_val;		
   CORBA::TypeCode_var tc_type;
   try {
@@ -230,13 +220,9 @@ void TIDorb::core::NVListImpl::assign_out_arguments(CORBA::NVList_ptr from_list,
       to_nam_val = to_list->item(i);
       from_nam_val = from_list->item(i);
       if(to_nam_val->flags() != CORBA::ARG_IN) { 
-        	//jagd AnyImpl& from_any = dynamic_cast< AnyImpl& > (from_nam_val->value()->delegate());
-        	AnyImpl& from_any = *(AnyImpl*) &(from_nam_val->value()->delegate());
-        	//jagd AnyImpl& to_any = dynamic_cast< AnyImpl& > (to_nam_val->value()->delegate());
-        	AnyImpl& to_any =   *(AnyImpl*) & (to_nam_val->value()->delegate());        
-        	tc_type = from_any.type();
-        // Fix bug [#392] Any::type(tc) reset any value
-        //to_any.type(tc_type);
+        AnyImpl& from_any = *(AnyImpl*) &(from_nam_val->value()->delegate());
+        AnyImpl& to_any =   *(AnyImpl*) & (to_nam_val->value()->delegate());        
+        tc_type = from_any.type();
         to_any.set_type(tc_type);
         to_any.assign_value(from_any, wrap_anys);
       }
@@ -264,9 +250,7 @@ void TIDorb::core::NVListImpl::assign_in_arguments(CORBA::NVList_ptr from_list,
     throw CORBA::MARSHAL ("Invalid number of out arguments.");
   //0, CompletionStatus.COMPLETED_NO);  
   
-  //jagd 3 CORBA::NamedValue_var to_nam_val;
   CORBA::NamedValue * to_nam_val;
-  //jagd 3 CORBA::NamedValue_var from_nam_val;		
   CORBA::NamedValue * from_nam_val;		
   CORBA::TypeCode_var tc_type;
   try {
@@ -274,13 +258,9 @@ void TIDorb::core::NVListImpl::assign_in_arguments(CORBA::NVList_ptr from_list,
       to_nam_val = to_list->item(i);
       from_nam_val = from_list->item(i);
       if(to_nam_val->flags() != CORBA::ARG_OUT){ 
-        	//jagd AnyImpl& from_any = dynamic_cast< AnyImpl& > (from_nam_val->value()->delegate());
-        	AnyImpl& from_any = *(AnyImpl*) & (from_nam_val->value()->delegate());
-        	//jagd AnyImpl& to_any = dynamic_cast< AnyImpl& > (to_nam_val->value()->delegate());
-        	AnyImpl& to_any = *(AnyImpl*) &(to_nam_val->value()->delegate());
+        AnyImpl& from_any = *(AnyImpl*) & (from_nam_val->value()->delegate());
+        AnyImpl& to_any = *(AnyImpl*) &(to_nam_val->value()->delegate());
         tc_type = from_any.type();
-        // Fix bug [#392] Any::type(tc) reset any value
-        //to_any.type(tc_type);
         to_any.set_type(tc_type);
         to_any.assign_value(from_any, wrap_anys);
       }
@@ -295,14 +275,11 @@ void TIDorb::core::NVListImpl::assign_in_arguments(CORBA::NVList_ptr from_list,
 
 void TIDorb::core::NVListImpl::read_params_out(CORBA::NVList_ptr list, TIDorb::core::cdr::CDRInputStream& input)
 {
-  //jagd 2
-  //if(CORBA::is_nil(list))
   if(!(list))
     throw CORBA::BAD_PARAM("Null list reference");
     
   CORBA::ULong length = list->count();
   
-  //jagd 3 CORBA::NamedValue_var nam_val;
   CORBA::NamedValue * nam_val;
   CORBA::TypeCode_var tc;
   
@@ -319,14 +296,11 @@ void TIDorb::core::NVListImpl::read_params_out(CORBA::NVList_ptr list, TIDorb::c
 
 void TIDorb::core::NVListImpl::write_params_out(CORBA::NVList_ptr list, TIDorb::core::cdr::CDROutputStream& output)
 {
-  //jagd 2
-  //if(CORBA::is_nil(list))
   if(!(list))
     throw CORBA::BAD_PARAM("Null list reference");
     
   CORBA::ULong length = list->count();
   
-  //jagd 3 CORBA::NamedValue_var nam_val;
   CORBA::NamedValue * nam_val;
   
   for (CORBA::ULong i = 0; i < length; i++) {
@@ -340,14 +314,11 @@ void TIDorb::core::NVListImpl::write_params_out(CORBA::NVList_ptr list, TIDorb::
 
 void TIDorb::core::NVListImpl::read_params_in(CORBA::NVList_ptr list, TIDorb::core::cdr::CDRInputStream& input)
 {
- //jagd 2
- //if(CORBA::is_nil(list))
  if(!(list))
     throw CORBA::BAD_PARAM("Null list reference");
     
   CORBA::ULong length = list->count();
   
-  //jagd 3 CORBA::NamedValue_var nam_val;
   CORBA::NamedValue * nam_val;
   CORBA::TypeCode_var tc;
   
@@ -364,14 +335,11 @@ void TIDorb::core::NVListImpl::read_params_in(CORBA::NVList_ptr list, TIDorb::co
 
 void TIDorb::core::NVListImpl::write_params_in(CORBA::NVList_ptr list, TIDorb::core::cdr::CDROutputStream& output)
 {
- //jagd 2
- //if(CORBA::is_nil(list))
   if(!(list))
     throw CORBA::BAD_PARAM("Null list reference");
     
   CORBA::ULong length = list->count();
 
-  //jagd 3 CORBA::NamedValue_var nam_val;
   CORBA::NamedValue * nam_val;
   
   for (CORBA::ULong i = 0; i < length; i++) {

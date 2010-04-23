@@ -48,3 +48,5 @@ const CORBA::ULong TIDorb::core::comm::iiop::ServiceId::SendingContextRunTime = 
 const CORBA::ULong TIDorb::core::comm::iiop::ServiceId::INVOCATION_POLICIES = 7;
 const CORBA::ULong TIDorb::core::comm::iiop::ServiceId::FORWARDED_ENTITY = 8;
 const CORBA::ULong TIDorb::core::comm::iiop::ServiceId::UnknownExceptionInfo = 9;
+
+const CORBA::ULong TIDorb::core::comm::iiop::ServiceId::SecurityAttributeService = 10;

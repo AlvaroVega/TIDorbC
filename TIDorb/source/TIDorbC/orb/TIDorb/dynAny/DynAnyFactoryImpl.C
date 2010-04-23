@@ -81,8 +81,6 @@ void DynAnyFactoryImpl::destroy()
 void DynAnyFactoryImpl::set_orb(CORBA::ORB_ptr orb)
    throw(CORBA::SystemException)
 {
-   //jagd
-   //_orb = dynamic_cast<TIDorb::core::TIDORB*>(orb);
    _orb = (TIDorb::core::TIDORB*)(orb);
 }
 
@@ -254,8 +252,6 @@ DynAnyFactoryImpl::create_dyn_any_from_type_code(CORBA::TypeCode_ptr type)
   if(_destroyed)
     throw CORBA::OBJECT_NOT_EXIST();
 
-   //jagd 
-   //if (CORBA::is_nil(type))
    if (!(type))
    {
       throw CORBA::BAD_TYPECODE("Null TypeCode reference");
@@ -326,8 +322,6 @@ DynamicAny::DynAny_ptr
 DynAnyFactoryImpl::create_alias_dyn_any_from_type_code(CORBA::TypeCode_ptr type)
    throw(DynamicAny::DynAnyFactory::InconsistentTypeCode, CORBA::SystemException)
 {
-  //jagd
-  //if (CORBA::is_nil(type))
   if (!(type))
   {
     throw CORBA::BAD_TYPECODE("Null TypeCode reference");
@@ -407,8 +401,6 @@ DynAnyFactoryImpl::create_alias_dyn_any_from_type_code(CORBA::TypeCode_ptr type)
 CORBA::Boolean DynAnyFactoryImpl::is_basic(CORBA::TypeCode_ptr type)
    throw (CORBA::SystemException)
 {
-   //jagd
-   //if (CORBA::is_nil(type))
    if (!(type))
    {
       throw CORBA::BAD_PARAM("Null TypeCode reference");
@@ -452,8 +444,6 @@ CORBA::Boolean DynAnyFactoryImpl::is_basic(CORBA::TypeCode_ptr type)
 CORBA::Boolean DynAnyFactoryImpl::alias_with_basic_tc(CORBA::TypeCode_ptr type)
    throw (CORBA::SystemException)
 {
-   //jagd
-   //if (CORBA::is_nil(type))
    if (!(type))
    {
        throw CORBA::BAD_PARAM("Null TypeCode reference");
@@ -504,8 +494,6 @@ CORBA::Boolean DynAnyFactoryImpl::_is_a(const char* repositoryIdentifier)
 CORBA::Boolean DynAnyFactoryImpl::_is_equivalent(CORBA::Object_ptr other)
    throw(CORBA::SystemException)
 {
-   //jagd
-   //if (CORBA::is_nil(other))
    if (!(other))
    {
       throw CORBA::BAD_PARAM("Null Object reference");

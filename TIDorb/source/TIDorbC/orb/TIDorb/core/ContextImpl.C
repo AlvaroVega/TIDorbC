@@ -54,22 +54,15 @@ TIDorb::core::ContextImpl::ContextImpl(CORBA::ORB_ptr orb, const char* name,
   throw (TIDThr::SystemException)
 : m_orb(orb),
   m_name(name), 
-  //jagd 2
-  //m_parent(CORBA::Context::_duplicate(parent)),
   m_parent((parent)),
   m_values(0),
   m_childs(0)
 {
-//jagd 3  _count(1);
 }
 
 TIDorb::core::ContextImpl::~ContextImpl() throw (TIDThr::SystemException)
 {
   CORBA::release(m_orb);
-  //jagd 2
-  //CORBA::release(m_parent);
-  //jagd 2 
-  //CORBA::release(m_values);  
   delete (m_values);  
   
   if(m_childs) {
@@ -77,8 +70,6 @@ TIDorb::core::ContextImpl::~ContextImpl() throw (TIDThr::SystemException)
     ContextList::iterator end = m_childs->end();
     
     for(i= m_childs->begin(); i != end ; i++)
-      //jagd 2 
-      //CORBA::release((CORBA::Context_ptr) *i);
       delete *i;
       
     delete m_childs;
@@ -102,8 +93,6 @@ void TIDorb::core::ContextImpl::create_child(const char* child_context_name,
     throw CORBA::BAD_PARAM(0,CORBA::COMPLETED_NO);
 		
   ContextImpl* child = 
-    //jagd 2
-    //new ContextImpl(m_orb, child_context_name, CORBA::Context::_duplicate(this));
     new ContextImpl(m_orb, child_context_name,(this));
 	
   {
@@ -142,14 +131,10 @@ void TIDorb::core::ContextImpl::set_one_value(const char* prop_name, const CORBA
 void TIDorb::core::ContextImpl::set_values(CORBA::NVList_ptr values)
 {
   TIDThr::Synchronized sync(*this);	
- 
-        //jagd 2 
-	//if (CORBA::is_nil(values))
-	if (!(values))
-		throw  CORBA::BAD_PARAM(0,CORBA::COMPLETED_NO); // "Null NVList reference"
+  
+  if (!(values))
+    throw  CORBA::BAD_PARAM(0,CORBA::COMPLETED_NO); // "Null NVList reference"
 
-//  jagd 2
-//  CORBA::release(m_values);
   delete m_values;
   
   CORBA::ULong list_size = values->count();
@@ -263,10 +248,8 @@ void TIDorb::core::ContextImpl::write(TIDorb::portable::OutputStream& output,
   }
 
   vector< const char* >  nv_context;
-   //jagd2
-   //CORBA::NVList_ptr aux_list = CORBA::NVList::_nil();
+
    CORBA::NVList_ptr aux_list = 0;
-   //CORBA::NamedValue_ptr nam_val = CORBA::NamedValue::_nil();
    CORBA::NamedValue_ptr nam_val = 0;
 
    CORBA::ULong aux_list_size = 0;
@@ -302,24 +285,6 @@ void TIDorb::core::ContextImpl::write(TIDorb::portable::OutputStream& output,
                                           
 CORBA::Context_ptr CORBA::Context::_duplicate(CORBA::Context_ptr ctx)
 {
-  /*
-  try {
-   
-    //jagd
-    //TIDorb::core::ContextImpl* context = dynamic_cast<TIDorb::core::ContextImpl*> (ctx);
-    TIDorb::core::ContextImpl* context = (TIDorb::core::ContextImpl*)ctx;
- 
-
- 
-    if(context)
-      context->_add_ref();
-  
-    return ctx;
-    
-  } catch (const TIDThr::Exception& ex) {
-    throw CORBA::INTERNAL(0,CORBA::COMPLETED_NO);
-  }
-  */
   return ctx;
 }
 
@@ -330,19 +295,7 @@ CORBA::Context_ptr CORBA::Context::_nil()
 
 void CORBA::release(CORBA::Context_ptr ctx)
 {
-  /*
-  try {
-    //jagd 
-    //TIDorb::core::ContextImpl* context = dynamic_cast<TIDorb::core::ContextImpl*> (ctx);
-    TIDorb::core::ContextImpl* context = (TIDorb::core::ContextImpl*)ctx;
-  
-    if(context)
-      context->_remove_ref();
 
-  } catch (const TIDThr::Exception& ex) {
-    throw CORBA::INTERNAL(0,CORBA::COMPLETED_NO);
-  }
-  */
 }
 
 CORBA::Boolean CORBA::is_nil(CORBA::Context_ptr ctx)

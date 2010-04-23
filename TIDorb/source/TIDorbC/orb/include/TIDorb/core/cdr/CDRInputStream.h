@@ -39,7 +39,7 @@
 
 
 
-//jagd
+
 namespace TIDorb {
 namespace core {
      class AnyImpl;
@@ -179,12 +179,10 @@ class CDRInputStream: public TIDorb::portable::InputStream,
     CDRInputStream* read_encapsulation();
     void skip_encapsulation();    
 
-    //jagd
     TIDorb::core::AnyImpl * any_ref;
     bool point_ok;
     TIDorb::core::AnyImpl * get_any_ref(){ return any_ref;}
     void put_any_ref(TIDorb::core::AnyImpl * a_any_ref) {any_ref=a_any_ref;}
-    //ejagd 
     
   protected:
   

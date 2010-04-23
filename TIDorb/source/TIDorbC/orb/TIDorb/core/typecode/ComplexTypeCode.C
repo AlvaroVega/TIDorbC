@@ -66,12 +66,8 @@ TIDorb::core::typecode::ComplexTypeCode::ComplexTypeCode(CORBA::TCKind kind,
 TIDorb::core::typecode::ComplexTypeCode::~ComplexTypeCode()
   throw (TIDThr::SystemException)
 {
-//MLG
-//delete[] m_name;
-//delete[] m_id;
   CORBA::string_free(m_name);
   CORBA::string_free(m_id);
-//EMLG
 }
 
 
@@ -117,10 +113,7 @@ const char* TIDorb::core::typecode::ComplexTypeCode::id() const
 
 const char* TIDorb::core::typecode::ComplexTypeCode::name() const
 {
-//FRAN 
-//  return CORBA::string_dup(m_name);
   return m_name;
-//EFRAN
 }
 
 
@@ -137,13 +130,9 @@ bool TIDorb::core::typecode::ComplexTypeCode::isSimple()const
 void TIDorb::core::typecode::ComplexTypeCode::marshal
        (TIDorb::core::cdr::CDROutputStream& output)
 {
-  //  TIDThr::Synchronized synchro(*this);
   TIDThr::Synchronized synchro(m_recursive_mutex);
 
-//MLG: TypeCodeCache
   TIDorb::core::TIDORB* output_orb = NULL;
-  //jagd 
-  //output_orb = dynamic_cast<TIDorb::core::TIDORB*>(output.orb());
   output_orb = (TIDorb::core::TIDORB*)(output.orb());
   
   if (output_orb)
@@ -155,7 +144,6 @@ void TIDorb::core::typecode::ComplexTypeCode::marshal
   	if (cache)
   		cache->put(CORBA::TypeCode::_duplicate(this));
   }
-//EMLG
 
   // cheks if the typecode has been marshaled before
 
@@ -170,9 +158,7 @@ void TIDorb::core::typecode::ComplexTypeCode::marshal
     previous_position = output.get_context()->lookup(this);
   }
 
-//MLG
   if (previous_position) { // marshal indirection
-//EMLG
     output.write_indirection(previous_position);
     return;
   }
@@ -238,17 +224,16 @@ void TIDorb::core::typecode::ComplexTypeCode::write_params
 void TIDorb::core::typecode::ComplexTypeCode::read_params
   (TIDorb::core::cdr::CDRInputStream& input)
 {
-//FRAN
   if (m_id){
       CORBA::string_free(m_id);
   }
-//EFRAN
+
   input.read_string(m_id);
-//FRAN
+
   if (m_name){
       CORBA::string_free(m_name);
   }
-//EFRAN
+
   input.read_string(m_name);
 }
 

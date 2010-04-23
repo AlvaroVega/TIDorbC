@@ -48,11 +48,9 @@ public:
 
   enum ProcessingStatus {CLIENT = 0, RUNNING, SHUTDOWNING, SHUTDOWNED};
 
-//MLG  
   ProcessingState (TIDORB* orb) throw (TIDThr::SystemException) 
     : m_state(CLIENT), m_orb(orb)  {}
   ~ProcessingState() throw (TIDThr::SystemException) {}  
-//EMLG
   
   ProcessingStatus state() {
     return m_state;

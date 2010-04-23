@@ -134,7 +134,7 @@ class AnyImpl : public TIDorb::portable::Any
     CORBA::Boolean set_Streamable(TIDorb::portable::Streamable* value) const;
     CORBA::Boolean extract_Value(CORBA::ValueBase*& value) const;
  
-    //jagd void read_value(TIDorb::portable::InputStream& stream, CORBA::TypeCode_ptr tc);
+    // void read_value(TIDorb::portable::InputStream& stream, CORBA::TypeCode_ptr tc);
     void read_value(TIDorb::portable::InputStream& stream, CORBA::TypeCode_ptr tc,bool skip_mode=false);
     void write_value(TIDorb::portable::OutputStream& os) const;
     
@@ -152,13 +152,11 @@ class AnyImpl : public TIDorb::portable::Any
     void assign(const AnyImpl& to, bool wrap = false);
     void assign_value(const AnyImpl& a, bool wrap = false);
 
-    //jagd
     enum Estado {OK,DEPENDIENTE,PRIMERO};
     void skip_value(TIDorb::core::cdr::CDRInputStream* &input);
     Estado mi_cdr;
     AnyImpl * my_any_ref;
     TIDorb::core::typecode::TypeCodeImpl * my_typecode;
-    //ejagd
    
   protected:
   
@@ -171,16 +169,14 @@ class AnyImpl : public TIDorb::portable::Any
     
   private:
   
-//MLG
     //TIDorb::core::TIDORB_ref m_orb;
     TIDorb::core::TIDORB* m_orb;
-//EMLG    
 
     TIDorb::core::typecode::TypeCodeImpl* m_type;	
 
-// pra@tid.es: content_type in case of basic type aliases
+// content_type in case of basic type aliases
     CORBA::TypeCode_ptr m_effective_type;
-// end pra@tid.es
+// end
 
     TIDorb::core::cdr::CDRInputStream* m_marshaled_value;
 

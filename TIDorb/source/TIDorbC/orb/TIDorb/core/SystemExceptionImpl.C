@@ -125,8 +125,6 @@ const CORBA::TypeCode_ptr _tc_BAD_QOS =
      if(delegate.extract_Streamable(_holder))
      {
         const SystemExceptionHolder* _hld=dynamic_cast< const SystemExceptionHolder*>(_holder);
-        //jagd
-        //const SystemExceptionHolder* _hld=( const SystemExceptionHolder*)(_holder);
         if(_hld){
             (CORBA::SystemException*&)se = (CORBA::SystemException*) _hld->value();
             return true;
@@ -135,7 +133,6 @@ const CORBA::TypeCode_ptr _tc_BAD_QOS =
           return false;
      } // has Streamable
 
-    // Fix to bug #365 Incorrect extraction of a SystemException from a CORBA::Any
     CORBA::TypeCode_ptr type = any.type();
     SystemExceptionHolder* _hld = new SystemExceptionHolder(type->id());
     CORBA::release(type);

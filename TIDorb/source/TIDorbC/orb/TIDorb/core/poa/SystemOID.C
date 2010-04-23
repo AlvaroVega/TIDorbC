@@ -90,9 +90,8 @@ TIDorb::core::poa::SystemOID* TIDorb::core::poa::SystemOID::fromOID
 (const TIDorb::core::poa::OID& oid)
 {
   try {
-    //jagd
+    // TODO: try to remove dynamic_cast
     const SystemOID& other = dynamic_cast < const SystemOID & > (oid);
-    //const SystemOID& other = *( const SystemOID* )(&oid);
      return new SystemOID(other);
   } catch(const bad_cast& bc) {
     return fromByteArray(oid.get_object_id());

@@ -116,11 +116,11 @@ void TIDorb::core::typecode::AliasTypeCode::read_params
   (TIDorb::core::cdr::CDRInputStream& input)
 {
   ComplexTypeCode::read_params(input);
-//FRAN
+
   if (m_type){
     CORBA::release(m_type);
   }
-//EFRAN
+
   input.read_TypeCode(m_type);
 }
 
@@ -128,9 +128,6 @@ void TIDorb::core::typecode::AliasTypeCode::remarshal_value
   (TIDorb::core::cdr::CDRInputStream& input,
    TIDorb::core::cdr::CDROutputStream& output) const
 {
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl*> (m_type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)m_type->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)m_type;
   tc->remarshal_value(input, output);
 }
@@ -139,9 +136,6 @@ bool TIDorb::core::typecode::AliasTypeCode::values_equal
       (TIDorb::core::cdr::CDRInputStream& a_input,
        TIDorb::core::cdr::CDRInputStream& b_input) const
 {
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl*> (m_type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)m_type->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)m_type;
   return tc->values_equal(a_input, b_input);
 }
@@ -151,9 +145,6 @@ bool TIDorb::core::typecode::AliasTypeCode::values_equal
 
 void TIDorb::core::typecode::AliasTypeCode::dump (ostream& output) const
 {
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl*> (m_type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)m_type->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)m_type;
 
   output << "[TYPECODE]{typedef: ";
@@ -170,9 +161,6 @@ bool TIDorb::core::typecode::AliasTypeCode::dump_value
   (TIDorb::core::cdr::CDRInputStream& input,
    ostream& output) const
 {
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl*> (m_type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)m_type->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)m_type;
 
   output << "[VALUE]{typedef " << m_name << ":";

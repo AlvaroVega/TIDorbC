@@ -45,8 +45,6 @@
 #include "TIDorb/core/ziop/CompressionEnablingPolicyImpl.h"
 #include "TIDorb/core/ziop/CompressionLowValuePolicyImpl.h"
 #include "TIDorb/core/ziop/CompressionMinRatioPolicyImpl.h"
-//#include "TIDorb/core/ziop/ZIOPPoliciesComponent.h"
-//#include "TIDorb/core/ziop/ZIOPInvocationPoliciesContext.h"
 #include "TIDorb/core/ziop/Ziop.h"
 
 

@@ -108,6 +108,7 @@ static struct e_ent etbl[] =  {
   ENT(ENOLCK),
 #ifndef __HP_aCC
 #ifndef __darwin
+#ifndef __hpux 
   ENT(EBADE),
   ENT(EBADR),
   ENT(EXFULL),
@@ -116,6 +117,7 @@ static struct e_ent etbl[] =  {
   ENT(EBADSLT),
   ENT(EDEADLOCK),
   ENT(EBFONT),
+#endif
 #endif
 #endif
   /* stream problems */
@@ -147,6 +149,7 @@ static struct e_ent etbl[] =  {
   ENT(EOVERFLOW),
 #ifndef __HP_aCC
 #ifndef __darwin
+#ifndef __hpux
   ENT(ENOTUNIQ),
   ENT(EBADFD),
   ENT(EREMCHG),
@@ -156,6 +159,7 @@ static struct e_ent etbl[] =  {
   ENT(ELIBSCN),
   ENT(ELIBMAX),
   ENT(ELIBEXEC),
+#endif
 #endif
 #endif
   ENT(EILSEQ),
@@ -196,12 +200,16 @@ static struct e_ent etbl[] =  {
 #ifndef __HP_aCC
 #ifndef __sun
 #ifndef __darwin
+#ifndef __hpux
+#ifndef __CYGWIN__
   ENT(EUCLEAN),
   ENT(ENOTNAM),
 
   ENT(ENAVAIL),
   ENT(EISNAM),
   ENT(EREMOTEIO),
+#endif
+#endif
 #endif
 #endif
 #endif
@@ -216,8 +224,12 @@ static struct e_ent etbl[] =  {
   ENT(ESTALE),
 #ifndef __HP_aCC
 #ifndef __darwin
+#ifndef __hpux
+#ifndef __CYGWIN__
   ENT(ERESTART),
   ENT(ESTRPIPE),
+#endif
+#endif
 #endif
 #endif
 #ifdef EIORESID

@@ -38,7 +38,6 @@
 #include "CORBA.h"
 #include <string.h>
 
-//MLG
 void* CORBA::LocalObject::_impl()
 {
 	return this;
@@ -49,7 +48,6 @@ const char* CORBA::LocalObject::_typeid()
 	//return CORBA::string_dup("LocalObject");
 	return "LocalObject";
 }
-//EMLG
 
 CORBA::LocalObject::LocalObject()
 {
@@ -195,7 +193,7 @@ CORBA::LocalObject::_validate_connection(CORBA::PolicyList_out inconsistent_poli
 ::CORBA::LocalObject_ptr
 CORBA::LocalObject::_narrow(::CORBA::Object_ptr obj)
 {
-  //TODO jagd
+  //TODO: try to remove dynamic_cast
   CORBA::LocalObject* local = dynamic_cast< CORBA::LocalObject* > (obj);
 
   if(!local)

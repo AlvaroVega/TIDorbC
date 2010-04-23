@@ -70,11 +70,11 @@ namespace core {
 
 
     static TIDorb::core::PolicyContext st_orb_instances;
-  //PRA
+
   private:
     // Consume -ORB options, moving the rest of elements of argv[]
     int modify_parameters(int& argc, char** argv, int currpos, int numparams);
-  //EPRA
+
 
   public:
 
@@ -569,7 +569,7 @@ namespace core {
 
 
 //
-// pra@tid.es - FT extensions
+// FT extensions
 //
 
     /**
@@ -647,6 +647,122 @@ namespace core {
     bool assume_ziop_server;
     static const char* assume_ziop_server_name;
     static const bool DEFAULT_ASSUME_ZIOP_SERVER;
+
+    /**
+     * Private key file (RSA or DSA) in PEM format
+     * Values must be a file name
+     * Default value: null
+     */
+    
+    char* ssl_private_key;
+    static const char* ssl_private_key_name;
+    static const char* DEFAULT_SSL_PRIVATE_KEY;
+
+    /**
+     * X509 certificate file (RSA or DSA) in PEM format created using a private key
+     * (provided by ssl_private_key argument)
+     * Values must be a file name
+     * Default value: null
+     */
+
+    char* ssl_certificate;
+    static const char* ssl_certificate_name;
+    static const char* DEFAULT_SSL_CERTIFICATE;
+
+    /**
+     * X509 Certificate Autority (CA) file in PEM format (if was used) to generate
+     * X509 certificate file  (provided by ssl_certificate argument)
+     * Values must be a file name
+     * Default value: null
+     */
+
+    char* ssl_ca;
+    static const char* ssl_ca_name;
+    static const char* DEFAULT_SSL_CA;
+
+    /**
+     * CSIv2 mode. Enables the usage of SAS context between client and server 
+     * to provide authentication
+     * Values must be "true" or "false".
+     * Default "false".
+     */
+
+    bool csiv2;
+    static const char* csiv2_name;
+    static const bool DEFAULT_CSIv2;
+
+
+    /**
+     * SSL session timeout (in seconds). When timeout is reached a new SSL session
+     * is established
+     * Values must be integer.
+     * Default 300.
+     */
+
+    unsigned int ssl_session_timeout;
+    static const char* ssl_session_timeout_name;
+    static const unsigned int DEFAULT_SSL_SESSION_TIMEOUT;
+
+
+    /**
+     * SSL ORB listen port to be used by SSLIOP layer.
+     * Values must be greater or equal than 0.
+     * Default value: <code>0</code> (assigned by system)
+     */
+
+    unsigned short ssl_port;
+    static const char* ssl_port_name;
+    static const unsigned short DEFAULT_SSL_PORT;
+
+
+    /**
+     * SSL version to be used by SSLIOP layer
+     * SSLv2 is not recomended due to security flaws
+     * Values must be 0 (SSLv2), 1 (SSLv3), 2 (SSLv23), 3 (TLSv1)
+     * Default value: 2 
+     */
+
+    unsigned int ssl_version;
+    static const char* ssl_version_name;
+    static const unsigned int DEFAULT_SSL_VERSION;
+
+
+    /**
+     * Username to be used by GSSUP user/password authentication protocol
+     * Needs the following arguments: -ORB_CSIv2 and -ORB_gssup_password
+     * Values must be a string
+     * Default value: null
+     */
+
+    char* gssup_user;
+    static const char* gssup_user_name;
+    static const char* DEFAULT_GSSUP_USER;
+
+
+    /**
+     * Passwrod to be used by GSSUP user/password authentication protocol
+     * Needs the following arguments: -ORB_CSIv2 and -ORB_gssup_user
+     * Values must be a string
+     * Default value: null
+     */
+
+    char* gssup_password;
+    static const char* gssup_password_name;
+    static const char* DEFAULT_GSSUP_PASSWORD;
+
+
+    /**
+     * Target name to be used by some GSS protocols like GSSUP
+     * Needs the following arguments: -ORB_CSIv2 and -ORB_gssup_user
+     * Values must be a string
+     * Default value: null
+     */
+
+    char* csiv2_target_name;
+    static const char* csiv2_target_name_name;
+    static const char* DEFAULT_CSIV2_TARGET_NAME;
+
+
 
   };
 

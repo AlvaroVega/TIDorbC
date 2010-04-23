@@ -56,7 +56,6 @@ Lock::~Lock() throw (TIDThr::SystemException)
 	
 void Lock::put_reply(GIOPFragmentedMessage* msg)
 {
-  //    TIDThr::Synchronized(*this);
     message = msg;
     set_completed();
 }

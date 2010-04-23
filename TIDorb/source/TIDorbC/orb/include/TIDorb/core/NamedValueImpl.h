@@ -48,7 +48,7 @@ namespace TIDorb {
 namespace core {
 
 class NamedValueImpl : public CORBA::NamedValue
-                       //jagd 3 public TIDThr::RefCounter
+                       // public TIDThr::RefCounter
 {
   public:
     NamedValueImpl(){};
@@ -70,7 +70,6 @@ class NamedValueImpl : public CORBA::NamedValue
 
     
 //  protected:
-//  jagd 4 optimizacion
     bool m_release_out;  
 
     CORBA::Boolean m_consume_name;  
@@ -80,11 +79,9 @@ class NamedValueImpl : public CORBA::NamedValue
     CORBA::Any* m_value;
     CORBA::Flags m_flags;
 
-//MLG
   public:
     void* _impl();
     const char* _typeid();
-//EMLG
 };
 
 }

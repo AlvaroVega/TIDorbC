@@ -38,7 +38,6 @@
 #include "TIDorb/core/poa/POAManagerImpl.h"
 
 
-//MLG
 void* TIDorb::core::poa::POAManagerImpl::_impl()
 {
 	return this;
@@ -49,7 +48,6 @@ const char* TIDorb::core::poa::POAManagerImpl::_typeid()
 	//return CORBA::string_dup("POAManagerImpl");
 	return "POAManagerImpl";
 }
-//EMLG
 
 
 
@@ -59,7 +57,7 @@ TIDorb::core::util::Counter TIDorb::core::poa::POAManagerImpl::_serial;
 
 
 TIDorb::core::poa::POAManagerImpl::POAManagerImpl(TIDorb::core::TIDORB* the_orb)
-  : _completion(the_orb) //PRA
+  : _completion(the_orb)
 {
   orb = the_orb;
 
@@ -82,9 +80,6 @@ TIDorb::core::poa::POAManagerImpl::POAManagerImpl(TIDorb::core::TIDORB* the_orb)
                             orb_conf.poa_starving_time,
                             orb_conf.poa_thread_stack_size,
                             orb_conf.poa_bound_threads);
-  //PRA
-  // _completion = new CompletionWaiter(orb);
-  //EPRA
 
   _poas = new vector<PortableServer::POA_var>;
 
@@ -107,9 +102,6 @@ TIDorb::core::poa::POAManagerImpl::~POAManagerImpl()
   delete _pool;
   delete _poas;
   delete _requestQueue;
-  //PRA
-  //delete _completion;
-  //EPRA
   delete conf;
 }
 
@@ -221,9 +213,7 @@ TIDorb::core::poa::POAManagerConf* TIDorb::core::poa::POAManagerImpl::getConf()
  */
 void TIDorb::core::poa::POAManagerImpl::addPOA(PortableServer::POA_ptr poa)
 {
-  //PRA
   TIDThr::Synchronized synchro(monitor);
-  //EPRA
   _poas->push_back(poa);
 }
 
@@ -273,7 +263,6 @@ void TIDorb::core::poa::POAManagerImpl::activate()
       throw PortableServer::POAManager::AdapterInactive();
     }
     if (_state != PortableServer::POAManager::ACTIVE) {
-      //_completion->stopWaiting();
       _completion.stopWaiting();
       _state = PortableServer::POAManager::ACTIVE;
       stateMutex.notifyAll();
@@ -302,7 +291,6 @@ void TIDorb::core::poa::POAManagerImpl::hold_requests(CORBA::Boolean wait_for_co
       throw PortableServer::POAManager::AdapterInactive();
     }
     if (_state != PortableServer::POAManager::HOLDING) {
-      //PRA _completion->stopWaiting();
       _completion.stopWaiting();
       _state = PortableServer::POAManager::HOLDING;
       stateMutex.notifyAll();
@@ -341,7 +329,6 @@ void TIDorb::core::poa::POAManagerImpl::discard_requests(bool wait_for_completio
     }
 
     if (_state != PortableServer::POAManager::DISCARDING) {
-      //PRA _completion->stopWaiting();
       _completion.stopWaiting();
       _state = PortableServer::POAManager::DISCARDING;
       stateMutex.notifyAll();
@@ -383,7 +370,6 @@ void TIDorb::core::poa::POAManagerImpl::deactivate(CORBA::Boolean etherealize_ob
     }
 
     // reset the last completion waiters
-    //_completion->stopWaiting();
     _completion.stopWaiting();
 
     _pool->deactivation();
@@ -457,9 +443,8 @@ void TIDorb::core::poa::POAManagerImpl::put(TIDorb::core::poa::QueuedRequest* re
  */
 void TIDorb::core::poa::POAManagerImpl::removePOA(PortableServer::POA_ptr poa)
 {
-  //PRA
   TIDThr::Synchronized synchro(monitor);
-  //EPRA
+
   vector<PortableServer::POA_var>::iterator iter;
   for (iter = _poas->begin(); iter != _poas->end(); iter++) {
     if (*iter == poa) {
@@ -478,9 +463,8 @@ void TIDorb::core::poa::POAManagerImpl::removePOA(PortableServer::POA_ptr poa)
  */
 PortableServer::POA_ptr TIDorb::core::poa::POAManagerImpl::findPOA(const char* poaName)
 {
-  //PRA
   TIDThr::Synchronized synchro(monitor);
-  //EPRA
+
   vector<PortableServer::POA_var>::iterator iter;
   vector<PortableServer::POA_var>::const_iterator end = _poas->end();
   for (iter = _poas->begin(); iter != end; iter++) {
@@ -500,7 +484,6 @@ PortableServer::POA_ptr TIDorb::core::poa::POAManagerImpl::findPOA(const char* p
  */
 void TIDorb::core::poa::POAManagerImpl::beginRequest()
 {
-  //PRA _completion->beginRequest();
   _completion.beginRequest();
 }
 
@@ -512,7 +495,6 @@ void TIDorb::core::poa::POAManagerImpl::beginRequest()
  */
 void TIDorb::core::poa::POAManagerImpl::endRequest()
 {
-  //PRA _completion->endRequest();
   _completion.endRequest();
 }
 
@@ -524,9 +506,8 @@ void TIDorb::core::poa::POAManagerImpl::endRequest()
  */
 void TIDorb::core::poa::POAManagerImpl::etherealizeAllPOAs()
 {
-  //PRA
   TIDThr::Synchronized synchro(monitor);
-  //EPRA
+
   vector<PortableServer::POA_var>::iterator iter;
   vector<PortableServer::POA_var>::const_iterator end = _poas->end();
   for (iter = _poas->begin(); iter != end; iter++) {

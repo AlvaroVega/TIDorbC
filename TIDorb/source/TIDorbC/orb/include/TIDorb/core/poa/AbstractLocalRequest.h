@@ -47,7 +47,7 @@ namespace poa {
 
 
 class AbstractLocalRequest : public TIDorb::core::poa::QueuedRequest,
-                             public TIDThr::RefCounter /*PRA*/
+                             public TIDThr::RefCounter 
 {
 public:
   AbstractLocalRequest(TIDorb::core::poa::POAKey* poakey,

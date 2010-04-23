@@ -88,7 +88,6 @@ class TypeCodeImpl : public CORBA::TypeCode,
     virtual CORBA::ValueModifier type_modifier() const;
     virtual CORBA::TypeCode_ptr concrete_base_type() const;
 
-  //jagd optimizacion
     inline void _add_ref() throw (TIDThr::SystemException)
     {
       if (!isSimple())
@@ -100,7 +99,6 @@ class TypeCodeImpl : public CORBA::TypeCode,
       if (!isSimple())
        TIDThr::RefCounter::_remove_ref();
     }
-    //Ejagd
 
     // TIDorb operations
 
@@ -176,7 +174,6 @@ class TypeCodeImpl : public CORBA::TypeCode,
     CORBA::TCKind m_kind;	
     bool m_exhaustive_equal;
 
-//MLG
   public:
     virtual void* _impl()
     {
@@ -187,7 +184,7 @@ class TypeCodeImpl : public CORBA::TypeCode,
         //return CORBA::string_dup("TypeCodeImpl");
         return "TypeCodeImpl";
     }
-//EMLG
+
 };
 
 } // CORBA

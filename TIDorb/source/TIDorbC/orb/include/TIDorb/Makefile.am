@@ -83,6 +83,13 @@ dist_noinst_HEADERS = \
    core/comm/RECOVERABLE_COMM_FAILURE.h \
    core/comm/ReliableOnewayThread.h \
    core/comm/ServerListener.h \
+   core/comm/SSLConnection.h \
+   core/comm/SSLIIOPCommLayer.h \
+   core/comm/SSLServerListener.h \
+   core/comm/ssliop/SSLComponent.h \
+   core/comm/ssliop/SSLIOPCorbaloc.h \
+   core/comm/ssliop.h \
+   core/comm/ssliop_fw.h \
    core/comm/TCPConnection.h \
    core/comm/UDPConnection.h \
    core/comm/ziop/ZIOPMessage.h \
@@ -99,6 +106,7 @@ dist_noinst_HEADERS = \
    core/ConfORB.h \
    core/ContextImpl.h \
    core/ContextListImpl.h \
+   core/DomainManagerImpl.h \
    core/EnvironmentImpl.h \
    core/ExceptionListImpl.h \
    core/ForwardRequest.h \
@@ -191,6 +199,17 @@ dist_noinst_HEADERS = \
    core/ServerRequestStatus.h \
    core/ShutdownThread.h \
    core/TIDORB.h \
+   core/security/CSIComponent.h \
+   core/security/QOPPolicyImpl.h \
+   core/security/EstablishTrustPolicyImpl.h \
+   core/security/SecurityManagerImpl.h \
+   core/security/SecurityChecker.h \
+   core/security/sas/SASManager.h \
+   core/security/sas/SASServiceContext.h \
+   core/security/sas_fw.h \
+   core/security/sas.h \
+   core/security_fw.h \
+   core/security.h \
    core/typecode/AbstractInterfaceTypeCode.h \
    core/typecode/AliasTypeCode.h \
    core/typecode/ArrayTypeCode.h \

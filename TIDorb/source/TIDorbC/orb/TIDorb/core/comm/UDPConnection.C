@@ -55,7 +55,6 @@ TIDorb::core::comm::UDPConnection::UDPConnection(ConnectionManager* mngr, TIDSoc
   : TIDorb::core::comm::Connection(mngr), collections(conf.max_uncompleted_messages)
 {
   datagram_max_size = conf.udp_fragment_size;
-  //datagram_buffer   = new unsigned char[datagram_max_size];
   datagram_buffer   = (unsigned char*) malloc(datagram_max_size);
   datagram_size     = 0;
   datagram_offset   = 0;
@@ -84,7 +83,6 @@ TIDorb::core::comm::UDPConnection::UDPConnection(ConnectionManager* mngr, TIDSoc
 
 TIDorb::core::comm::UDPConnection::~UDPConnection() throw (TIDThr::SystemException)
 {
-  //delete[] datagram_buffer;
   free(datagram_buffer);
   delete socket;
 
@@ -142,10 +140,8 @@ const char* TIDorb::core::comm::UDPConnection::toString()
       default:
         buffer << "Invalid UDP" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")"; /*unreachable*/
     }
-    //PRA
     //buffer << " connection at " << my_port; /*pra@tid.es socket->getLocalPort();*/
     buffer << " connection " << hashCode() << ends;
-    //EPRA
 
     str = CORBA::string_dup(buffer.str().data());
   }
@@ -167,7 +163,7 @@ TIDorb::core::comm::UDPConnection::server_connection(TIDorb::core::comm::Connect
 
   try {
 
-/* pra@tid.es - Allow reuse port
+/*  Allow reuse port
     // create the datagram socket
     socket = new TIDSocket::DatagramSocket(listen_point._port);
 */
@@ -412,9 +408,6 @@ void TIDorb::core::comm::UDPConnection::dispatch_request(TIDorb::core::comm::iio
   
   // Get UIPMC profile
   const TIDorb::core::iop::TaggedProfile* tagged_profile = target->profile();
-  //jagd
-  //const TIDorb::core::comm::miop::ProfileMIOP* profile =
-  //  dynamic_cast<const TIDorb::core::comm::miop::ProfileMIOP*>(tagged_profile);
   const TIDorb::core::comm::miop::ProfileMIOP* profile =
     (const TIDorb::core::comm::miop::ProfileMIOP*)(tagged_profile);
 
@@ -443,9 +436,6 @@ void TIDorb::core::comm::UDPConnection::dispatch_request(TIDorb::core::comm::iio
   }
 
   PortableServer::POAManager_ptr poamanager = root_GOA->the_POAManager();
-  //jagd
-  //TIDorb::core::poa::POAManagerImpl* poamanagerimpl =
-  //  dynamic_cast<TIDorb::core::poa::POAManagerImpl*>(poamanager);
   TIDorb::core::poa::POAManagerImpl* poamanagerimpl =
     (TIDorb::core::poa::POAManagerImpl*)(poamanager);
 

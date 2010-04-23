@@ -88,18 +88,12 @@ CORBA::TypeCode_ptr TIDorb::core::AnyImpl::get_effective_type(const CORBA::TypeC
 
 TIDorb::core::AnyImpl::AnyImpl()
 {
-  //jagd
   mi_cdr=TIDorb::core::AnyImpl::OK;
   my_any_ref=NULL;
   my_typecode=NULL;
-  //ejagd
 
   m_orb = NULL;
-//MLG
-  //m_type = dynamic_cast<TIDorb::core::typecode::TypeCodeImpl*>
-             //(TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(CORBA::tk_null));
-  //jagd 
-  //m_type = (TIDorb::core::typecode::TypeCodeImpl*)TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(CORBA::tk_null)->_impl();
+
   m_type = (TIDorb::core::typecode::TypeCodeImpl*)TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(CORBA::tk_null);
   m_effective_type = NULL;
   m_marshaled_value = NULL;
@@ -109,13 +103,10 @@ TIDorb::core::AnyImpl::AnyImpl()
 
 TIDorb::core::AnyImpl::~AnyImpl()
 {
-//MLG
   CORBA::release(m_type);
-//EMLG
   CORBA::release(m_effective_type);
 
  // reset_value();
- //jagd
  if(m_value)
     m_value->_remove_ref();
  delete m_marshaled_value;
@@ -139,22 +130,6 @@ CORBA::TypeCode_ptr TIDorb::core::AnyImpl::type() const
   return CORBA::TypeCode::_duplicate(m_type);
 }
 
-// Fix bug [#392] Any::type(tc) reset any value
-// void TIDorb::core::AnyImpl::type(CORBA::TypeCode_ptr tc)
-// {
-//   CORBA::release(m_effective_type);
-//   m_effective_type = get_effective_type(tc);
-
-//   CORBA::release(m_type);
-//   //m_type = dynamic_cast<TIDorb::core::typecode::TypeCodeImpl*>
-//             //(CORBA::TypeCode::_duplicate(tc));
-//   //jagd
-//   //m_type = (TIDorb::core::typecode::TypeCodeImpl*)CORBA::TypeCode::_duplicate(tc)->_impl();
-//   m_type = (TIDorb::core::typecode::TypeCodeImpl*)CORBA::TypeCode::_duplicate(tc);
-//   reset_value();
-// }
-
-// Fix bug [#392] Any::type(tc) reset any value NEW IMPLEMENTATION
 void TIDorb::core::AnyImpl::type(CORBA::TypeCode_ptr tc)
 {
   if(!m_type->equivalent(tc))
@@ -167,29 +142,8 @@ void TIDorb::core::AnyImpl::type(CORBA::TypeCode_ptr tc)
   m_type = (TIDorb::core::typecode::TypeCodeImpl*)CORBA::TypeCode::_duplicate(tc);
 }
 
-// Fix bug [#392] Any::type(tc) reset any value
-// void TIDorb::core::AnyImpl::set_equivalent_type(CORBA::TypeCode_ptr tc)
-// {
-//   if(!m_type->equivalent(tc))
-//     throw CORBA::BAD_OPERATION();
-
-//   CORBA::release(m_type);
-//   //m_type = dynamic_cast<TIDorb::core::typecode::TypeCodeImpl*>
-//             //(CORBA::TypeCode::_duplicate(tc));
-//   //jagd 
-//   //m_type = (TIDorb::core::typecode::TypeCodeImpl*)CORBA::TypeCode::_duplicate(tc)->_impl();
-//   m_type = (TIDorb::core::typecode::TypeCodeImpl*)CORBA::TypeCode::_duplicate(tc);
-
-//   CORBA::release(m_effective_type);
-//   m_effective_type = get_effective_type(tc);
-// }
-
-void TIDorb::core::AnyImpl::set_equivalent_type(CORBA::TypeCode_ptr tc) // NEW IMPLEMENTATION
+void TIDorb::core::AnyImpl::set_equivalent_type(CORBA::TypeCode_ptr tc)
 {
-// Fix bug [#392] Any::type(tc) reset any value
-//   if(!m_type->equivalent(tc))
-//     throw CORBA::BAD_OPERATION();
-
   CORBA::release(m_effective_type);
   m_effective_type = get_effective_type(tc);
 
@@ -198,7 +152,6 @@ void TIDorb::core::AnyImpl::set_equivalent_type(CORBA::TypeCode_ptr tc) // NEW I
 
 }
 
-// Fix bug [#392] Any::type(tc) reset any value NEW METHOD
 void TIDorb::core::AnyImpl::set_type(CORBA::TypeCode_ptr tc) 
 {
   CORBA::release(m_effective_type);
@@ -216,7 +169,7 @@ void TIDorb::core::AnyImpl::reset_value()
     m_value->_remove_ref();
     m_value = NULL;
   }
-  //jagd tenemos que guardar el buffer para que el siguiente tenga el puntero correcto
+  //tenemos que guardar el buffer para que el siguiente tenga el puntero correcto
   //solo si estamos en skip mode optimizado
   //if(m_marshaled_value){
   if(m_marshaled_value&&my_any_ref==NULL){
@@ -228,27 +181,23 @@ void TIDorb::core::AnyImpl::reset_value()
 
 bool TIDorb::core::AnyImpl::has_Streamable() const
 {
-//MLG
   return m_value != NULL;
-//EMLG
 }
 
 // asigns the new vaule and reads from the _marshaled value.
 void TIDorb::core::AnyImpl::init_value(TIDorb::portable::Streamable* holder)
 {
-  //jagd optimizacion del skip
+  //skip optimization
   if (mi_cdr==TIDorb::core::AnyImpl::DEPENDIENTE)
   {
     my_any_ref->skip_value(m_marshaled_value);
   }
-  //ejagd
   if (m_marshaled_value) {
     m_marshaled_value->rewind();
     m_value = holder;
     m_value->_read(*m_marshaled_value);
-    //jagd optimizacion del skip
+    //skip optimization
     mi_cdr=TIDorb::core::AnyImpl::OK;
-    //ejagd
   } else {
     throw CORBA::BAD_OPERATION();//("Any without value.", 0, CompletionStatus.COMPLETED_NO);
   }
@@ -373,7 +322,7 @@ bool TIDorb::core::AnyImpl::operator==(const TIDorb::portable::Any& a) const
       const CORBA::Any* value;
       a.extract_any(value);
       extract_any(my_value);
-      //TODO jagd
+      //TODO: try to remove dynamic_cast
       bool equal = (dynamic_cast<AnyImpl& >(my_value->delegate()) ==
                     dynamic_cast<AnyImpl& >(value->delegate()));
       return equal;
@@ -384,11 +333,7 @@ bool TIDorb::core::AnyImpl::operator==(const TIDorb::portable::Any& a) const
       a.extract_Object(value);
       extract_Object(my_value);
  
-      //jagd 2
-      //if(CORBA::is_nil(my_value)) {
       if(!my_value) {
-      //jagd 2
-        //return (CORBA::is_nil(value))? true : false;
         return (bool)(!value);
       } else {
         return my_value->_is_equivalent(value);
@@ -446,11 +391,6 @@ bool TIDorb::core::AnyImpl::operator==(const TIDorb::portable::Any& a) const
     default:
       break;
   }
-  //jagd
-  //TIDorb::core::cdr::CDRInputStream* input =
-  //  dynamic_cast < TIDorb::core::cdr::CDRInputStream* > (create_input_stream());
-  //TIDorb::core::cdr::CDRInputStream* input_a =
-  //  dynamic_cast < TIDorb::core::cdr::CDRInputStream* > (a.create_input_stream());
  
   TIDorb::core::cdr::CDRInputStream* input =
     (TIDorb::core::cdr::CDRInputStream*) (create_input_stream());
@@ -469,8 +409,6 @@ void TIDorb::core::AnyImpl::wrap_value(const TIDorb::core::AnyImpl* a)
 {
   CORBA::TypeCode_var other_type = a->type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(other_type);
   set_type(other_type);
 
   m_wrapped_any = a;
@@ -479,8 +417,7 @@ void TIDorb::core::AnyImpl::wrap_value(const TIDorb::core::AnyImpl* a)
 // faults in gcc 2.95
 TIDorb::portable::Any& TIDorb::core::AnyImpl::operator=(const TIDorb::portable::Any& a)
 {
-  //TODO revis jagd
-  //const AnyImpl& ref = dynamic_cast < const AnyImpl& > (a);
+  //TODO revis 
   const AnyImpl& ref = * ( const AnyImpl* ) (&a);
   assign(ref);
   return *this;
@@ -496,8 +433,6 @@ void TIDorb::core::AnyImpl::assign(const TIDorb::core::AnyImpl& a, bool wrap)
     case CORBA::tk_null:
     case CORBA::tk_void:
     {
-      // Fix bug [#392] Any::type(tc) reset any value
-      //type(a_type);
       set_type(a_type);
       return;
     }
@@ -670,7 +605,7 @@ void TIDorb::core::AnyImpl::assign(const TIDorb::core::AnyImpl& a, bool wrap)
   }
 
   TIDorb::portable::InputStream* input = a.create_input_stream();
-  // jagd se desactiva el algoritmo de aplanado rapido
+  // se desactiva el algoritmo de aplanado rapido
   // read_value(*input, a_type); 
   read_value(*input, a_type, true); 
   delete input;
@@ -692,14 +627,14 @@ void TIDorb::core::AnyImpl::assign_value(const TIDorb::core::AnyImpl& a, bool wr
 void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
                                        CORBA::TypeCode_ptr tc, bool skip_mode)
 {
-  //jagd optimiza el skip del buffer
+  // optimiza el skip del buffer
   TIDorb::core::cdr::CDRInputStream& is1 = *(TIDorb::core::cdr::CDRInputStream*)(&input);
 
   if (!skip_mode)
   {
     if (!is1.point_ok)
     {
-      //jagd hay que borrar el anterior 
+      // hay que borrar el anterior 
       reset_value(); 
       my_any_ref= is1.get_any_ref();
       my_typecode= (TIDorb::core::typecode::TypeCodeImpl*)tc;
@@ -708,7 +643,6 @@ void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
       return;
     }
   }
-  //ejagd
 
   TIDorb::core::AnyImpl::Estado temp_cdr=mi_cdr;
   mi_cdr=TIDorb::core::AnyImpl::OK; 
@@ -717,8 +651,6 @@ void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
   {
     case CORBA::tk_null:
     case CORBA::tk_void:
-      // Fix bug [#392] Any::type(tc) reset any value
-      //type(tc);
       set_type(tc);
       return;
     case CORBA::tk_short:
@@ -833,10 +765,8 @@ void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
           char* value;
           input.read_string(value);
           insert_string(value);
-          //PRA
           //TODO: posible memory leak?
           //CORBA::string_free(value);
-          //EPRA
           return;
         }
         else{
@@ -859,10 +789,8 @@ void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
           CORBA::WChar* value;
           input.read_wstring(value);
           insert_wstring(value);
-          //PRA
           //TODO: posible memory leak?
           //CORBA::wstring_free(value);
-          //EPRA
           return;
         }
       } catch (const CORBA::TypeCode::BadKind& bk) {
@@ -889,17 +817,12 @@ void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
       break;
   }
   mi_cdr=temp_cdr; 
-  //jagd
   TIDorb::core::cdr::CDRInputStream& is = *(TIDorb::core::cdr::CDRInputStream*)(&input);
   if (!skip_mode)
   { 
     mi_cdr=TIDorb::core::AnyImpl::PRIMERO;
-    // Fix bug [#392] Any::type(tc) reset any value
-    //type(tc);
     set_type(tc);
 
-    //TODO jagd
-    //TIDorb::core::cdr::CDRInputStream& is = dynamic_cast <TIDorb::core::cdr::CDRInputStream&>(input);
   
     m_marshaled_value = is.copy();
   
@@ -909,20 +832,17 @@ void TIDorb::core::AnyImpl::read_value(TIDorb::portable::InputStream& input,
   
     // set the input stream to the end of the value
   
-    //jagd optimiza el skip del buffer  
+    // optimiza el skip del buffer  
     is.point_ok=false;
     is.put_any_ref(this); 
   } 
   else
   { 
-    // Fix bug [#392] Any::type(tc) reset any value
-    //type(tc); 
     set_type(tc); 
     m_marshaled_value = is.copy(); 
     m_marshaled_value->fix_starting(); 
     m_type->skip_value(is);
   }
-    //ejagd
 }
 
 
@@ -942,7 +862,7 @@ void TIDorb::core::AnyImpl::skip_value(TIDorb::core::cdr::CDRInputStream* & inpu
     my_any_ref->skip_value(input); 
     if(m_marshaled_value!=input)
       m_marshaled_value=((TIDorb::core::cdr::CDRInputStream*)input)->copy();
-    if (my_typecode) //OJO NO HAS DUPLICADO EL TC
+    if (my_typecode) // Take care, typecode is not duplicated
       read_value(*input,my_typecode,true);
     else   
       read_value(*input,m_type,true);
@@ -969,9 +889,6 @@ void TIDorb::core::AnyImpl::write_value(TIDorb::portable::OutputStream& os) cons
   } else if (m_marshaled_value){
     TIDorb::core::cdr::CDRInputStream* _marshaled_value_copy = m_marshaled_value->copy();
 
-    //jagd
-    //TIDorb::core::cdr::CDROutputStream& output =
-    //  dynamic_cast<TIDorb::core::cdr::CDROutputStream&> (os);
     TIDorb::core::cdr::CDROutputStream& output =
       *(TIDorb::core::cdr::CDROutputStream*) (&os);
 
@@ -993,9 +910,6 @@ TIDorb::portable::OutputStream* TIDorb::core::AnyImpl::create_output_stream()
 
   TIDorb::core::cdr::CDROutputStream* out = new TIDorb::core::cdr::CDROutputStream(m_orb);
 
-  //jagd
-  //m_marshaled_value =
-  //  dynamic_cast <TIDorb::core::cdr::CDRInputStream*> (out->create_input_stream());
   m_marshaled_value =
     (TIDorb::core::cdr::CDRInputStream*) (out->create_input_stream());
 
@@ -1031,22 +945,13 @@ void TIDorb::core::AnyImpl::create_marshaled_value() const
   }
 
   if (m_value) {
-    //jagd 5
-    //TIDorb::portable::OutputStream* output = new TIDorb::core::cdr::CDROutputStream(m_orb);
     TIDorb::core::cdr::CDROutputStream output(m_orb);
 
-    //jagd 5
-    //m_value->_write(*output);
     m_value->_write(output);
 
-    //jagd
-    //((TIDorb::core::AnyImpl*) this)->m_marshaled_value =
-    //  dynamic_cast<TIDorb::core::cdr::CDRInputStream*> (output->create_input_stream());
     ((TIDorb::core::AnyImpl*) this)->m_marshaled_value =
-      //jagd 5 (TIDorb::core::cdr::CDRInputStream*)(output->create_input_stream());
       (TIDorb::core::cdr::CDRInputStream*)(output.create_input_stream());
 
-    //jagd 5 delete output;
   } else {
     throw  CORBA::BAD_OPERATION(); // ("Any without value.", 0, CompletionStatus.COMPLETED_NO);
   }
@@ -1057,17 +962,13 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_octet(CORBA::Octet& value) const
   if (m_effective_type->kind() != CORBA::tk_octet)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
 
-  //jagd
-  //TIDorb::core::util::OctetHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::OctetHolder*> (m_value);
   TIDorb::core::util::OctetHolder* holder =
     (TIDorb::core::util::OctetHolder*) (m_value);
   
@@ -1082,21 +983,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_octet(CORBA::Octet& value) const
 void TIDorb::core::AnyImpl::insert_octet(CORBA::Octet s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::OctetHolder* holder = new TIDorb::core::util::OctetHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
   
   if (!type)
@@ -1108,16 +1003,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_boolean(CORBA::Boolean& value) con
   if (m_effective_type->kind() != CORBA::tk_boolean)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::BooleanHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::BooleanHolder*> (m_value);
   TIDorb::core::util::BooleanHolder* holder =
     (TIDorb::core::util::BooleanHolder*) (m_value);
 
@@ -1132,10 +1023,7 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_boolean(CORBA::Boolean& value) con
 void TIDorb::core::AnyImpl::insert_boolean(CORBA::Boolean s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::BooleanHolder* holder = new TIDorb::core::util::BooleanHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
@@ -1143,11 +1031,8 @@ void TIDorb::core::AnyImpl::insert_boolean(CORBA::Boolean s, CORBA::TypeCode_ptr
     type_aux = holder->_type();
 
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1159,16 +1044,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_char(CORBA::Char& value) const
   if (m_effective_type->kind() != CORBA::tk_char)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::CharHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::CharHolder*> (m_value);
   TIDorb::core::util::CharHolder* holder =
     (TIDorb::core::util::CharHolder*) (m_value);
 
@@ -1183,21 +1064,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_char(CORBA::Char& value) const
 void TIDorb::core::AnyImpl::insert_char(CORBA::Char s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::CharHolder* holder = new TIDorb::core::util::CharHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1209,16 +1084,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_wchar(CORBA::WChar& value) const
   if (m_effective_type->kind() != CORBA::tk_wchar)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::WCharHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::WCharHolder*> (m_value);
   TIDorb::core::util::WCharHolder* holder =
     (TIDorb::core::util::WCharHolder*) (m_value);
   
@@ -1233,10 +1104,7 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_wchar(CORBA::WChar& value) const
 void TIDorb::core::AnyImpl::insert_wchar(CORBA::WChar s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::WCharHolder* holder = new TIDorb::core::util::WCharHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
@@ -1244,11 +1112,8 @@ void TIDorb::core::AnyImpl::insert_wchar(CORBA::WChar s, CORBA::TypeCode_ptr typ
     type_aux = holder->_type();
 
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1261,16 +1126,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_short(CORBA::Short& value) const
   if (m_effective_type->kind() != CORBA::tk_short)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::ShortHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::ShortHolder*> (m_value);
   TIDorb::core::util::ShortHolder* holder =
     (TIDorb::core::util::ShortHolder*) (m_value);
   
@@ -1285,21 +1146,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_short(CORBA::Short& value) const
 void TIDorb::core::AnyImpl::insert_short(CORBA::Short s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::ShortHolder* holder = new TIDorb::core::util::ShortHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1311,16 +1166,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_ushort(CORBA::UShort& value) const
   if (m_effective_type->kind() != CORBA::tk_ushort)
     return false;
   
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::UShortHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::UShortHolder*> (m_value);
   TIDorb::core::util::UShortHolder* holder =
     (TIDorb::core::util::UShortHolder*) (m_value);
   
@@ -1335,21 +1186,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_ushort(CORBA::UShort& value) const
 void TIDorb::core::AnyImpl::insert_ushort(CORBA::UShort s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::UShortHolder* holder = new TIDorb::core::util::UShortHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1361,16 +1206,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_long(CORBA::Long& value) const
   if (m_effective_type->kind() != CORBA::tk_long)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //  TIDorb::core::util::LongHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::LongHolder*> (m_value);
   TIDorb::core::util::LongHolder* holder =
   (TIDorb::core::util::LongHolder*) (m_value);
 
@@ -1385,21 +1226,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_long(CORBA::Long& value) const
 void TIDorb::core::AnyImpl::insert_long(CORBA::Long s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::LongHolder* holder = new TIDorb::core::util::LongHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1411,16 +1246,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_ulong(CORBA::ULong& value) const
   if (m_effective_type->kind() != CORBA::tk_ulong)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::ULongHolder* holder =
-  //dynamic_cast<TIDorb::core::util::ULongHolder*> (m_value);
   TIDorb::core::util::ULongHolder* holder =
   (TIDorb::core::util::ULongHolder*) (m_value);
 
@@ -1435,21 +1266,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_ulong(CORBA::ULong& value) const
 void TIDorb::core::AnyImpl::insert_ulong(CORBA::ULong s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::ULongHolder* holder = new TIDorb::core::util::ULongHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1461,16 +1286,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_longlong(CORBA::LongLong& value) c
   if (m_effective_type->kind() != CORBA::tk_longlong)
     return false;
   
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::LongLongHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::LongLongHolder*> (m_value);
   TIDorb::core::util::LongLongHolder* holder =
     (TIDorb::core::util::LongLongHolder*) (m_value);
 
@@ -1485,21 +1306,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_longlong(CORBA::LongLong& value) c
 void TIDorb::core::AnyImpl::insert_longlong(CORBA::LongLong s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::LongLongHolder* holder = new TIDorb::core::util::LongLongHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1511,16 +1326,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_ulonglong(CORBA::ULongLong& value)
   if (m_effective_type->kind() != CORBA::tk_ulonglong)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::ULongLongHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::ULongLongHolder*> (m_value);
   TIDorb::core::util::ULongLongHolder* holder =
     (TIDorb::core::util::ULongLongHolder*) (m_value);
 
@@ -1535,21 +1346,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_ulonglong(CORBA::ULongLong& value)
 void TIDorb::core::AnyImpl::insert_ulonglong(CORBA::ULongLong s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::ULongLongHolder* holder = new TIDorb::core::util::ULongLongHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1560,16 +1365,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_float(CORBA::Float& value) const
 {
   if (m_effective_type->kind() != CORBA::tk_float)
     return false;
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::FloatHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::FloatHolder*> (m_value);
   TIDorb::core::util::FloatHolder* holder =
     (TIDorb::core::util::FloatHolder*) (m_value);
 
@@ -1584,21 +1385,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_float(CORBA::Float& value) const
 void TIDorb::core::AnyImpl::insert_float(CORBA::Float s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::FloatHolder* holder = new TIDorb::core::util::FloatHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1609,16 +1404,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_double(CORBA::Double& value) const
 {
   if (m_effective_type->kind() != CORBA::tk_double)
     return false;
-  //jagd optimizacion del skip 
+  // skip optimization 
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::DoubleHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::DoubleHolder*> (m_value);
   TIDorb::core::util::DoubleHolder* holder =
     (TIDorb::core::util::DoubleHolder*) (m_value);
 
@@ -1633,21 +1424,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_double(CORBA::Double& value) const
 void TIDorb::core::AnyImpl::insert_double(CORBA::Double s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::DoubleHolder* holder = new TIDorb::core::util::DoubleHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1658,16 +1443,12 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_longdouble(CORBA::LongDouble& valu
 {
   if (m_effective_type->kind() != CORBA::tk_longdouble)
     return false;
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::LongDoubleHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::LongDoubleHolder*> (m_value);
   TIDorb::core::util::LongDoubleHolder* holder =
     (TIDorb::core::util::LongDoubleHolder*) (m_value);
 
@@ -1682,21 +1463,15 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_longdouble(CORBA::LongDouble& valu
 void TIDorb::core::AnyImpl::insert_longdouble(CORBA::LongDouble s, CORBA::TypeCode_ptr type)
 {
   TIDorb::core::util::LongDoubleHolder* holder = new TIDorb::core::util::LongDoubleHolder(s);
-//FRAN
-  // Fix bug [#396] Typecode alias of a Any is not transmitted in a parameter out/return 
-  // of an invocation
-  //CORBA::TypeCode_var type_aux = holder->_type();
+
   CORBA::TypeCode_ptr type_aux;
   if (type)
     type_aux = type; // Take care, typecode is not duplicated
   else
     type_aux = holder->_type();
 
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 
   if (!type)
@@ -1707,16 +1482,14 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_string(const char*& value) const
 {
   if (m_effective_type->kind() != CORBA::tk_string)
     return false;
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::StringHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::StringHolder*> (m_value);
+  
+  
   TIDorb::core::util::StringHolder* holder =
     (TIDorb::core::util::StringHolder*) (m_value);
 
@@ -1733,13 +1506,11 @@ void TIDorb::core::AnyImpl::insert_string(const char* s)
   TIDorb::core::util::StringHolder* holder =
     new TIDorb::core::util::StringHolder();
   holder->value(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1748,13 +1519,11 @@ void TIDorb::core::AnyImpl::insert_string(char* s)
   TIDorb::core::util::StringHolder* holder =
     new TIDorb::core::util::StringHolder();
   holder->value(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1763,16 +1532,14 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_wstring(const CORBA::WChar*& value
   if (m_effective_type->kind() != CORBA::tk_wstring)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::WStringHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::WStringHolder*> (m_value);
+  
+  
   TIDorb::core::util::WStringHolder* holder =
     (TIDorb::core::util::WStringHolder*) (m_value);
 
@@ -1789,13 +1556,11 @@ void TIDorb::core::AnyImpl::insert_wstring(const CORBA::WChar* s)
   TIDorb::core::util::WStringHolder* holder =
     new TIDorb::core::util::WStringHolder();
   holder->value(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1804,13 +1569,11 @@ void TIDorb::core::AnyImpl::insert_wstring(CORBA::WChar* s)
   TIDorb::core::util::WStringHolder* holder =
     new TIDorb::core::util::WStringHolder();
   holder->value(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1819,16 +1582,14 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_any(const CORBA::Any*& value) cons
   if (m_effective_type->kind() != CORBA::tk_any)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::AnyHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::AnyHolder*> (m_value);
+  
+  
   TIDorb::core::util::AnyHolder* holder =
     (TIDorb::core::util::AnyHolder*) (m_value);
 
@@ -1840,27 +1601,25 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_any(const CORBA::Any*& value) cons
   return false;
 }
 
-//jagd se implementa un ANY que no borre
+//se implementa un ANY que no borre
 CORBA::Boolean TIDorb::core::AnyImpl::extract_any( CORBA::Any*& value) 
 {
   if (m_effective_type->kind() != CORBA::tk_any)
     return false;
 
-  //jagd optimizacion del skip
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   }
-  //ejagd
-  //jagd
-  //TIDorb::core::util::AnyHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::AnyHolder*> (m_value);
+  
+  
   TIDorb::core::util::AnyHolder* holder =
     (TIDorb::core::util::AnyHolder*) (m_value);
 
   if(holder) {
-    //jagd 
+     
     holder->free=false;
     value = (CORBA::Any *)holder->value();
     return true;
@@ -1875,13 +1634,11 @@ void TIDorb::core::AnyImpl::insert_any(CORBA::Any* s)
 {
   TIDorb::core::util::AnyHolder* holder = new TIDorb::core::util::AnyHolder();
   holder->value(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1892,13 +1649,11 @@ void TIDorb::core::AnyImpl::insert_any(const CORBA::Any& s)
 
   holder->value(s);
 
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1907,24 +1662,22 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_Object(CORBA::Object_out value) co
   if (m_effective_type->kind() != CORBA::tk_objref)
     return false;
  
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::ObjectHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::ObjectHolder*> (m_value);
+  
+  
   TIDorb::core::util::ObjectHolder* holder =
     (TIDorb::core::util::ObjectHolder*) (m_value);
 
   if(holder) {
-//FRAN
+
 //    value = CORBA::Object::_duplicate(holder->value());
     value = holder->value();
-//EFRAN
+
     return true;
   }
 
@@ -1936,13 +1689,11 @@ void TIDorb::core::AnyImpl::insert_Object(CORBA::Object_ptr s)
   TIDorb::core::util::ObjectHolder* holder =
     new TIDorb::core::util::ObjectHolder();
   holder->value(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1951,13 +1702,11 @@ void TIDorb::core::AnyImpl::insert_Object(CORBA::Object_ptr s, const CORBA::Type
   TIDorb::core::util::ObjectHolder* holder =
     new TIDorb::core::util::ObjectHolder();
   holder->value(s,tc);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -1966,16 +1715,14 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_TypeCode(CORBA::TypeCode_out value
   if (m_effective_type->kind() != CORBA::tk_TypeCode)
     return false;
  
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::TypeCodeHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::TypeCodeHolder*> (m_value);
+  
+  
   TIDorb::core::util::TypeCodeHolder* holder =
     (TIDorb::core::util::TypeCodeHolder*) (m_value);
 
@@ -1991,13 +1738,11 @@ void TIDorb::core::AnyImpl::insert_TypeCode(CORBA::TypeCode_ptr s)
 {
   TIDorb::core::util::TypeCodeHolder* holder =
     new TIDorb::core::util::TypeCodeHolder(s);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -2006,13 +1751,13 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_Streamable(const TIDorb::portable:
   if(m_wrapped_any)
     return m_wrapped_any->extract_Streamable(value);
 
-  //jagd optimizacion del skip 
+  // skip optimization
   // if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   // {
   //   ((TIDorb::core::AnyImpl *)this)->skip_value((TIDorb::core::AnyImpl *)this)->(m_marshaled_value);
   //   ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   // } 
-  //ejagd
+  
   if(m_value) {
     value = m_value;
     return true;
@@ -2043,13 +1788,10 @@ void TIDorb::core::AnyImpl::insert_Streamable(TIDorb::portable::Streamable* valu
   if(!value)
     throw CORBA::BAD_PARAM();
 
-//FRAN
   CORBA::TypeCode_var type_aux = value->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(value->_type());
-//EFRAN
+
   m_value = value;
 }
 
@@ -2058,13 +1800,10 @@ void TIDorb::core::AnyImpl::insert_Streamable(const TIDorb::portable::Streamable
   if(!value)
     throw CORBA::BAD_PARAM();
 
-//FRAN
   CORBA::TypeCode_var type_aux = value->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(value->_type());
-//EFRAN
+
   m_value = (TIDorb::portable::Streamable*) value;
 
   m_value->_add_ref();
@@ -2077,9 +1816,7 @@ bool TIDorb::core::AnyImpl::dump(ostream& os) const
   os << "[ANY]";
   m_type->dump(os);
 
-  //jagd
-  //TIDorb::core::cdr::CDRInputStream* input =
-  //  dynamic_cast<TIDorb::core::cdr::CDRInputStream*> (create_input_stream());
+  
   TIDorb::core::cdr::CDRInputStream* input =
     (TIDorb::core::cdr::CDRInputStream*) (create_input_stream());
 
@@ -2095,13 +1832,11 @@ void TIDorb::core::AnyImpl::insert_Value(CORBA::ValueBase* value)
   TIDorb::core::util::ValueHolder* holder =
     new TIDorb::core::util::ValueHolder();
   holder->value(value);
-//FRAN
+
   CORBA::TypeCode_var type_aux = holder->_type();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(type_aux);
+
   set_type(type_aux);
-  //type(holder->_type());
-//EFRAN
+
   m_value = holder;
 }
 
@@ -2110,8 +1845,7 @@ void TIDorb::core::AnyImpl::insert_Value(CORBA::ValueBase* the_value, CORBA::Typ
   TIDorb::core::util::ValueHolder* holder =
     new TIDorb::core::util::ValueHolder();
   holder->value(the_value);
-  // Fix bug [#392] Any::type(tc) reset any value
-  //type(the_type);
+
   set_type(the_type);
   m_value = holder;
 }
@@ -2121,16 +1855,14 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_Value(CORBA::ValueBase*& value) co
   if (m_effective_type->kind() != CORBA::tk_value)
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::ValueHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::ValueHolder*> (m_value);
+  
+  
   TIDorb::core::util::ValueHolder* holder =
     (TIDorb::core::util::ValueHolder*) (m_value);
 
@@ -2171,16 +1903,14 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_fixed(CORBA::Fixed& value, CORBA::
   if(!type->equal(m_type))
     return false;
 
-  //jagd optimizacion del skip 
+  // skip optimization
   if (!m_value&&mi_cdr!=TIDorb::core::AnyImpl::OK)
   {
     ((TIDorb::core::AnyImpl *)this)->skip_value(((TIDorb::core::AnyImpl *)this)->m_marshaled_value);
     ((TIDorb::core::AnyImpl *)this)->mi_cdr=TIDorb::core::AnyImpl::OK;
   } 
-  //ejagd
-  //jagd
-  //TIDorb::core::util::FixedHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::FixedHolder*> (m_value);
+  
+  
   TIDorb::core::util::FixedHolder* holder =
     (TIDorb::core::util::FixedHolder*) (m_value);
 
@@ -2200,9 +1930,7 @@ CORBA::Boolean TIDorb::core::AnyImpl::extract_fixed(CORBA::Fixed& value,
   if(m_effective_type->kind() != CORBA::tk_fixed)
     return false;
   
-  //jagd
-  //TIDorb::core::util::FixedHolder* holder =
-  //  dynamic_cast<TIDorb::core::util::FixedHolder*> (m_value);
+  
   TIDorb::core::util::FixedHolder* holder =
     (TIDorb::core::util::FixedHolder*) (m_value);
 

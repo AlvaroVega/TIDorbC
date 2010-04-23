@@ -16,7 +16,8 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/08_FT/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/09_PortableGroup/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/10_Messaging/ \
-	-I$(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/
+	-I$(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/ \
+	-I$(top_builddir)/source/TIDorbC/orb/IDL/12_Security/
 
 
 lib_LTLIBRARIES = libTIDorb.la
@@ -92,6 +93,11 @@ libTIDorb_la_SOURCES = \
 	$(srcdir)/core/comm/miop/GroupInfo.C \
 	$(srcdir)/core/comm/miop/ProfileMIOP.C \
 	$(srcdir)/core/comm/miop/MIOPCorbaloc.C \
+	$(srcdir)/core/comm/SSLConnection.C \
+	$(srcdir)/core/comm/SSLIIOPCommLayer.C \
+	$(srcdir)/core/comm/SSLServerListener.C \
+	$(srcdir)/core/comm/ssliop/SSLComponent.C \
+	$(srcdir)/core/comm/ssliop/SSLIOPCorbaloc.C \
 	$(srcdir)/core/comm/ziop/ZIOPMessage.C \
 	$(srcdir)/core/compression/CompressionManagerImpl.C \
 	$(srcdir)/core/compression/CompressorFactoryImpl.C \
@@ -101,6 +107,7 @@ libTIDorb_la_SOURCES = \
 	$(srcdir)/core/goa/MIOPRequest.C \
 	$(srcdir)/core/goa/AbstractMIOPRequest.C \
 	$(srcdir)/core/ContextImpl.C \
+	$(srcdir)/core/DomainManagerImpl.C \
 	$(srcdir)/core/AbstractBaseImpl.C \
 	$(srcdir)/core/ShutdownThread.C \
 	$(srcdir)/core/PolicyContext.C \
@@ -139,6 +146,13 @@ libTIDorb_la_SOURCES = \
 	$(srcdir)/core/TIDORB.C \
 	$(srcdir)/core/Fixed.C \
 	$(srcdir)/core/RequestSeqImpl.C \
+	$(srcdir)/core/security/CSIComponent.C \
+	$(srcdir)/core/security/QOPPolicyImpl.C \
+	$(srcdir)/core/security/EstablishTrustPolicyImpl.C \
+	$(srcdir)/core/security/SecurityManagerImpl.C \
+	$(srcdir)/core/security/SecurityChecker.C \
+	$(srcdir)/core/security/sas/SASManager.C \
+	$(srcdir)/core/security/sas/SASServiceContext.C \
 	$(srcdir)/core/typecode/TypeCodeImpl.C \
 	$(srcdir)/core/typecode/RecursiveTypeCode.C \
 	$(srcdir)/core/typecode/StringTypeCode.C \

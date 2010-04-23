@@ -146,16 +146,11 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
     /**
      * Pending request invoked
      */
-     //jagd no hace falta mutex para proteger el contador 
-     //TIDorb::core::util::Counter requests_invoked;
     unsigned long requests_invoked;
      
     /**
      * Pending requests in POA.
      */
-    //jagd aunque protejaramos el mutex quien llama a request in POA
-    //no esta sincronizado asi que se produce el mismo efecto. 
-    //TIDorb::core::util::Counter requests_in_POA;
     unsigned long requests_in_POA;
 
     /**
@@ -191,6 +186,11 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
 
 
     /**
+     * CSIv2 SAS enabled.
+     */
+    bool sas_enabled;
+
+    /**
      * Server Object Listen Points assotiated.
      */        
      
@@ -207,10 +207,8 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
     /**
      *  The ConnectionManager.
      */
-//MLG: En un principio siempre hay manager    
-    //ConnectionManager_ref manager;
     ConnectionManager* manager;
-//EMLG    
+
 
     /**
      *  Lock list where the pending requests are waiting for response.
@@ -261,10 +259,14 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
 
     const TIDorb::core::ConfORB& conf;
 
+    TIDorb::core::security::sas::SASManager* sas_manager;
+
+
   protected:
     Connection(ConnectionManager* mngr)
       throw (TIDThr::SystemException, CORBA::SystemException);
-	  TIDorb::core::TIDORB* _orb;		
+
+    TIDorb::core::TIDORB* _orb;		
 
   public:
     virtual ~Connection() throw (TIDThr::SystemException);
@@ -399,9 +401,7 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
   public:
     bool send_locate_request(TIDorb::core::iop::IOR* ior,
                              const TIDorb::core::PolicyContext& policy_context)
-//PRA
       throw (RECOVERABLE_COMM_FAILURE,TIDorb::core::ForwardRequest,CORBA::SystemException);
-//EPRA
 
   protected:
     bool send_locate_request(TIDorb::core::iop::IOR* ior,
@@ -416,9 +416,7 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
 
     virtual void send_oneway_request_sync(TIDorb::core::RequestImpl* request,
                                           TIDorb::core::iop::IOR* ior)
-//PRA
       throw (RECOVERABLE_COMM_FAILURE,TIDorb::core::ForwardRequest,CORBA::SystemException);
-//EPRA
 
   protected:
     virtual void send_oneway_request_async(TIDorb::core::RequestImpl* request,
@@ -448,7 +446,7 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
      void send_locate_reply(const TIDorb::core::comm::iiop::Version& version, TIDorb::core::comm::iiop::RequestId id, CORBA::Object* obj);
      void send_locate_reply(const TIDorb::core::comm::iiop::Version& version, TIDorb::core::comm::iiop::RequestId id, const CORBA::SystemException& excep);
 
-     // pra@tid.es - FT extensions
+     // FT extensions
      CORBA::ULongLong                    heartbeat_time;
      TIDorb::core::comm::iiop::RequestId heartbeart_req_id;
 
@@ -457,9 +455,14 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
 
 
      void set_service_context_list(TIDorb::core::comm::iiop::GIOPRequestMessage* message,
-                                   TIDorb::core::PolicyContext* policy_context);
+                                   TIDorb::core::PolicyContext* policy_context,
+                                   TIDorb::core::security::sas::SASServiceContext* sas_context);
 
-     void service_context_received(const TIDorb::core::comm::iiop::ServiceContextList* services);
+     void set_service_context_list(TIDorb::core::comm::iiop::GIOPReplyMessage* message,
+                                   TIDorb::core::security::sas::SASServiceContext* sas_context);
+
+     void service_context_received(const TIDorb::core::comm::iiop::ServiceContextList* services,
+                                   TIDorb::core::ServerRequestImpl* request = NULL);
 
      bool canBeRemoved()
  		 {
@@ -489,7 +492,6 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
 };
 
 
-//PRA
 class Connection_ref : public TIDThr::HandleT<Connection>,
                        public TIDorb::core::util::RemovableObject
 {
@@ -505,7 +507,6 @@ class Connection_ref : public TIDThr::HandleT<Connection>,
     }
     virtual ~Connection_ref() {}
 };
-//EPRA
 
 
 } //comm

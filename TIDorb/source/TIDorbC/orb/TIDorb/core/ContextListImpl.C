@@ -101,8 +101,6 @@ CORBA::ContextList_ptr CORBA::ContextList::_duplicate(CORBA::ContextList_ptr lis
 {
   try {
    
-    //jagd 
-    //TIDorb::core::ContextListImpl* list_impl = dynamic_cast<TIDorb::core::ContextListImpl*> (list);
     TIDorb::core::ContextListImpl* list_impl = (TIDorb::core::ContextListImpl*) (list);
   
     if(list_impl)
@@ -124,8 +122,6 @@ void CORBA::release(CORBA::ContextList_ptr list)
 {
   try {
    
-    //jagd 
-    //TIDorb::core::ContextListImpl* list_impl = dynamic_cast<TIDorb::core::ContextListImpl*> (list);
     TIDorb::core::ContextListImpl* list_impl = (TIDorb::core::ContextListImpl*) (list);
   
     if(list_impl)

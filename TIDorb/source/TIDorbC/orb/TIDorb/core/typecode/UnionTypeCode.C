@@ -299,23 +299,17 @@ bool UnionTypeCode::skip_value (TIDorb::core::cdr::CDRInputStream& input) const
 {
   CORBA::Any discriminator;
 
-  // jagd
-  //discriminator.delegate().read_value(input, m_discriminator_type);
   discriminator.delegate().read_value(input, m_discriminator_type, true);
 
   CORBA::Long index = search_member_index(discriminator);
 
-  //PRA
   if (index == -1) {
     return true;	// default constructed union
   }
-  //EPRA
 
   if ((index < 0) || (index >= m_members->length())) {
     throw CORBA::MARSHAL();
   }
-  //jagd
-  //TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type)->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type);
 
   tc->skip_value(input);
@@ -332,26 +326,20 @@ void UnionTypeCode::remarshal_value
 {
   CORBA::Any discriminator;
 
-  // jagd
-  //discriminator.delegate().read_value(input, m_discriminator_type);
+
   discriminator.delegate().read_value(input, m_discriminator_type, true);
   discriminator.delegate().write_value(output);
 
   CORBA::Long index = search_member_index(discriminator);
 
-  //PRA
   if (index == -1) {
     return;		// default constructed union
   }
-  //EPRA
 
   if ((index < 0) || (index >= m_members->length())) {
     throw CORBA::MARSHAL();
   }
 
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl *>((CORBA::TypeCode_ptr)((*m_members)[index]).type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type)->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type);
 
   tc->remarshal_value(input, output);
@@ -366,9 +354,7 @@ bool UnionTypeCode::values_equal
 {
   CORBA::Any discriminator_a, discriminator_b;
 
-  // jagd
-  //discriminator_a.delegate().read_value(a_input, m_discriminator_type);
-  //discriminator_b.delegate().read_value(b_input, m_discriminator_type);
+
   discriminator_a.delegate().read_value(a_input, m_discriminator_type, true);
   discriminator_b.delegate().read_value(b_input, m_discriminator_type, true);
 
@@ -376,19 +362,15 @@ bool UnionTypeCode::values_equal
     return false;
 
   CORBA::Long index = search_member_index(discriminator_a);
-  //PRA
+
   if (index == -1) {
     return true;	// default constructed union
   }
-  //EPRA
 
   if ((index < 0) || (index >= m_members->length())) {
     throw CORBA::MARSHAL();
   }
 
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl *>((CORBA::TypeCode_ptr)((*m_members)[index]).type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type)->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type);
 
   return tc->values_equal(a_input, b_input);
@@ -418,9 +400,6 @@ void UnionTypeCode::dump (ostream& output) const
 
     output<< ": " << member_name(i)  << " -> ";
 
-    //my_member_type = dynamic_cast<TypeCodeImpl*>((CORBA::TypeCode_ptr)((*m_members)[i]).type);
-    //jagd 
-    //my_member_type = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[i].type)->_impl();
     my_member_type = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[i].type);
 
     my_member_type->dump(output);
@@ -436,8 +415,6 @@ bool UnionTypeCode::dump_value (TIDorb::core::cdr::CDRInputStream& input,
                                 ostream& output) const
 {
   CORBA::Any discriminator;
-  // jagd
-  //discriminator.delegate().read_value(input, m_discriminator_type);
   discriminator.delegate().read_value(input, m_discriminator_type, true);
 
   output << "[VALUE]{union " << m_name << " discriminator: ";
@@ -445,19 +422,14 @@ bool UnionTypeCode::dump_value (TIDorb::core::cdr::CDRInputStream& input,
   discriminator.delegate().dump(output);
 
   CORBA::Long index = search_member_index(discriminator);
-  //PRA
   if (index == -1) {
     return true;	// default constructed union
   }
-  //EPRA
 
   if ((index < 0) || (index >= m_members->length())) {
     throw CORBA::MARSHAL();
   }
 
-  //TypeCodeImpl* tc = dynamic_cast<TypeCodeImpl *>((CORBA::TypeCode_ptr)((*m_members)[index]).type);
-  //jagd 
-  //TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type)->_impl();
   TypeCodeImpl* tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[index].type);
 
   if(index == m_default_used)

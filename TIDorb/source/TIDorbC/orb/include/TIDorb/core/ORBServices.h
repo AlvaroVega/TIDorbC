@@ -86,12 +86,13 @@ class ORBServices : public virtual TIDThr::RecursiveMutex
   static const char* CODEC_FACTORY_ID; 
   static const char* PI_CURRENT_ID;
   static const char* COMPRESSION_MANAGER_ID;
+  static const char* SECURITY_MANAGER_ID;
 
   enum ORBServiceCode{ROOT_POA = 0, POA_CURRENT,INTERFACE_REPOSITORY, NAME_SERVICE, 
                       TRADING_SERVICE, SECURITY_CURRENT, TRANSACTION_CURRENT, DYN_ANY_FACTORY,
                       ORB_POLICY_MANAGER, POLICY_CURRENT, NOTIFICATION_SERVICE,
                       TYPED_NOTIFICATION_SERVICE, CODEC_FACTORY, PI_CURRENT,
-                      COMPRESSION_MANAGER};
+                      COMPRESSION_MANAGER, SECURITY_MANAGER};
   
   typedef map<string, CORBA::Object_ptr> ServiceTable;
   typedef map<string, ORBServiceCode> ServiceCodeTable;

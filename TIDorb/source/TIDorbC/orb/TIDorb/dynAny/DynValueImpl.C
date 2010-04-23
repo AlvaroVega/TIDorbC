@@ -439,9 +439,6 @@ void DynValueImpl::_write(TIDorb::portable::OutputStream& out) const
         value_info.set_repository_ids(&rep_id, 1);
 //       }
 
-      //jagd
-      //TIDorb::core::cdr::CDROutputStream& cdr_output =
-      //  dynamic_cast<TIDorb::core::cdr::CDROutputStream& > (out);
       TIDorb::core::cdr::CDROutputStream& cdr_output =
         *(TIDorb::core::cdr::CDROutputStream*) (&out);
 
@@ -462,17 +459,9 @@ void DynValueImpl::extractTypeInfo()
 
     _next_value->fix_starting();
 
-    //PRA
-    //if(value_info.is_null()) {
-    //    throw CORBA::MARSHAL();
-    //}
-    //EPRA
-    
     if (value_info.is_null()) {
        set_to_null();
     } else if (value_info.isIndirection()) {
-       //PRA
-       //throw new CORBA::INTERNAL("Unexpected Indirection");
        throw CORBA::INTERNAL("Unexpected Indirection");
     } else {
 

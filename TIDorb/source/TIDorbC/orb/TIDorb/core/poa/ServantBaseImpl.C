@@ -49,9 +49,6 @@ PortableServer::ServantBase::ServantBase(const PortableServer::ServantBase& othe
 {
   if(other._delegate != NULL)
   {
-    //jagd
-    //_delegate = new TIDorb::core::poa::ServantDelegate
-    //  (dynamic_cast< TIDorb::core::poa::ServantDelegate& > (*(other._delegate)));
     _delegate = new TIDorb::core::poa::ServantDelegate
       ( *(TIDorb::core::poa::ServantDelegate *)(other._delegate));
   }
@@ -65,9 +62,6 @@ PortableServer::ServantBase&
   {
     delete _delegate;
     
-    //jagd 
-    //_delegate = new TIDorb::core::poa::ServantDelegate
-    //  (dynamic_cast< TIDorb::core::poa::ServantDelegate& > (*(other._delegate)));
     _delegate = new TIDorb::core::poa::ServantDelegate
       ( *(TIDorb::core::poa::ServantDelegate *)(other._delegate));
   }

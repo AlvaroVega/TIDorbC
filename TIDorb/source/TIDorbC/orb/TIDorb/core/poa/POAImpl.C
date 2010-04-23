@@ -57,8 +57,6 @@ TIDorb::core::poa::POAImpl::POAImpl(TIDorb::core::TIDORB* the_orb, const char* a
 throw (PortableServer::POA::InvalidPolicy,CORBA::SystemException)
 : _destroyed(false), 
   _name (CORBA::string_dup(adapter_name)),
-  //jagd
-  //_parent (PortableServer::POA::_duplicate(parent)),
   _parent (parent),
   _POAManager (NULL),
   _completion (the_orb), 
@@ -83,12 +81,8 @@ throw (PortableServer::POA::InvalidPolicy,CORBA::SystemException)
 
   _poa_id = TIDorb::core::util::Time::currentTimeMillis();
 
-  //jagd
-  //_POAManager = dynamic_cast<TIDorb::core::poa::POAManagerImpl*>
-  //               (PortableServer::POAManager::_duplicate(a_POAManager));
-  //
   _POAManager = (TIDorb::core::poa::POAManagerImpl*)a_POAManager;
-   //              (PortableServer::POAManager::_duplicate(a_POAManager));
+
   _POAManager->_add_ref();
 
 
@@ -102,7 +96,6 @@ throw (PortableServer::POA::InvalidPolicy,CORBA::SystemException)
     TIDorb::core::poa::POAImpl* parent_aux =
       dynamic_cast<TIDorb::core::poa::POAImpl*>(parent);
   
-    //jagd
     parent_aux->_add_ref();
 
     CORBA::ULong length;
@@ -249,7 +242,7 @@ throw (PortableServer::POA::InvalidPolicy,CORBA::SystemException)
 
 TIDorb::core::poa::POAImpl::~POAImpl()
 {
-  //jagd destruimos el array
+  //destruimos el array
    for (size_t i = 0; i < _children.size(); i++) {
      _children[i]->_remove_ref();
    }
@@ -265,12 +258,12 @@ TIDorb::core::poa::POAImpl::~POAImpl()
   delete _ThreadPolicy;
   delete _BidirectionalPolicy;
   delete _referencePolicies;
-  //PRA
+
   delete _currentOID;
   if (_servant) {
     _servant->_remove_ref();
   }
-  //EPRA
+
   CORBA::string_free(_poa_string_name);
   CORBA::release(orb);
 };
@@ -284,12 +277,6 @@ void TIDorb::core::poa::POAImpl::tryToRemoveObject(const TIDorb::core::poa::OID&
 throw (PortableServer::POA::ObjectNotActive)
 {
   if (_ServantRetentionPolicy->value() == PortableServer::RETAIN) {
-//     if (_activeObjectMap->isActive(oid)) {
-//       bool OidNotInUse = _activeObjectMap->removeUser(oid);
-//       if (OidNotInUse) {
-//         trueRemoveObject(oid);
-//       }
-//     }
     bool OidNotInUse = _activeObjectMap->removeUser_if_Active(oid);
     if (OidNotInUse) {
       trueRemoveObject(oid);
@@ -307,7 +294,6 @@ throw (PortableServer::POA::ObjectNotActive )
   // Remove OID from ActiveObjectMap 
 
   
-  // PortableServer::Servant servant = _activeObjectMap->get(oid);
   PortableServer::Servant servant = _activeObjectMap->get_and_remove(oid);
   
   // add reference counting to the servant before erase from the AOM
@@ -339,8 +325,7 @@ throw (PortableServer::POA::ObjectNotActive )
   {
     TIDThr::Synchronized synchro(recursive_mutex);
     TIDorb::portable::ServantDelegate* aux_delegate=servant->get_delegate();
-    //jagd 
-    //TIDorb::core::poa::ServantDelegate* delegate=dynamic_cast<TIDorb::core::poa::ServantDelegate*>(aux_delegate);
+
     TIDorb::core::poa::ServantDelegate* delegate=(TIDorb::core::poa::ServantDelegate*)(aux_delegate);
     delegate->notifyAll();
     servant->_remove_ref();
@@ -351,15 +336,10 @@ throw (PortableServer::POA::ObjectNotActive )
 * Find a POA among the POA's children.
 * @param poa_name The POA name.
 */
-//jagd
-//PortableServer::POA_ptr TIDorb::core::poa::POAImpl::find_children(const char* poa_name) {
 TIDorb::core::poa::POAImpl * TIDorb::core::poa::POAImpl::find_children(const char* poa_name) {
-  //jagd 
-  //PortableServer::POA_ptr poa = NULL;
   TIDorb::core::poa::POAImpl * poa = NULL;
   for (size_t i=0; i<_children.size(); i++) {
-    //jagd 
-    //poa = (PortableServer::POA*)_children[i];
+
     poa = _children[i];
     if (strcmp(poa_name,poa->the_name())==0) {
       return poa;
@@ -375,8 +355,7 @@ TIDorb::core::poa::POAImpl * TIDorb::core::poa::POAImpl::find_children(const cha
 */
 const char* TIDorb::core::poa::POAImpl::getRepositoryId(PortableServer::Servant servant) {
   TIDorb::portable::ServantDelegate* aux_delegate=servant->get_delegate();
-  //jagd
-  //TIDorb::core::poa::ServantDelegate* delegate=dynamic_cast<TIDorb::core::poa::ServantDelegate*>(aux_delegate);
+
   TIDorb::core::poa::ServantDelegate* delegate=(TIDorb::core::poa::ServantDelegate*)(aux_delegate);
 
   const PortableServer::ObjectId& __oid = delegate->object_id(servant);
@@ -519,6 +498,7 @@ CORBA::Object_ptr
   TIDorb::core::iop::IOR* ior =
     orb->getCommunicationManager()->getExternalLayer()->createIOR(intf, 
                                      poakey, poaComponents);
+  // TODO: add something about QOPPolicy and EstablishTrustPolicy ???
   return TIDorb::core::ObjectImpl::fromIOR(orb, ior);
 };
 
@@ -556,8 +536,7 @@ throw (PortableServer::POA::ObjectNotActive,PortableServer::POA::WrongPolicy,COR
     // Default servant invocation (oid == current request oid ??)
 
     TIDorb::portable::ServantDelegate* aux_delegate=_servant->get_delegate();
-    //jagd 
-    //TIDorb::core::poa::ServantDelegate* delegate=dynamic_cast<TIDorb::core::poa::ServantDelegate*>(aux_delegate);
+
     TIDorb::core::poa::ServantDelegate* delegate=(TIDorb::core::poa::ServantDelegate*)(aux_delegate);
     delegate->setObjectId(oid.get_object_id());
     return _servant;
@@ -675,9 +654,7 @@ const char* operation, PortableServer::ServantLocator::Cookie* cookie, CORBA::Bo
         servant = _servant;
         // Default servant invocation (oid == current request oid ??)
         TIDorb::portable::ServantDelegate* aux_delegate=servant->get_delegate();
-        //jagd 
-        // TIDorb::core::poa::ServantDelegate* delegate=
-        //   dynamic_cast<TIDorb::core::poa::ServantDelegate*>(aux_delegate);
+
         TIDorb::core::poa::ServantDelegate* delegate = 
           (TIDorb::core::poa::ServantDelegate*)(aux_delegate);
         delegate->setObjectId(oid.get_object_id());
@@ -692,90 +669,6 @@ const char* operation, PortableServer::ServantLocator::Cookie* cookie, CORBA::Bo
     
   
   
-//     // RETAIN && USE_ACTIVE_OBJECT_MAP_ONLY
-//     if ( (_ServantRetentionPolicy->value() == PortableServer::RETAIN) && 
-//         (_RequestProcessingPolicy->value() == PortableServer::USE_ACTIVE_OBJECT_MAP_ONLY)) {
-//       servant = id_to_servant(oid);
-//     }
-
-//     // RETAIN && USE_DEFAULT_SERVANT
-//     if ((_ServantRetentionPolicy->value() == PortableServer::RETAIN) &&
-//     (_RequestProcessingPolicy->value() == PortableServer::USE_DEFAULT_SERVANT)) {
-//       servant = id_to_servant(oid);
-//     }
-
-//     // RETAIN && USE_SERVANT_MANAGER
-//     if ((_ServantRetentionPolicy->value() == PortableServer::RETAIN) &&
-//     (_RequestProcessingPolicy->value() == PortableServer::USE_SERVANT_MANAGER)) {
-//       if (_servant_manager == NULL) {
-//         throw CORBA::OBJ_ADAPTER();
-//       }
-//       try {
-//         // try to get id from the Active Object Map
-//         servant = id_to_servant(oid);
-//       } catch (const PortableServer::POA::ObjectNotActive &e) {
-//         // try to use Servant Activator (incarnate)
-
-//         PortableServer::ServantActivator_var activator =
-//           PortableServer::ServantActivator::_narrow(_servant_manager);
-
-//         servant = activator->incarnate(oid.get_object_id(), this);
-//         if (!servant) {
-//           throw CORBA::OBJ_ADAPTER();
-//         }
-//         try {
-//           // try to activate servant created by Servant Activator
-//           activate_object_with_id(oid, servant);
-//         } catch (const PortableServer::POA::ServantAlreadyActive &e2) {
-//           throw CORBA::OBJ_ADAPTER();
-//         }
-//       }
-//     }
-
-
-//     // NON_RETAIN && USE_SERVANT_MANAGER
-//     if ((_ServantRetentionPolicy->value() == PortableServer::NON_RETAIN) &&
-//     (_RequestProcessingPolicy->value() == PortableServer::USE_SERVANT_MANAGER)) {
-//       if (_servant_manager == NULL) {
-//         throw CORBA::OBJ_ADAPTER("No  ServantManager setted");
-//       }
-//       // try to use Servant Locator (preinvoke)
-//       PortableServer::ServantLocator* locator =
-//         PortableServer::ServantLocator::_narrow(_servant_manager);
-
-//       if (isSingleThread()) {
-//         TIDThr::Synchronized synchro(*single_thread_recursive_mutex);
-//         servant = locator->preinvoke(oid.get_object_id(), this, (char*)operation, *cookie);
-
-//       } else {
-//         servant = locator->preinvoke(oid.get_object_id(), this, (char*)operation, *cookie);
-//       }
-
-//       if(!servant)
-//         throw CORBA::OBJ_ADAPTER("ServantLocator::preinvoke returns NULL");
-
-//       *servantLocatorUsed = true;
-//       // Servant delegate creation (oid == current request oid ??)
-//       TIDorb::core::poa::ServantDelegate* delegate = new ServantDelegate(this, oid.get_object_id());
-//       servant->set_delegate(delegate);
-//     }
-
-//     // NON_RETAIN && USE_DEFAULT_SERVANT
-//     if ((_ServantRetentionPolicy->value() == PortableServer::NON_RETAIN) &&
-//     (_RequestProcessingPolicy->value() == PortableServer::USE_DEFAULT_SERVANT)) {
-//       if (_servant == NULL) {
-//         throw CORBA::OBJ_ADAPTER();
-//       }
-//       // return Default Servant
-//       servant = _servant;
-//       // Default servant invocation (oid == current request oid ??)
-//       TIDorb::portable::ServantDelegate* aux_delegate=servant->get_delegate();
-//       //jagd 
-//       //TIDorb::core::poa::ServantDelegate* delegate=dynamic_cast<TIDorb::core::poa::ServantDelegate*>(aux_delegate);
-//       TIDorb::core::poa::ServantDelegate* delegate=(TIDorb::core::poa::ServantDelegate*)(aux_delegate);
-//       delegate->setObjectId(oid.get_object_id());
-//     }
-
 
   } catch (const PortableServer::POA::WrongPolicy &dummy) {
     // should never happen !!
@@ -837,9 +730,6 @@ throw (PortableServer::POA::ObjectNotActive) {
 
   if (_ServantRetentionPolicy->value() == PortableServer::RETAIN) {
 
-//     if (_activeObjectMap->isActive(oid)) {
-//       _activeObjectMap->addUser(oid);
-//     }
     _activeObjectMap->addUser_if_Active(oid);
   }
 
@@ -962,8 +852,6 @@ throw (PortableServer::POA::AdapterAlreadyExists, PortableServer::POA::InvalidPo
   if (a_POAManager == NULL) {
     POAmgr = new POAManagerImpl(orb);
   } else {
-    //jagd
-    //POAmgr = dynamic_cast<TIDorb::core::poa::POAManagerImpl*>(a_POAManager);
     POAmgr = (TIDorb::core::poa::POAManagerImpl*)(a_POAManager);
   }
 
@@ -1020,8 +908,6 @@ throw (PortableServer::POA::AdapterNonExistent, CORBA::SystemException)
   if(adapter_name == NULL)
   throw CORBA::BAD_PARAM("Null reference", 0,CORBA::COMPLETED_NO);
 
-  //jagd
-  //PortableServer::POA_ptr poa = find_children(adapter_name);
   TIDorb::core::poa::POAImpl * poa = find_children(adapter_name);
 
   if (poa == NULL) {
@@ -1029,8 +915,6 @@ throw (PortableServer::POA::AdapterNonExistent, CORBA::SystemException)
       try {
         _activator->unknown_adapter(this, (char*)adapter_name);
       } catch (const CORBA::Exception &e) {
-        //MCPG - Pendiente
-        //throw CORBA::CORBA::OBJ_ADAPTER(e.getMessage());
       }
       poa = find_children(adapter_name);  // see if _activator has created the POA
       if (poa == NULL) {
@@ -1210,8 +1094,6 @@ PortableServer::POAList* TIDorb::core::poa::POAImpl::the_children() throw(CORBA:
   childrenArray->length(_children.size());
 
   for (size_t i = 0; i < _children.size(); i++)
-  //jagd
-    //(*childrenArray)[i] = PortableServer::POA::_duplicate(_children[i]);
     {
       _children[i]->_add_ref();
       (*childrenArray)[i] = _children[i];
@@ -1310,6 +1192,7 @@ throw (PortableServer::POA::NoServant,PortableServer::POA::WrongPolicy,CORBA::Sy
   if (_servant == NULL) {
     throw PortableServer::POA::NoServant();
   }
+  _servant->_add_ref();
   return _servant;
 };
 
@@ -1420,10 +1303,7 @@ throw (PortableServer::POA::ServantAlreadyActive,PortableServer::POA::ObjectAlre
   if(id.length() == 0)
   throw CORBA::BAD_PARAM("Invalid id length: 0", 0,CORBA::COMPLETED_NO);
 
-  //PRA
-  //TIDorb::core::poa::OID* aux_oid=new OID(id);
   TIDorb::core::poa::OID aux_oid(id);
-  //EPRA
   activate_object_with_id(aux_oid, p_servant);
 
 }
@@ -1454,10 +1334,7 @@ throw (PortableServer::POA::ObjectNotActive,PortableServer::POA::WrongPolicy,COR
     throw PortableServer::POA::WrongPolicy();
   }
 
-  //PRA
-  //TIDorb::core::poa::OID* tid_oid = new OID(oid);
   TIDorb::core::poa::OID tid_oid(oid);
-  //EPRA
 
   {
     TIDThr::Synchronized synchro(recursive_mutex);
@@ -1691,7 +1568,7 @@ throw (PortableServer::POA::ServantNotActive,PortableServer::POA::WrongPolicy,CO
 *            If the object reference does not belong to this POA.
 * @exception PortableServer::POA::WrongPolicy
 *            If POA policies do not allow this operation.
-* // pra@tid.es - MIOP extensions
+* // MIOP extensions
 * @exception CORBA::INV_OBJREF
 *            If reference is a Group Object reference.
 * // end MIOP extensions
@@ -1719,7 +1596,7 @@ throw (PortableServer::POA::ObjectNotActive,PortableServer::POA::WrongAdapter,Po
 *            If the object reference does not belong to this POA.
 * @exception PortableServer::POA::WrongPolicy
 *            If POA policies do not allow this operation.
-* // pra@tid.es - MIOP extensions
+* // MIOP extensions
 * @exception CORBA::INV_OBJREF
 *            If reference is a Group Object reference.
 * // end MIOP extensions
@@ -1779,11 +1656,12 @@ throw (PortableServer::POA::ObjectNotActive,PortableServer::POA::WrongPolicy,COR
   if(oid.length() == 0)
   throw CORBA::BAD_PARAM("Invalid oid length: 0", 0,CORBA::COMPLETED_NO);
 
-  //PRA
-  //TIDorb::core::poa::OID* aux_oid = new OID(oid);
   TIDorb::core::poa::OID aux_oid(oid);
-  //EPRA
-  return id_to_servant(aux_oid);
+
+  PortableServer::Servant _aux_servant = id_to_servant(aux_oid);
+  // 1.37.3 Servant Memory Management Considerations: _add_ref()
+  _aux_servant->_add_ref();
+  return _aux_servant;
 };
 
 /**
@@ -1805,10 +1683,7 @@ throw (PortableServer::POA::ObjectNotActive,PortableServer::POA::WrongPolicy,COR
   if(oid.length() == 0)
   throw CORBA::BAD_PARAM("Invalid oid length: 0", 0,CORBA::COMPLETED_NO);
 
-  //PRA
-  //TIDorb::core::poa::OID* tid_oid = new OID(oid);
   TIDorb::core::poa::OID tid_oid(oid);
-  //EPRA
 
   if (_ServantRetentionPolicy->value() != PortableServer::RETAIN) {
     throw PortableServer::POA::WrongPolicy();
@@ -1912,17 +1787,16 @@ void TIDorb::core::poa::POAImpl::trueDestroy()
   if (_etherealize) {
     // Etherealize all objects
     etherealizeAllObjects();
-  } /*PRA else {
+  } /* else {
     // init activeObjectMap (perhaps this is not necessary)
     _activeObjectMap = new ActiveObjectMap();
-  } EPRA*/
+  } */
 
   // remove POA from parent
   if (_parent != NULL) {
     TIDorb::core::poa::POAImpl* aux_parent  =
       dynamic_cast<TIDorb::core::poa::POAImpl*>((PortableServer::POA *)_parent);
 
-    //vector<PortableServer::POA_var>::iterator iterador;
     vector<TIDorb::core::poa::POAImpl *>::iterator iterador;
     iterador = aux_parent->_children.begin();
     while (iterador != aux_parent->_children.end()){

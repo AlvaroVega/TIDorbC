@@ -58,7 +58,7 @@ namespace comm {
 
 class IIOPCommLayer : public CommunicationLayer
 {
-   private:
+   protected:
 
    /**
     * Monitorizada....
@@ -81,7 +81,7 @@ class IIOPCommLayer : public CommunicationLayer
    ConnectionManager_ref connection_manager;
 
 
-   // pra@tid.es - FT extensions
+   // FT extensions
    CORBA::Boolean             server_heartbeat_enabled;
    ::FT::HeartbeatPolicyValue client_heartbeat_policy;
    // end FT extensions
@@ -91,7 +91,9 @@ class IIOPCommLayer : public CommunicationLayer
 
    time_t max_recover_count;
    time_t recover_time;
-   
+
+
+   TIDorb::core::security::sas::SASManager_ref sas_manager;
 
    public:
 
@@ -105,14 +107,14 @@ class IIOPCommLayer : public CommunicationLayer
 
     IIOPCommLayer(TIDorb::core::TIDORB* orb) throw (TIDThr::SystemException);
 
-    bool is_initialized() { return !server_listener.is_null();}
+    virtual bool is_initialized() { return !server_listener.is_null();}
 
     /**
      * Sends a request using the IIOP protocol.
      * @param request the CORBA request.
      */
     void request(TIDorb::core::RequestImpl* request,
-                      TIDorb::core::iop::IOR* ior)
+                 TIDorb::core::iop::IOR* ior)
         throw(TIDorb::core::ForwardRequest, CORBA::SystemException);
 
 
@@ -121,63 +123,65 @@ class IIOPCommLayer : public CommunicationLayer
      * with the server referenced in the request target address.
      * @param request the CORBA request.
      */
-    void oneway_request(TIDorb::core::RequestImpl* request,
-                             TIDorb::core::iop::IOR* ior);
+    virtual void oneway_request(TIDorb::core::RequestImpl* request,
+                                TIDorb::core::iop::IOR* ior);
     /**
      * Sends a oneway request using the IIOP protocol allocating an active Connection
      * with the server referenced in the request target address.
      * @param request the CORBA request.
      */
-    void reliable_oneway_run(TIDorb::core::RequestImpl* request,
-                                  TIDorb::core::iop::IOR* ior);
+    virtual void reliable_oneway_run(TIDorb::core::RequestImpl* request,
+                                     TIDorb::core::iop::IOR* ior);
 
     /**
      * Sends a object existence request.
      * @param ior the object IOR.
      */
-    bool object_exists(TIDorb::core::iop::IOR* ior, 
-                       const TIDorb::core::PolicyContext& policy_context)
+    virtual bool object_exists(TIDorb::core::iop::IOR* ior, 
+                               const TIDorb::core::PolicyContext& policy_context)
         throw(TIDorb::core::ForwardRequest,CORBA::SystemException);
 
    /**
      * The layer can use this IOR to stablish a remote connection
      */
    
-     bool accepts(const TIDorb::core::iop::IOR& ior);
+     virtual bool accepts(const TIDorb::core::iop::IOR& ior);
   
     /**
      * Creates a Delegate for a CORBA::Object
      */
    
-     TIDorb::core::ObjectDelegateImpl* 
+     virtual TIDorb::core::ObjectDelegateImpl* 
          createDelegate(TIDorb::core::iop::IOR* ior);
     
     /**
      * ORB Server Connection part shutdown.
      */
-    void shutdown();
+    virtual void shutdown();
 
     /**
      * IIOP Layer close.
      */
 
-    bool is_local(const TIDorb::core::iop::IOR& ior) const;
+    virtual bool is_local(const TIDorb::core::iop::IOR& ior) const;
     
-    bool has_server_listener() {return !server_listener.is_null();}
+    virtual bool has_server_listener() {return !server_listener.is_null();}
 
-    void destroy();
+    virtual void destroy();
 
-    void init_server_listener();
+    virtual void init_server_listener();
 
-    TIDorb::core::iop::IOR* createIOR(const char* id, TIDorb::core::poa::POAKey* key, 
+    virtual TIDorb::core::iop::IOR* createIOR(const char* id, TIDorb::core::poa::POAKey* key, 
                                       const TIDorb::core::iop::VectorTaggedComponent& extraComponents);
     TIDorb::core::comm::iiop::ServiceContextList* get_bidirectional_service();
 
-    // pra@tid.es - FT extensions
+    // FT extensions
     ::FT::HeartbeatPolicyValue& getClientHeartbeatPolicy() { return client_heartbeat_policy; }
     TIDorb::core::comm::ConnectionManager* getConnectionManager() { return connection_manager; }
     // end FT extensions
 
+
+    TIDorb::core::security::sas::SASManager* getSASManager() { return sas_manager; }
 
     /**
      * Sends a request (with response) allocating an active connection with
@@ -191,7 +195,7 @@ class IIOPCommLayer : public CommunicationLayer
                         TIDorb::core::comm::iiop::ListenPoint& listen_point)
         throw(CORBA::SystemException);
 
-    void send_request(TIDorb::core::RequestImpl* request, TIDorb::core::iop::IOR* ior)
+    virtual void send_request(TIDorb::core::RequestImpl* request, TIDorb::core::iop::IOR* ior)
         throw(TIDorb::core::ForwardRequest,CORBA::SystemException);
 };
 

@@ -50,7 +50,7 @@ TIDorb::core::comm::ConnectionManager::ConnectionManager
 {
   destroyed = false;
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   _group  = NULL;
   _thread = NULL;
 
@@ -60,10 +60,8 @@ TIDorb::core::comm::ConnectionManager::ConnectionManager
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
     pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
     _group = new TIDThr::ThreadGroup(NULL, "", &attr);
-    //PRA
     // it can be destroyed because ThreadGroup copies it inside the constructor
     pthread_attr_destroy(&attr);
-    //EPRA
     try {
       _thread = new HeartbeatThread(this, _group,
                                     client_heartbeat_policy.heartbeat_interval,
@@ -76,6 +74,7 @@ TIDorb::core::comm::ConnectionManager::ConnectionManager
     }
   }
   // end FT extensions
+  //  sas_manager = new TIDorb::core::security::sas::SASManager(orb);
 }
 
 
@@ -348,21 +347,68 @@ TIDorb::core::comm::ConnectionManager::open_client_connection
   
   
   
-  
-/**
- * Looks for a client connection with the listen point. If it does not exist, then the creates one.
- * @param listen_point the <code>ListenPoint</code> that determines a remote ORB in a Object reference.
- */
-void TIDorb::core::comm::ConnectionManager::prepareClientConnection
+ 
+
+
+TIDorb::core::comm::Connection* 
+TIDorb::core::comm::ConnectionManager::open_ssl_client_connection
   (const TIDorb::core::comm::iiop::ListenPoint& listen_point,
    TIDorb::core::PolicyContext* policy_context)
-{ 
-  // NOT USED BY ANYONE
-  getClientConnection(listen_point, policy_context);
+{
+  if (_orb->trace != NULL) {
+    TIDorb::util::StringBuffer msg;
+    msg << "Opening SSL client connection to " << listen_point.toString();
+    _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data());
+  }
+  
+  // create the new connection
+  Connection* conn = SSLConnection::client_connection(this, listen_point);
+
+  BiDirPolicy::BidirectionalPolicy_var bidir = NULL;
+  // is bidirectional ???
+  if (policy_context != NULL) {
+    CORBA::Policy_var pol =      
+      policy_context->getPolicy(BiDirPolicy::BIDIRECTIONAL_POLICY_TYPE);
+    
+    bidir = BiDirPolicy::BidirectionalPolicy::_narrow(pol);
+  }
+  
+  IIOPCommLayer* comm_layer = _orb->getCommunicationManager()->getExternalLayer();
+
+  if ( (bidir != NULL) && (bidir->value() == BiDirPolicy::BOTH) && 
+       (comm_layer->has_server_listener())) {
+
+    conn->set_bidirectional_mode(comm_layer->get_bidirectional_service());
+
+  } else {
+    TIDorb::core::poa::CurrentImpl* poa_current = 
+      dynamic_cast<TIDorb::core::poa::CurrentImpl*>(_orb->init_POACurrent());
+    
+    
+    if (poa_current->in_context()) { 
+
+      try {
+        PortableServer::POA_ptr aux_poa = poa_current->get_POA();
+
+        TIDorb::core::poa::POAImpl* current_poa = dynamic_cast<TIDorb::core::poa::POAImpl*>(aux_poa);
+        
+        if(current_poa->isBidirectional())
+          conn->set_bidirectional_mode(comm_layer->get_bidirectional_service());
+
+        // TODO: current_poa will be only for SSL??
+        
+
+      } catch(const PortableServer::Current::NoContext& nc) {
+      }
+
+      // add the new connection to connection table
+    }
+    
+   }
+  
+  return conn;
 }
-    
-    
-    
+
     
 /**
  * Checks in a new connection for manage it.
@@ -715,4 +761,138 @@ TIDorb::core::comm::ConnectionManager::open_miop_server_connection(
     return MulticastConnection::server_connection(this, listen_point);
   else
     return UDPConnection::server_connection(this, listen_point);
+}
+
+
+
+/**
+ * When a new Socket is created (a new connection has been accepted by the
+ * <code>ServerSocket</code>) a new Connection, in SERVER mode, must be registered.
+ * @param socket the new socket.
+ */
+void TIDorb::core::comm::ConnectionManager::createSSLServerConnection(TIDSocket::SSLSocket* socket)
+{  
+  TIDThr::Synchronized synchro(*this);  
+  if(destroyed) {
+    // drop the socket
+    try {
+      ((TIDSocket::Socket*)socket)->close();
+    } catch (const TIDSocket::IOException& ioe) {
+    } 
+  } else { 
+    // create the new connection and add the new connection to connection table
+    new_connection(SSLConnection::server_connection(this, socket));
+  }
+}
+
+
+
+/**
+ * Looks for a client connection with the listen point. If it does not exist, then the creates one.
+ * @param listen_point the <code>ListenPoint</code> that determines a remote ORB in a Object reference.
+ */
+TIDorb::core::comm::Connection* 
+TIDorb::core::comm::ConnectionManager::getSSLClientConnection
+  (const TIDorb::core::comm::iiop::ListenPoint& listen_point, 
+   TIDorb::core::PolicyContext* policy_context)
+{ 
+  // opened connection
+  Connection_ref* conn =  0;
+  
+  // check if a connection is opening now
+  OpeningLock_ref opening_lock;
+
+  // this thread must open a connection and unlock the OpeningLock
+  bool open_a_connection = false;
+  
+  // iterator for map connections: client, bidirectional
+  ConnectionMapIteratorT connIt;
+
+  {
+    TIDThr::Synchronized synchro(*this);  
+  
+    if (destroyed) {
+      throw CORBA::TRANSIENT("CommunicationLayer shutdown",0, CORBA::COMPLETED_NO);
+    }
+
+    // looks for an existing client connection
+    connIt = ssl_client_connections.find(listen_point);
+    if (connIt != ssl_client_connections.end()){
+      conn = (Connection_ref*)(*connIt).second;
+      if (conn)
+        return (Connection*) (*conn); 
+    }
+    
+//     ////////// -------------
+//     // looks for an existing bidirectional connection
+//     connIt = bidirectional_connections.find(listen_point);
+//     if (connIt != bidirectional_connections.end()){
+//       conn = (Connection_ref*)(*connIt).second;
+//       if (conn)
+//         return (Connection*) (*conn); 
+
+//     }
+//     ////////// -------------
+    
+    // check if is opening now
+    ConnectionsOpening::iterator i = connections_opening.find(listen_point);
+    
+    if (i == connections_opening.end()) {
+      opening_lock = new OpeningLock();
+      connections_opening[listen_point] = opening_lock;
+      open_a_connection = true;
+    } else {
+      opening_lock = i->second;
+    }
+  }
+  
+  Connection* ssl_client_conn = 0;
+  if(! open_a_connection) {
+    try {
+      ssl_client_conn = opening_lock->wait_opening(_orb->conf().socket_connect_timeout);
+    } catch (const CORBA::COMM_FAILURE& ce) {
+      TIDThr::Synchronized synchro(*this);
+      // Delete current lock to allow open new connection at the next retry.
+      // Current lock was created at previous retry, which raised TRANSIENT
+      if (_orb->trace != NULL) {
+        TIDorb::util::StringBuffer msg;
+        msg << "Socket connection timeout exceeded waiting to connecting with ";
+        msg << listen_point.toString();
+        msg << ". Released lock over it. ";
+        _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
+      }
+      connections_opening.erase(listen_point);
+      throw CORBA::TRANSIENT(ce.what());
+    }
+  } else {
+    try {
+      ssl_client_conn = open_ssl_client_connection(listen_point, policy_context);
+    } catch (const CORBA::COMM_FAILURE& ce) {
+      TIDThr::Synchronized synchro(*this);   
+      opening_lock->set_error(ce);
+      connections_opening.erase(listen_point);
+      throw;
+    }
+      
+    {
+      TIDThr::Synchronized synchro(*this);
+      
+      new_connection(ssl_client_conn);
+      
+      // add the new connection to the client_connections
+      ssl_client_connections[listen_point]= (Connection_ref*) new Connection_ref(ssl_client_conn);
+      
+      
+      opening_lock->set_opened(ssl_client_conn);
+      connections_opening.erase(listen_point);
+
+      if (_orb->trace != NULL) {
+        TIDorb::util::StringBuffer msg;
+        msg << ssl_client_conn->toString() << " open!";
+        _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data());
+      }
+      
+    }
+  }
+  return ssl_client_conn;
 }

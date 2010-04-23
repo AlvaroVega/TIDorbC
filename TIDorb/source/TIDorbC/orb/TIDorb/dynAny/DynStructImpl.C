@@ -146,7 +146,7 @@ DynamicAny::FieldName DynStructImpl::current_member_name()
       throw DynamicAny::DynAny::InvalidValue(); // "No member (current = -1)"
    }
 
-   // at this point alwais curremt_member is valid
+   // at this point always current_member is valid
    return CORBA::string_dup(_base_type->member_name(_current));
 }
 

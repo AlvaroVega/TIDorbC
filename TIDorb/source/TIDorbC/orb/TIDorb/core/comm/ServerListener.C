@@ -38,6 +38,7 @@
 
 #include "TIDorb/core/comm.h"
 
+#include "TIDSocket.h"
 
 #undef ERROR
 
@@ -135,7 +136,7 @@ const TIDorb::core::comm::iiop::ListenPoint&
 void TIDorb::core::comm::ServerListener::shutdown()
 {
   try {
-    TIDThr::Synchronized(*this);
+    TIDThr::Synchronized synchro(*this);
     if(!do_shutdown) {
       do_shutdown = true;
       server_socket->close();
@@ -220,18 +221,16 @@ void TIDorb::core::comm::ServerListener::run()
 
     while (!do_shutdown){
 
-      //PRA
       if (_orb->trace != NULL) {
         TIDorb::util::StringBuffer buffer;
         buffer << "Accepting connections at " << listen_point.toString() << "..." << ends;
         _orb->print_trace(TIDorb::util::TR_DEBUG, buffer.str().data());
       }
-      //EPRA
 
       while (connected) {
 
         TIDSocket::Socket* client_socket = NULL;
-        //PRA
+
         try {
 
           if (server_socket != NULL)
@@ -252,20 +251,14 @@ void TIDorb::core::comm::ServerListener::run()
                               CORBA::UNKNOWN());
           }
         }
-        //EPRA         
 
         try {
           if(client_socket != NULL)
             manager->createServerConnection(client_socket);
 
         } catch (...) {
-          //PRA
-          //try {
-          //  client_socket->close();
-          //} catch (...) {
-          //}
+
           delete client_socket;
-          //EPRA
 
           if (_orb->trace != NULL){
             _orb->print_trace(TIDorb::util::TR_ERROR, "Error creating ServerConnection");

@@ -56,10 +56,8 @@ class ServantDelegate : public virtual TIDThr::Monitor {
                                         const char* logical_type_id) = 0;
    virtual CORBA::Boolean          non_existent(PortableServer::ServantBase* self) = 0;
    
-   //PRA
    virtual const CORBA::ORB_ptr         orb(PortableServer::ServantBase* self) = 0;
    virtual const TIDorb::portable::ORB* orb() = 0;
-   //EPRA   
    virtual CORBA::Object_ptr       this_object(PortableServer::ServantBase* self) = 0;
    
    virtual const CORBA::RepositoryIdSeq_ptr 

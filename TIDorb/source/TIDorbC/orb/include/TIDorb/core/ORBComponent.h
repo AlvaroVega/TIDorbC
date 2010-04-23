@@ -59,10 +59,7 @@ class ORBComponent: public virtual TIDThr::Monitor{
    * The ORB.
    */
   protected:
-//MLG  
-    //TIDORB_ref _orb;
     TIDORB* _orb;
-//EMLG    
 
   public:
    ORBComponent(TIDORB* orb) throw (TIDThr::SystemException): _orb(orb){}

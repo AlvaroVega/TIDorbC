@@ -45,6 +45,8 @@ const char* TIDorb::core::util::URL::TIDORB_PROTOCOL    = "corbaloc:tidorb:";
 const char* TIDorb::core::util::URL::IIOP_PROTOCOL_1    = "corbaloc::";
 const char* TIDorb::core::util::URL::IIOP_PROTOCOL_2    = "corbaloc:iiop:";
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 const char* TIDorb::core::util::URL::MIOP_PROTOCOL      = "corbaloc:miop:";
 // end MIOP extensions
+
+const char* TIDorb::core::util::URL::SSLIOP_PROTOCOL      = "corbaloc:ssliop:";

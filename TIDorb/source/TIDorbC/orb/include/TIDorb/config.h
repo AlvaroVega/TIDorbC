@@ -42,6 +42,7 @@
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     (defined(__linux)) || \
     (defined(__darwin)) || \
+    (defined(__hpux)) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_NAMESPACE_STD
 #define TIDORB_HAVE_NAMESPACE_STD 1
@@ -54,6 +55,7 @@
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__darwin)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__hpux)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_IOSTREAM
 #define TIDORB_HAVE_IOSTREAM 1
@@ -66,6 +68,7 @@
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__darwin)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__hpux)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_FSTREAM
 #define TIDORB_HAVE_FSTREAM 1
@@ -78,6 +81,7 @@
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD))  || \
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__darwin)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__hpux)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_SSTREAM
 #define TIDORB_HAVE_SSTREAM 1
@@ -90,6 +94,7 @@
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     defined(__linux) || \
     defined(__darwin) || \
+    defined(__hpux) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_STRSTREAM
 #define TIDORB_HAVE_STRSTREAM 1

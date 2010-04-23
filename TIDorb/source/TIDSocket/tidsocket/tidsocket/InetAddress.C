@@ -223,6 +223,9 @@ char* InetAddress::getCanonicalHostName()
 #ifdef __sun
     ht_ptr = gethostbyaddr_r((const char*) ip_ptr, len, AF_INET,
                              &ht, ht_buffer, HOSTENT_BUFFER_SIZE, &ht_error);
+#elif defined __CYGWIN__
+    ht_ptr = gethostbyaddr((const char*) ip_ptr, len, AF_INET);
+    ht_error = h_errno;
 #else
     ht_ptr = gethostbyaddr((const void*) ip_ptr, len, AF_INET);
     ht_error = h_errno;
@@ -409,7 +412,7 @@ InetAddress* InetAddress::getByName(const char* host)
         throw UnknownHostException("getByName() error");
     }
 
-    // Copia la primera dirección
+    // Copia la primera direcciï¿½n
     inet = new InetAddress(list->at(0));
     delete list;
 
@@ -428,7 +431,7 @@ InetAddressList* InetAddress::getAllByName(const char* host)
     InetAddressList* list = NULL;
     InetAddress*     inet = NULL;
 
-    // Si host es NULL, devuelve la dirección de bucle local
+    // Si host es NULL, devuelve la direcciï¿½n de bucle local
     if (host == NULL)
     {
         struct in_addr loopback = { INADDR_LOOPBACK };
@@ -452,6 +455,9 @@ InetAddressList* InetAddress::getAllByName(const char* host)
                              HOSTENT_BUFFER_SIZE, &ht_error);
 #else
     ht_ptr = gethostbyname(host);
+//     gethostbyname_r(host, 
+//                      &ht, ht_buffer, HOSTENT_BUFFER_SIZE, 
+//                      &ht_ptr, &ht_error);
     ht_error = h_errno;
 #endif
 

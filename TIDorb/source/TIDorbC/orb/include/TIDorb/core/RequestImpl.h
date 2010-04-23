@@ -121,8 +121,6 @@ class RequestImpl: public CORBA::Request,
     	/**
   	 * operation name.
   	 */
-        //jagd
-  	//char* m_operation_name;
   	const char* m_operation_name;
   	 
     /**
@@ -152,9 +150,7 @@ class RequestImpl: public CORBA::Request,
   
     TIDorb::portable::Stub* m_target;
     NVListImpl*        m_arguments;
-    //jagd 4 NamedValueImpl*    m_result;
     NamedValueImpl     m_result;
-    //jagd 3 EnvironmentImpl*   m_env;
     EnvironmentImpl    m_env;
     ExceptionListImpl* m_exceptions;
     ContextListImpl*   m_context_list;

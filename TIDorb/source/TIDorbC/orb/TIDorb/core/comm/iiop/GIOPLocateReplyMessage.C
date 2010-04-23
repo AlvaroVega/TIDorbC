@@ -39,7 +39,6 @@
 #include "TIDorb/core/comm/iiop/GIOPLocateReplyMessage.h"
 #include "TIDorb/core/util/exceptions.h"
 
-//MLG
 void* TIDorb::core::comm::iiop::GIOPLocateReplyMessage::_impl()
 {
 	return this;
@@ -50,7 +49,6 @@ const char* TIDorb::core::comm::iiop::GIOPLocateReplyMessage::_typeid()
 	//return CORBA::string_dup("GIOPLocateReplyMessage");
 	return "GIOPLocateReplyMessage";
 }
-//EMLG
 
 
 TIDorb::core::comm::iiop::GIOPLocateReplyMessage::GIOPLocateReplyMessage
@@ -125,8 +123,6 @@ void TIDorb::core::comm::iiop::GIOPLocateReplyMessage::insert_system_exception
 
   _reply_status = TIDorb::core::comm::iiop::LOC_SYSTEM_EXCEPTION;
 
-  //MCPG -ATENCION
-
   create_message_buffer_output(orb);
 
   TIDorb::core::util::exceptions::SystemExceptionEncoder::write(*message_buffer_out, exception);
@@ -142,7 +138,6 @@ CORBA::SystemException* TIDorb::core::comm::iiop::GIOPLocateReplyMessage::extrac
   if(_reply_status != TIDorb::core::comm::iiop::LOC_SYSTEM_EXCEPTION)
       throw CORBA::INTERNAL("Unexpected extract_arguments, SYSTEM_EXCEPTION is not the reply status");
 
-//MCPG- ATENCION
   return TIDorb::core::util::exceptions::SystemExceptionEncoder::read(*message_buffer_in);
 }
 

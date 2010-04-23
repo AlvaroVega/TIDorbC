@@ -43,9 +43,7 @@
 
 #include "CORBA.h"
 #include "TIDThr.h"
-//MLG
 #include "TIDorb/core/typecode/TypeCodeCache.h"
-//EMLG
 
 #ifdef TIDORB_HAVE_IOSTREAM
   #include <iostream>

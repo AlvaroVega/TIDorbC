@@ -44,7 +44,7 @@ namespace TIDorb {
 namespace core {
 namespace comm {
 
-class LockPool: public virtual TIDThr::RecursiveMutex {	
+class LockPool : public virtual TIDThr::RecursiveMutex {	
   
   protected:
                   

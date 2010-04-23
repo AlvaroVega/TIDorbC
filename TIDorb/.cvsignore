@@ -12,9 +12,3 @@ lib_sun28SC53debug
 include_sun28SC53debug
 .cdtproject
 .project
-source-devel
-lib_sun28SC53
-include_linuxGCC34debug
-lib_linuxGCC34debug
-lib_linuxAmd64GCC34debug
-include_linuxAmd64GCC34debug

@@ -97,28 +97,6 @@ CORBA::Short TIDorb::core::comm::iiop::TargetAddress::object_key(TIDorb::core::c
 
 
 
-
-//
-// pra@tid.es - MIOP extensions
-//
-
-/*
-TIDorb::core::comm::iiop::ProfileIIOP* TIDorb::core::comm::iiop::TargetAddress::profile() const
-{
-        return _profile;
-}
-
-CORBA::Short TIDorb::core::comm::iiop::TargetAddress::profile(TIDorb::core::comm::iiop::ProfileIIOP* value)
-{
-        reset();
-        _discriminator = (CORBA::Short) TIDorb::core::comm::iiop::ProfileAddr;
-        _profile       = value;
-
-        return _discriminator;
-}
-*/
-
-
 TIDorb::core::iop::TaggedProfile* TIDorb::core::comm::iiop::TargetAddress::profile() const
 {
         return _profile;
@@ -135,11 +113,6 @@ CORBA::Short TIDorb::core::comm::iiop::TargetAddress::profile(TIDorb::core::iop:
 
         return _discriminator;
 }
-
-//
-// end MIOP extensions
-//
-
 
 
 
@@ -184,7 +157,7 @@ TIDorb::core::comm::iiop::ObjectKey* TIDorb::core::comm::iiop::TargetAddress::ge
 
                 case TIDorb::core::comm::iiop::ProfileAddr:
                 {
-                        // pra@tid.es - MIOP extensions
+                        // MIOP extensions
                         TIDorb::core::iop::TaggedProfile* tag_profile;
                         tag_profile = (TIDorb::core::iop::TaggedProfile*) _profile;
 
@@ -259,7 +232,7 @@ void TIDorb::core::comm::iiop::TargetAddress::write_ior_address
 {
   
     
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   // Pre-GIOP 1.2 support: UIPMC profile should be placed in the profile field
   if (ior.is_group_reference()) {
     throw CORBA::MARSHAL("UIPMC profile should be placed in the profile field");

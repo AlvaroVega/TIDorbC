@@ -61,11 +61,10 @@ TIDorb::core::ServerRequestImpl::ServerRequestImpl
      m_context(0),
      m_server_parameters(0),
      m_system_exception(0),
-     //jagd 2
-     //m_forward_obj(CORBA::Object::_nil())
      m_forward_obj(0),
      m_marshaled_parameters(cdr_parameters),
-     m_compressor(compressor)
+     m_compressor(compressor),
+     m_sas_context(NULL)
 {
 }
 
@@ -81,10 +80,9 @@ TIDorb::core::ServerRequestImpl::ServerRequestImpl
      m_context(0),
      m_server_parameters(0),
      m_system_exception(0),
-     //jagd 2
-     //m_forward_obj(CORBA::Object::_nil())
      m_forward_obj(0),
-     m_compressor(Compression::CompressorIdLevel(0,0))
+     m_compressor(Compression::CompressorIdLevel(0,0)),
+     m_sas_context(NULL)
 {
   m_operation_name = CORBA::string_dup(other.m_operation_name);
   m_marshaled_parameters = other.m_marshaled_parameters->copy();
@@ -95,8 +93,6 @@ TIDorb::core::ServerRequestImpl::ServerRequestImpl
 TIDorb::core::ServerRequestImpl::~ServerRequestImpl()
 {
   CORBA::string_free(m_operation_name);
-  //jagd 2 
-  //CORBA::release(m_context);
   delete (m_context);
   CORBA::release(m_server_parameters);
   CORBA::release(m_forward_obj);
@@ -124,8 +120,6 @@ CORBA::Context_ptr TIDorb::core::ServerRequestImpl::ctx()
   if(m_completion_status != ARGUMENTS_FIXED)
     throw CORBA::BAD_INV_ORDER(8, CORBA::COMPLETED_NO);
 
-  //jagd 2
-  //return CORBA::Context::_duplicate(m_context);
   return (m_context);
 }
 
@@ -142,18 +136,14 @@ void TIDorb::core::ServerRequestImpl::arguments(CORBA::NVList_ptr& parameters)
 
   m_completion_status = ARGUMENTS_FIXED;
 
-  //m_server_parameters = dynamic_cast <NVListImpl*>(CORBA::NVList::_duplicate(parameters));
   m_server_parameters = (NVListImpl*)CORBA::NVList::_duplicate(parameters)->_impl();
 
   NVListImpl::read_params_in(m_server_parameters, *m_marshaled_parameters);
 
   try {
-    //jagd 2
-    //CORBA::Context_ptr ctx = CORBA::Context::_nil();
+
     CORBA::Context_ptr ctx = 0;
-    //XXXXXXXXMAL m_marshaled_parameters->read_Context(ctx);
-    //jagd
-    //m_context = dynamic_cast<ContextImpl*> (ctx);
+
     m_context = (ContextImpl*) (ctx);
   } catch (...) {
   }
@@ -327,4 +317,19 @@ void TIDorb::core::ServerRequestImpl::set_compressor(
                                Compression::CompressorIdLevel compressor)
 {
   m_compressor = compressor;
+}
+
+
+CSI::SASContextBody_ptr 
+TIDorb::core::ServerRequestImpl::get_sas_context_body() const
+{
+  //return (CSI::SASContextBody_ptr&) *m_sas_context;
+  return m_sas_context;
+}
+
+
+void TIDorb::core::ServerRequestImpl::set_sas_context_body(
+                                        CSI::SASContextBody_ptr sas_context)
+{
+  m_sas_context = sas_context;
 }

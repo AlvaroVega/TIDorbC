@@ -41,7 +41,7 @@
 #include "TIDSocket.h"
 #include <sys/time.h>
 #include <sys/types.h>
-#ifdef __darwin
+#if (defined __darwin || defined __CYGWIN__)
    #include <sys/ioctl.h>
    
    // I_NREAD was declared in CoreServices framework in OSX < 10.4
@@ -56,6 +56,8 @@
 
 #ifdef __sun
 #include <sys/conf.h>
+#include <sys/select.h>
+#include <string.h>
 #endif //__sun
 
 
@@ -140,7 +142,7 @@ int InputStream::read()
     int value = 0;
 
     unsigned char* b = (unsigned char*) &value;
-    size_t len = sizeof(unsigned char);
+    ssize_t len = sizeof(unsigned char);
 
     if (read(b, sizeof(value), 0, len) != len)
     {

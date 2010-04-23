@@ -333,7 +333,7 @@ TIDorb::types::BigInt CORBA::Fixed::extractFromString (const char *str,
           intValue = fraction;
         }
       else if (*decimalPart && (*decimalPart == '-' && pointPos == (decimalPart+1))) 
-        {// Si existe el signo negativo se contó como un digito.
+        {// Si existe el signo negativo se contï¿½ como un digito.
           intValue = (-fraction);
         } 
       else  
@@ -426,7 +426,7 @@ char* CORBA::Fixed::to_string()const
     result[indice++] = '.';
     existsDot = 1;
     for (int i = _digits; i < _scale; ++i)
-      {// Sumamos 1 a digits por que el 0. que ya se ha añadido tb cuenta como un digit. creo.
+      {// Sumamos 1 a digits por que el 0. que ya se ha aï¿½adido tb cuenta como un digit. creo.
         result[indice++] = '0';
       }
   }
@@ -604,7 +604,7 @@ TIDorb::types::BigInt CORBA::Fixed::transform (CORBA::Short nscale) const
     }
   else 
     {
-      /* si la escala a la que pasamos es mayor, hay que añadir 0's */ 
+      /* si la escala a la que pasamos es mayor, hay que aï¿½adir 0's */ 
       value = _val * power10 (fscale);
     }
   return value;
@@ -627,14 +627,14 @@ TIDorb::types::BigInt& CORBA::Fixed::adjust()
 
 
     while (previo == zero) {
-      //El objetivo es reducir la representación interna al maximo.
+      //El objetivo es reducir la representaciï¿½n interna al maximo.
       div = coc;
       TIDorb::types::BigInt::div(coc,div,10,previo);
       // Al dividir, si el resto es 0. el valor es reduccible.
       // Por ser !=0 el numero, esto parara.
       nscale++; //Indica la escala que hemos reducido.
     }
-    nscale--; // la ultima división no cuenta.
+    nscale--; // la ultima divisiï¿½n no cuenta.
     _scale -= nscale;
     _val = div;
   }
@@ -1079,7 +1079,7 @@ CORBA::Fixed::rescale(CORBA::Short nscale, CORBA::Short oscale,
       return coc;//*power10(fscale);
 
     }
-  /* si la escala a la que pasamos es mayor, hay que añadir 0's */ 
+  /* si la escala a la que pasamos es mayor, hay que aï¿½adir 0's */ 
   // fscale >0.
   TIDorb::types::BigInt val = 0;
   TIDorb::types::BigInt pot;
@@ -1239,7 +1239,7 @@ void CORBA::Fixed::div (CORBA::Fixed &res,
   TIDorb::types::BigInt divisor=0;
     
   // BigInt produce una division entera, asi que con el objetivo de producir decimales.
-  // El valor que Se dividirá los despazaremos tantos digitos como precisión requiera el resultado.
+  // El valor que Se dividirï¿½ los despazaremos tantos digitos como precisiï¿½n requiera el resultado.
   // y luego lo arreglamos para que quede bien.
   if (a1.fixed_scale() == a2.fixed_scale()) 
     {

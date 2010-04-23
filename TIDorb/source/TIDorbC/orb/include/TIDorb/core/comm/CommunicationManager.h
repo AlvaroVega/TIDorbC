@@ -68,7 +68,7 @@ class CommunicationManager
   /**
    * the internet layer for sending multicast request
    */
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   MIOPCommLayer_ref multicast_layer;
   // end MIOP extensions
 
@@ -97,7 +97,7 @@ class CommunicationManager
 
   IIOPCommLayer* getExternalLayer();
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   MIOPCommLayer* getMulticastLayer();
   // end MIOP extensions
 

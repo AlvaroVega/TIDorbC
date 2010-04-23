@@ -122,11 +122,7 @@ const char* TIDorb::core::comm::MulticastConnection::toString()
       default:
         buffer << "Invalid multicast" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")"; /*unreachable*/
     }
-    //PRA
-    //buffer << " connection at " << my_port; /*pra@tid.es socket->getLocalPort();*/
-    //    buffer << " connection at " << socket->getLocalPort();
     buffer << " connection " << hashCode() << ends;
-    //EPRA
 
     str = CORBA::string_dup(buffer.str().data());
   }
@@ -152,15 +148,13 @@ TIDorb::core::comm::MulticastConnection::server_connection(TIDorb::core::comm::C
   const TIDorb::core::ConfORB& conf = mngr->orb()->conf();
   try {
     // create the multicast socket
-    //socket = new TIDSocket::MulticastSocket(listen_point._port); // FIX
 
     // resolve multicast group address
     TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
     if (addr.isUnresolved() || !addr.getAddress().isMulticastAddress()) {
-      //delete socket; // FIX
       throw CORBA::COMM_FAILURE("Invalid multicast group address", 0, CORBA::COMPLETED_NO);
     }
-    socket = new TIDSocket::MulticastSocket(&addr); // FIX
+    socket = new TIDSocket::MulticastSocket(&addr);
  
 
     // Check if interface for incoming MIOP messages has been defined...

@@ -59,11 +59,13 @@ TIDorb::core::comm::Connection::Connection(ConnectionManager* mngr)
     conf(mngr->orb()->conf())
 
 {
-  manager= mngr;
+  manager = mngr;
   orb_ver = conf.GIOPVersion;
   max_response_blocked_time = conf.max_blocked_time;
   qos_enabled = conf.qos_enabled;
   assume_ziop_server = conf.assume_ziop_server;
+
+  sas_enabled = conf.csiv2;
 
   bidirectional_service = NULL;
   send_bidirectional_service = false;
@@ -73,7 +75,7 @@ TIDorb::core::comm::Connection::Connection(ConnectionManager* mngr)
   send_header_buffer = new TIDorb::core::cdr::BufferCDR(TIDorb::core::comm::iiop::GIOPHeader::HEADER_SIZE);
   receive_header_buffer = new TIDorb::core::cdr::BufferCDR(TIDorb::core::comm::iiop::GIOPHeader::HEADER_SIZE);
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   heartbeat_time = 0;
   heartbeart_req_id = TIDorb::core::util::Counter::RESERVED;
   // end FT extensions
@@ -83,12 +85,13 @@ TIDorb::core::comm::Connection::Connection(ConnectionManager* mngr)
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
   pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
   _group = new TIDThr::ThreadGroup(NULL, "", &attr);
-//FRAN
+
   // it can be destroyed because ThreadGroup copies it inside the constructor
   pthread_attr_destroy(&attr);
-//EFRAN
-}
 
+  sas_manager = 
+    _orb->getCommunicationManager()->getExternalLayer()->getSASManager();
+}
 
 
 
@@ -445,7 +448,7 @@ void TIDorb::core::comm::Connection::send_message(const TIDorb::core::comm::iiop
   if(state.is_open())
     manager->use(this);
 
-  // pra@tid.es - El metodo GIOPMessage::send(Connection) se ha movido a Connection
+  // El metodo GIOPMessage::send(Connection) se ha movido a Connection
   //message.send(this);
 
   const TIDorb::core::comm::iiop::Version& header_version = message.getHeader().getVersion();
@@ -471,7 +474,7 @@ void TIDorb::core::comm::Connection::send_message(const TIDorb::core::comm::iiop
 
 void TIDorb::core::comm::Connection::receive_message()
 {
-//MLG
+
   while(true) {
 
     if(state.is_open())
@@ -496,8 +499,6 @@ void TIDorb::core::comm::Connection::receive_message()
         continue;
       }
       
-
-
       switch(header.getMsgType()) {
         case TIDorb::core::comm::iiop::Request:
         {
@@ -728,7 +729,7 @@ void TIDorb::core::comm::Connection::receive_message()
       return;
     }
   }
-//EMLG  
+
 }
 
 
@@ -771,7 +772,14 @@ void TIDorb::core::comm::Connection::manage_message(TIDorb::core::comm::iiop::GI
         service_context_received( ((TIDorb::core::comm::iiop::GIOPReplyMessage*)fragmented_message->_impl())->get_service_context_list() );
       case TIDorb::core::comm::iiop::LocateReply:
         current_request_id = 0;
-        lock_list.put_reply(id, fragmented_message);                
+        if (!lock_list.put_reply(id, fragmented_message)) {
+          if (_orb->trace != NULL) {
+            TIDorb::util::StringBuffer msg;
+            msg << "LocateReply (fragmented) not found id(" << id << "). lock_list has "; 
+            msg << lock_list.size() << " elements";
+            _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
+          }
+        }
         break;
       default:
         break;
@@ -794,7 +802,7 @@ void TIDorb::core::comm::Connection::manage_message(TIDorb::core::comm::iiop::GI
 
   id = message->getRequestId();
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   //if (id.value() == heartbeart_req_id) {
   if (id == heartbeart_req_id) {
     heartbeat_time = TIDorb::core::util::Time::currentTimeMillis() - heartbeat_time;
@@ -815,8 +823,17 @@ void TIDorb::core::comm::Connection::manage_message(TIDorb::core::comm::iiop::GI
     uncompleted_messages.put_message(MessageId(this, id),message);
     
   } else {
-    service_context_received(message->get_service_context_list());
-    lock_list.put_reply(id, message);
+    service_context_received(message->get_service_context_list()); ///
+    // TODO: Check SAS results ??
+    if (!lock_list.put_reply(id, message)) {
+      // Due to NO_RESPONSE or worst
+      if (_orb->trace != NULL) {
+        TIDorb::util::StringBuffer msg;
+        msg << "Reply not found id(" << id << "). lock_list has "; 
+        msg << lock_list.size() << " elements";
+        _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
+      }
+    }
   }
 }
 
@@ -846,7 +863,14 @@ void TIDorb::core::comm::Connection::manage_message(TIDorb::core::comm::iiop::GI
     uncompleted_messages.put_message(MessageId(this, id),message);
     
   } else {
-    lock_list.put_reply(id, message);
+    if (!lock_list.put_reply(id, message)) {
+      if (_orb->trace != NULL) {
+        TIDorb::util::StringBuffer msg;
+        msg << "LocateReply not found id(" << id << "). lock_list has "; 
+        msg << lock_list.size() << " elements";
+        _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
+      }
+    }
   }
 }
 
@@ -924,10 +948,8 @@ void TIDorb::core::comm::Connection::manage_message(TIDorb::core::comm::iiop::GI
 bool 
 TIDorb::core::comm::Connection::send_locate_request(TIDorb::core::iop::IOR* ior,
                                                     const TIDorb::core::PolicyContext& policy_context)
-//PRA
 throw (TIDorb::core::comm::RECOVERABLE_COMM_FAILURE, 
        TIDorb::core::ForwardRequest,CORBA::SystemException)
-//EPRA
 {
   return send_locate_request(ior, TIDorb::core::comm::iiop::KeyAddr, policy_context);
 }
@@ -961,7 +983,7 @@ bool TIDorb::core::comm::Connection::send_locate_request
   
   if (_orb->trace != NULL) {
     TIDorb::util::StringBuffer msg;
-    msg << toString() << ": Sending LocationRequest " << id << " lock " << &lock;;
+    msg << toString() << ": Sending LocationRequest " << id << " lock " << &lock;
     _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
   }
 
@@ -969,14 +991,12 @@ bool TIDorb::core::comm::Connection::send_locate_request
   
   send_message(message, id);
   
-  //jagd requests_invoked.inc();
   requests_invoked++;
 
   // block the thread waiting for response
   lock.wait_for_completion(timeout);
 
   
-  //requests_invoked.dec();
   requests_invoked--;
     
   if (lock.is_completed()) {
@@ -994,10 +1014,8 @@ bool TIDorb::core::comm::Connection::send_locate_request
       throw CORBA::MARSHAL("No LocateReply message received",  0, CORBA::COMPLETED_NO);
     }
 
-//MLG
     TIDorb::core::comm::iiop::GIOPLocateReplyMessage* reply_message =
       (TIDorb::core::comm::iiop::GIOPLocateReplyMessage*)fragmented_message->_impl();
-//EMLG
 
     switch(reply_message->reply_status()) {
       case TIDorb::core::comm::iiop::UNKNOWN_OBJECT:      
@@ -1007,7 +1025,6 @@ bool TIDorb::core::comm::Connection::send_locate_request
       case TIDorb::core::comm::iiop::OBJECT_FORWARD:        
         throw TIDorb::core::ForwardRequest(reply_message->extract_forward());
       case TIDorb::core::comm::iiop::OBJECT_FORWARD_PERM:
-        // EMLG
         throw TIDorb::core::ForwardRequest(reply_message->extract_forward_perm());
       case TIDorb::core::comm::iiop::LOC_SYSTEM_EXCEPTION:
       {
@@ -1074,6 +1091,11 @@ void TIDorb::core::comm::Connection::send_oneway_request_async
 
     policy_context = request->getPolicyContext();
     
+    SSLIOP::SSL* ssl_ior = ior->get_SSL();
+    if (ssl_ior /* & something about QOP || SSL */ )
+      TIDorb::core::security::SecurityChecker::checkQOP(_orb, policy_context, 
+                                                         ssl_ior->target_requires);
+
     if (ior->is_ZIOP() || assume_ziop_server) {
 
       TIDorb::core::PolicyContext* policies_context_ior = NULL;
@@ -1094,7 +1116,7 @@ void TIDorb::core::comm::Connection::send_oneway_request_async
 
   try {
 
-    set_service_context_list(&message, NULL);
+    set_service_context_list(&message, NULL, NULL);
 
     message.insert_request(request, *ior, disposition);
 
@@ -1157,9 +1179,8 @@ void TIDorb::core::comm::Connection::send_oneway_request_async
 void TIDorb::core::comm::Connection::send_oneway_request_sync
   (TIDorb::core::RequestImpl* request,
    TIDorb::core::iop::IOR* ior)
-//PRA
-        throw(TIDorb::core::comm::RECOVERABLE_COMM_FAILURE,TIDorb::core::ForwardRequest,CORBA::SystemException)
-//EPRA
+  throw(TIDorb::core::comm::RECOVERABLE_COMM_FAILURE,
+        TIDorb::core::ForwardRequest,CORBA::SystemException)
 {
   send_oneway_request_sync(request, ior, TIDorb::core::comm::iiop::KeyAddr);
 }
@@ -1171,7 +1192,8 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
   (TIDorb::core::RequestImpl* request,
    TIDorb::core::iop::IOR* ior,
    TIDorb::core::comm::iiop::AddressingDisposition disposition)
-        throw(TIDorb::core::comm::RECOVERABLE_COMM_FAILURE,TIDorb::core::ForwardRequest,CORBA::SystemException)
+  throw(TIDorb::core::comm::RECOVERABLE_COMM_FAILURE,
+        TIDorb::core::ForwardRequest,CORBA::SystemException)
 {
   try {
 
@@ -1185,6 +1207,11 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
 
     if (policy_context != NULL)
       timeout = TIDorb::core::messaging::QoS::checkRequestTime(_orb, *policy_context);
+
+    SSLIOP::SSL* ssl_ior = ior->get_SSL();
+    if (ssl_ior /* & something about QOP || SSL */ )
+      TIDorb::core::security::SecurityChecker::checkQOP(_orb, policy_context, 
+                                                         ssl_ior->target_requires);
 
     if (ior->is_ZIOP() || assume_ziop_server) {
 
@@ -1214,7 +1241,7 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
 
   try {
 
-    set_service_context_list(&message, policy_context);
+    set_service_context_list(&message, policy_context, /* TODO */ NULL);
 
     message.insert_request(request, *ior, disposition);
 
@@ -1242,13 +1269,11 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
     throw TIDorb::core::comm::RECOVERABLE_COMM_FAILURE(comm);
   }
 
-  //jagd requests_invoked.inc();
   requests_invoked++;
 
   // block the thread waiting for response
   lock.wait_for_completion(timeout);
   
-  //jagd requests_invoked.dec();
   requests_invoked--;
 
 
@@ -1257,24 +1282,21 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
     auto_ptr<TIDorb::core::comm::iiop::GIOPFragmentedMessage>
         fragmented_message(lock.consume_reply());
         
-        lock_list.deactivate_lock(id);
+    lock_list.deactivate_lock(id);
 
     if (fragmented_message.get() == NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << toString() << " NULL LocateReply message with id " << id << " lock " << (&lock);
+      msg << toString() << " No Reply (locate) message with id " << id << " lock " << (&lock);
       throw CORBA::INTERNAL(msg.str().data());
     }
-    if (fragmented_message->getHeader().getMsgType() != TIDorb::core::comm::iiop::Reply) { 
+    if (fragmented_message->getHeader().getMsgType() != TIDorb::core::comm::iiop::Reply) {
       TIDorb::util::StringBuffer msg;
       msg << toString() << " No LocateReply message received with id " << id << " lock " << (&lock);
-      msg << " message type: " << fragmented_message->getHeader().getMsgType(); 
-      throw CORBA::MARSHAL(msg.str().data());
+      throw CORBA::MARSHAL(msg.str().data());        
     }
 
-//MLG
     TIDorb::core::comm::iiop::GIOPReplyMessage* reply_message =
       (TIDorb::core::comm::iiop::GIOPReplyMessage*)fragmented_message->_impl();
-//EMLG
       
     switch (reply_message->reply_status()) {
     	
@@ -1294,12 +1316,6 @@ void TIDorb::core::comm::Connection::send_oneway_request_sync
   }
 
   } catch (const TIDorb::core::comm::RECOVERABLE_COMM_FAILURE& ex ) {
-    if (_orb->trace != NULL) {
-      TIDorb::util::StringBuffer msg;
-      msg << "Connection::send_oneway_request_async catch ";
-      msg << " TIDorb::core::comm::RECOVERABLE_COMM_FAILURE: " << ex.what();
-      _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
-    }
     throw;
   } catch (const TIDorb::core::ForwardRequest& ex ) {
     if (_orb->trace != NULL) {
@@ -1377,8 +1393,29 @@ void TIDorb::core::comm::Connection::send_request
     
     policy_context = request->getPolicyContext();
     
-    if ( policy_context != NULL) 
+    if ( policy_context != NULL) {
       timeout = TIDorb::core::messaging::QoS::checkRequestTime(_orb, *policy_context); 
+    }
+
+    SSLIOP::SSL* ssl_ior = ior->get_SSL();
+    if (ssl_ior /* & something about QOP || SSL */ )
+      TIDorb::core::security::SecurityChecker::checkQOP(_orb, policy_context, 
+                                                         ssl_ior->target_requires);
+
+    CSIIOP::CompoundSecMechList* mechs = ior->get_CompoundSecMechList();
+    if (mechs) {
+      TIDorb::core::security::SecurityChecker::checkEstablishTrust(_orb, policy_context,
+                                                                    mechs);
+    }
+    
+    // ---------------------------------------------------------------------------------
+    // TODO: improve performance of this block
+    int mode = 
+      TIDorb::core::security::SecurityChecker::get_verify_mode(policy_context);
+    SSLConnection* ssl_conn = dynamic_cast <TIDorb::core::comm::SSLConnection*> (this);
+    if (ssl_conn)
+      ssl_conn->set_verify_mode(mode);
+    // ---------------------------------------------------------------------------------
 
     if (ior->is_ZIOP() || assume_ziop_server) {
 
@@ -1394,6 +1431,13 @@ void TIDorb::core::comm::Connection::send_request
     
   }
 
+  // Check SAS aviability and SASServiceContext
+  TIDorb::core::security::sas::SASServiceContext* sas_context = NULL;
+  if (sas_enabled) {
+    sas_context = sas_manager->get_client_SASServiceContext(ior);
+  }
+  
+
 
   TIDorb::core::comm::iiop::RequestId id = generateId();
   
@@ -1406,13 +1450,13 @@ void TIDorb::core::comm::Connection::send_request
   if (_orb->trace != NULL) {
     TIDorb::util::StringBuffer msg;
     msg << toString() << ": Sending request id(" << id
-        << ") operation \"" << request->operation() << "\"" << " lock " << &lock;
+        << ") operation \"" << request->operation() << "\"" << " lock " << &lock;;
     _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
   }
 
   try {
 
-    set_service_context_list(&message, policy_context);
+    set_service_context_list(&message, policy_context, sas_context);
 
     message.insert_request(request, *ior, disposition);
 
@@ -1442,13 +1486,11 @@ void TIDorb::core::comm::Connection::send_request
 
   request->set_completed(CORBA::COMPLETED_MAYBE);
 
-  //jagd requests_invoked.inc();
   requests_invoked++;
 
   // block the thread waiting for response
   lock.wait_for_completion(timeout); 
   
-  //jagd requests_invoked.dec();
   requests_invoked--;
   
   if(lock.is_completed()) {
@@ -1461,25 +1503,22 @@ void TIDorb::core::comm::Connection::send_request
     
     if(fragmented_message.get() == NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << toString() << " NULL Reply message with id " << id << " lock " << (&lock);
+      msg << toString() << " No Reply message with id " << id << " lock " << (&lock);
       if (_orb->trace != NULL) {
         _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
       }
       throw CORBA::INTERNAL(msg.str().data());
     }
     if(fragmented_message->getHeader().getMsgType() != TIDorb::core::comm::iiop::Reply) {
-      TIDorb::util::StringBuffer msg;
+   TIDorb::util::StringBuffer msg;
       msg << toString() << " No Reply message received with id " << id << " lock " << (&lock);
-      msg << " message type: " << fragmented_message->getHeader().getMsgType();
       if (_orb->trace != NULL) {
         _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
       }
       throw CORBA::MARSHAL(msg.str().data());
     }
-//MLG
     TIDorb::core::comm::iiop::GIOPReplyMessage* reply_message =
      (TIDorb::core::comm::iiop::GIOPReplyMessage*)fragmented_message->_impl();
-//EMLG
     request->set_completed(CORBA::COMPLETED_YES);
 
     switch (reply_message->reply_status()) {
@@ -1529,7 +1568,7 @@ void TIDorb::core::comm::Connection::send_request
   }
 
   } catch (const TIDorb::core::comm::RECOVERABLE_COMM_FAILURE& ex ) {
-   if (_orb->trace != NULL) {
+    if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_request catch TIDorb::core::comm::RECOVERABLE_COMM_FAILURE: ";
       msg << ex.what();
@@ -1540,7 +1579,7 @@ void TIDorb::core::comm::Connection::send_request
     }
     throw;
   } catch (const TIDorb::core::ForwardRequest& ex ) {
-   if (_orb->trace != NULL) {
+    if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_request catch TIDorb::core::ForwardRequest: ";
       msg << ex.what();
@@ -1551,7 +1590,7 @@ void TIDorb::core::comm::Connection::send_request
     }
     throw;
   } catch (const CORBA::SystemException& ex) {
-   if (_orb->trace != NULL) {
+    if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
       msg << "Connection::send_request catch CORBA::SystemException: ";
       msg << ex._name() << " " << ex.what();
@@ -1596,19 +1635,25 @@ void TIDorb::core::comm::Connection::send_request
   } catch (const exception& ex) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected exception: " << ex.what();
-      msg << " at Connection::send_request";
+      msg << "Connection::send_request catch exception: ";
+      msg << ex.what();
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
     throw CORBA::INTERNAL("exception");
   } catch (...) {
     if (_orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
-      msg << "Unexpected exception raised.";
-      msg << " at Connection::send_request";
+      msg << "Connection::send_request catch unexpected exception. ";
+      msg << " request id(" << request->get_id() << ")"; 
+      msg << " status("  << request->get_completed() << ") ";
+      msg << toString();
       _orb->print_trace(TIDorb::util::TR_ERROR, msg.str().data());
     }
     throw;
+
   }
 
 }
@@ -1619,7 +1664,6 @@ void TIDorb::core::comm::Connection::send_request
 void TIDorb::core::comm::Connection::send_reply(TIDorb::core::ServerRequestImpl* request,
                                                 TIDorb::core::PolicyContext* policy_context)
 {
-  //jagd requests_in_POA.dec();
   requests_in_POA--;
 
   // verify if the request can be sent
@@ -1630,11 +1674,20 @@ void TIDorb::core::comm::Connection::send_reply(TIDorb::core::ServerRequestImpl*
   // create message
   TIDorb::core::comm::iiop::GIOPReplyMessage message(request->getVersion(), id);
 
-  if(send_bidirectional_service) {
-    message.set_service_context_list(bidirectional_service);
-    bidirectional_service = NULL;
-    send_bidirectional_service = false;
+//   if(send_bidirectional_service) {
+//     message.set_service_context_list(bidirectional_service);
+//     bidirectional_service = NULL;
+//     send_bidirectional_service = false;
+//   }
+  // Check SAS aviability and SASServiceContext
+  TIDorb::core::security::sas::SASServiceContext* sas_context = NULL;
+  if (sas_enabled) {
+    // Get SASContextBody from ServerRequest
+    CSI::SASContextBody_ptr sas_context_body = request->get_sas_context_body();
+    
+    sas_context = new TIDorb::core::security::sas::SASServiceContext(sas_context_body);
   }
+  set_service_context_list(&message, sas_context);
 
   Compression::CompressorIdLevel compressor = request->get_compressor();
 
@@ -1676,7 +1729,6 @@ void TIDorb::core::comm::Connection::send_locate_reply
    TIDorb::core::comm::iiop::RequestId id,
    bool here)
 {
-  //requests_in_POA.dec();
   requests_in_POA--;
 
   // verify if the request can be sent
@@ -1701,7 +1753,6 @@ void TIDorb::core::comm::Connection::send_locate_reply
    TIDorb::core::comm::iiop::RequestId id,
    CORBA::Object_ptr obj)
 {
-  //jagd requests_in_POA.dec();
   requests_in_POA--;
 
   // verify if the request can be sent
@@ -1723,7 +1774,6 @@ void TIDorb::core::comm::Connection::send_locate_reply
    TIDorb::core::comm::iiop::RequestId id,
    const CORBA::SystemException& excep)
 {
-  //jagd requests_in_POA.dec();
   requests_in_POA--;
 
   // verify if the request can be sent
@@ -1741,7 +1791,7 @@ void TIDorb::core::comm::Connection::send_locate_reply
 
 
 //
-// pra@tid.es - FT extensions
+// FT extensions
 //
 
 void TIDorb::core::comm::Connection::send_heartbeat() throw(CORBA::SystemException)
@@ -1773,7 +1823,8 @@ void TIDorb::core::comm::Connection::send_heartbeat() throw(CORBA::SystemExcepti
 
 void TIDorb::core::comm::Connection::set_service_context_list(
                                            TIDorb::core::comm::iiop::GIOPRequestMessage* message,
-                                           TIDorb::core::PolicyContext* policy_context)
+                                           TIDorb::core::PolicyContext* policy_context,
+                                           TIDorb::core::security::sas::SASServiceContext* sas_context)
 {
 
   // Look for all Service Context
@@ -1805,8 +1856,16 @@ void TIDorb::core::comm::Connection::set_service_context_list(
     }
   }
 
-  // Any more?
+
+  if (sas_context != NULL) {
+    if (contexts == NULL) {
+      contexts = new TIDorb::core::comm::iiop::ServiceContextList();
+      yielded = true;
+    }
+    contexts->add(sas_context);
+  }
   
+
   if (contexts != NULL) {
     message->set_service_context_list(contexts, yielded);
   }        
@@ -1815,19 +1874,115 @@ void TIDorb::core::comm::Connection::set_service_context_list(
 
 
 
-void TIDorb::core::comm::Connection::service_context_received
-  (const TIDorb::core::comm::iiop::ServiceContextList* services)
+
+void TIDorb::core::comm::Connection::set_service_context_list(
+                                           TIDorb::core::comm::iiop::GIOPReplyMessage* message,
+                                           TIDorb::core::security::sas::SASServiceContext* sas_context)
+{
+
+  // Look for all Service Context
+  TIDorb::core::comm::iiop::ServiceContextList* contexts = NULL;
+  bool yielded = false;
+
+  // Bidirectional Service Context
+  if(send_bidirectional_service) {
+    contexts = bidirectional_service;
+    bidirectional_service = NULL;
+    send_bidirectional_service = false;
+  }
+
+  
+  if (sas_context != NULL) {    
+    if (contexts == NULL) {
+      contexts = new TIDorb::core::comm::iiop::ServiceContextList();
+      yielded = true;
+    }
+    contexts->add(sas_context);
+  }
+
+
+  if (contexts != NULL) {
+    message->set_service_context_list(contexts, yielded);
+  }        
+
+}
+
+
+
+void TIDorb::core::comm::Connection::service_context_received(
+               const TIDorb::core::comm::iiop::ServiceContextList* services,
+               TIDorb::core::ServerRequestImpl* request)
 {
   if(services == NULL)
     return;
 
   for(CORBA::ULong i = 0; i < services->components.size(); i++) {
     const TIDorb::core::comm::iiop::ServiceContext* context = services->components[i];
-    if ((context != NULL) &&  (context->_context_id == TIDorb::core::comm::iiop::BI_DIR_IIOP)) {
-      //jagd
-      //set_bidirectional_mode_by_peer(dynamic_cast<const TIDorb::core::comm::iiop::BiDirServiceContext*>(context));
+    if ((context != NULL) && (context->_context_id == TIDorb::core::comm::iiop::BI_DIR_IIOP)) {
       set_bidirectional_mode_by_peer((const TIDorb::core::comm::iiop::BiDirServiceContext*)(context));
     }
+    
+    if ((context != NULL) && (context->_context_id == IOP::SecurityAttributeService)) {
+      // TODO: sas context received as reply
+      //cerr << "Connection: SAS context received at TSS" << endl;
+      TIDorb::core::security::sas::SASServiceContext* sas_context = 
+        (TIDorb::core::security::sas::SASServiceContext*) context;
+      
+      CSI::SASContextBody_ptr sas_context_body = sas_context->getSASContextBody();
+
+      if (request) { // SAS Context received at server side (from a Request)
+        CSI::SASContextBody_ptr sas_context_body_reply = 
+          sas_manager->validate_SASContextBody(sas_context_body);
+
+        switch (sas_context_body_reply->_d()) {
+        case CSI::MTCompleteEstablishContext: 
+          // store sas_context_body_reply in ServerRequest 
+          //cerr << "Connection: CompleteEstablishContext evaluated at TSS" << endl;
+          request->set_sas_context_body(sas_context_body_reply);
+          break;
+        case CSI::MTContextError: 
+          // If sas_context_body_reply is a ContextError then send reply without process request
+          //cerr << "Connection: ContextError evaluated at TSS" << endl;
+
+
+          const char* error_reason = 
+            sas_manager->get_GSSToken_error_reason(sas_context_body_reply->error_msg().error_token);
+
+          const CORBA::NO_PERMISSION ex(error_reason,
+                                        sas_context_body_reply->error_msg().minor_status,
+                                        CORBA::COMPLETED_YES);
+          request->set_system_exception(ex);
+          request->set_sas_context_body(sas_context_body_reply);
+          send_reply(request);
+          // TODO: it generates a SystemException
+          delete request;
+          break;
+        }
+        
+      } else { // SAS Context received at client side (from a Reply)
+        // 'request' is not available
+        
+        //cerr << "Connection: SAS Context Body to be evaluated at CSS" << endl;
+        //CSI::SASContextBody_ptr sas_context_body_reply = NULL;;
+        // TO-DO: validate at client side ??
+        // comm_layer->getSASManager()->validate_SASContextBody(sas_context_body); ???
+
+        switch (sas_context_body->_d()) {
+        case CSI::MTCompleteEstablishContext: 
+          // store sas_context_body_reply in ServerRequest 
+          //cerr << "Connection: CompleteEstablishContext evaluated at CSS" << endl;
+          //request->set_sas_context_body(sas_context_body_reply);
+          break;
+        case CSI::MTContextError: 
+          // If sas_context_body_reply is a ContextError then send reply without process request
+          //cerr << "Connection: ContextError evaluated at CSS" << endl;
+          break;
+        }
+          
+      } // else
+      
+    }
+    
   }
 }
 
@@ -1836,7 +1991,6 @@ bool TIDorb::core::comm::Connection::has_pending_requests()
     TIDThr::Synchronized synchro(*this);
     
     if(mode == CLIENT_MODE) {
-      //jagd return requests_invoked.non_zero();
       return requests_invoked;
     } else {
       //return (requests_invoked.non_zero()) || (requests_in_POA.non_zero());

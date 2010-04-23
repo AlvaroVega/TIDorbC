@@ -79,11 +79,12 @@ class ObjectDelegateImpl : public TIDorb::portable::ObjectDelegate
 
     ObjectDelegateImpl* copy();
 
+    CORBA::DomainManagerList* getDomainManagerList();
+
   protected:
-//MLG  
-    //TIDORB_ref m_orb;
+
     TIDORB* m_orb;
-//EMLG    
+
     TIDorb::core::iop::IOR_ref m_reference;
     TIDorb::templates::RefCount_var<ObjectDelegateImpl> m_forwarded_delegate;    
     TIDorb::core::comm::CommunicationLayer_ref m_comm_layer;   
@@ -95,6 +96,8 @@ class ObjectDelegateImpl : public TIDorb::portable::ObjectDelegate
                        TIDorb::core::comm::CommunicationLayer* comm_layer,
                        TIDorb::core::PolicyContext* policies)
     throw (TIDThr::SystemException);
+
+    CORBA::DomainManagerList* m_domain_manager_list;     
 
 };
 

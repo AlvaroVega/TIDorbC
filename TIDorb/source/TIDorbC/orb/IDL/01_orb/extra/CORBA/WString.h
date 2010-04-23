@@ -21,7 +21,6 @@ namespace CORBA {
   
 inline WChar *wstring_alloc(ULong len)
 {
-  //return new WChar[len];
   return (WChar*) malloc(sizeof(WChar)*(len+1));
 }
 
@@ -35,8 +34,6 @@ inline WChar *wstring_dup(const WChar* str)
     WChar * tmp_wstr = 0;
     size_t str_length = wcslen(str);
     
-    //WChar * tmp_wstr = new WChar[str_lenght + 1];
-    //WChar * tmp_wstr = (WChar*) malloc(str_lenght + 1);
     tmp_wstr = CORBA::wstring_alloc(str_length);
     
     if (str_length)
@@ -49,14 +46,12 @@ inline WChar *wstring_dup(const WChar* str)
     tmp_wstr[str_length] = L'\0';
   
     return tmp_wstr;
-    //return wcsdup(str);
   }
 }
 
 inline void wstring_free(WChar* str)
 {
   if (str != 0) {
-    //delete[] str;
     free(str);
     str = 0;
   }

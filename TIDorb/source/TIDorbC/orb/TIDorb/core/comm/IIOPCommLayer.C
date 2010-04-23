@@ -63,16 +63,15 @@ TIDorb::core::comm::IIOPCommLayer::IIOPCommLayer(TIDorb::core::TIDORB* orb)
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
   pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
   _group = new TIDThr::ThreadGroup(NULL, "", &attr);
-//FRAN
+
   // it can be destroyed because ThreadGroup copies it inside the constructor
   pthread_attr_destroy(&attr);
-//EFRAN
 
   destroyed = false;
   bidirectional_service = NULL;
   server_listener = NULL;
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   server_heartbeat_enabled = false;
   client_heartbeat_policy.heartbeat = false;
 
@@ -97,6 +96,8 @@ TIDorb::core::comm::IIOPCommLayer::IIOPCommLayer(TIDorb::core::TIDORB* orb)
 
   max_recover_count = conf.max_comm_recovering_times;
   recover_time = conf.comm_recover_time;
+
+  sas_manager = new TIDorb::core::security::sas::SASManager(orb);
 }
 
 
@@ -129,15 +130,12 @@ void TIDorb::core::comm::IIOPCommLayer::getListenPoint(TIDorb::core::iop::IOR* i
   else
     listen_point = profile->getListenPoint();
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   if (client_heartbeat_policy.heartbeat) {
     const TIDorb::core::iop::VectorTaggedComponent& components = profile->getTaggedComponents();
     for (size_t i = 0; i < components.size(); i++) {
       TIDorb::core::iop::TaggedComponent* comp = components[i];
       if (comp->_tag == TIDorb::core::iop::TAG_FT_HEARTBEAT_ENABLED) {
-        //jagd
-        //TIDorb::core::comm::FT::HeartbeatEnabled* heartbeat =
-        //  dynamic_cast<TIDorb::core::comm::FT::HeartbeatEnabled*>(comp);
         TIDorb::core::comm::FT::HeartbeatEnabled* heartbeat =
           (TIDorb::core::comm::FT::HeartbeatEnabled*)(comp);
         listen_point._heartbeat_enabled = heartbeat->heartbeat_enabled;
@@ -162,12 +160,7 @@ void TIDorb::core::comm::IIOPCommLayer::send_request(TIDorb::core::RequestImpl* 
 {
 
   TIDorb::core::PolicyContext* policy_context = request->getPolicyContext();
-/*
-  TIDorb::core::comm::iiop::ProfileIIOP* profile = ior.profile_IIOP();
 
-  if (profile == NULL)
-    throw CORBA::INTERNAL("Cannot get IIOP Profile.");
-*/
   Connection_ref conn = NULL;
   int recover_count = max_recover_count;
 
@@ -189,7 +182,7 @@ void TIDorb::core::comm::IIOPCommLayer::send_request(TIDorb::core::RequestImpl* 
       if(recover_count <= 0) {
         if (_orb->trace != NULL) {
           TIDorb::util::StringBuffer msg;
-          msg << "Cannot recover the communication any more: ";
+          msg << "IIOPCommLayer Cannot recover the communication any more: ";
           _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data(),rcf.comm_failure);
         }
         rcf.comm_failure._raise();
@@ -197,7 +190,7 @@ void TIDorb::core::comm::IIOPCommLayer::send_request(TIDorb::core::RequestImpl* 
 
       if (_orb->trace != NULL){
         TIDorb::util::StringBuffer msg;
-        msg << "Communication recovered from: ";
+        msg << "IIOPCommLayer Communication recovered from: ";
         _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data(), rcf.comm_failure);
       }
 
@@ -209,28 +202,32 @@ void TIDorb::core::comm::IIOPCommLayer::send_request(TIDorb::core::RequestImpl* 
       if (ior->use_another_Profile_IIOP()) {
         if (_orb->trace != NULL) {
           TIDorb::util::StringBuffer msg;
-          msg << "TRANSIENT in remote invocation. Trying connect with another IIOP Profile... ";
+          msg << "IIOPCommLayer: TRANSIENT in remote invocation. Trying connect with another IIOP Profile... ";
           _orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
         }
         // continues bucle
       } else {
         if (_orb->trace != NULL) {
-          _orb->print_trace(TIDorb::util::TR_ERROR, "Exception in remote invocation", tr);
+          _orb->print_trace(TIDorb::util::TR_ERROR, "IIOPCommLayer: TransientException in remote invocation", tr);
         }
         tr._raise(); 
       }
     } catch (const CORBA::SystemException& se) {
       if (_orb->trace != NULL) {
-        _orb->print_trace(TIDorb::util::TR_ERROR, "Exception in remote invocation", se);
+        _orb->print_trace(TIDorb::util::TR_ERROR, "IIOPCommLayer: SystemException in remote invocation", se);
       }
       se._raise();
 
     } catch (const TIDorb::core::ForwardRequest&) {
+      if (_orb->trace != NULL) {
+        _orb->print_trace(TIDorb::util::TR_USER, "IIOPCommLayer: ForwardRequest in remote invocation");
+      }
       throw;
 
     } catch (const exception& re) {
       if (_orb->trace != NULL){
-        _orb->print_trace(TIDorb::util::TR_ERROR, "Exception in remote invocation", re);
+        _orb->print_trace(TIDorb::util::TR_ERROR, "IIOPCommLayer: Exception in remote invocation", re);
+        _orb->print_trace(TIDorb::util::TR_ERROR, "IIOPCommLayer: raising INTERNAL ");
       }
       //throw (re);
       throw CORBA::INTERNAL(re.what());
@@ -280,16 +277,9 @@ void TIDorb::core::comm::IIOPCommLayer::oneway_request(TIDorb::core::RequestImpl
     try {
 
       request->with_response(false);
-/*
 
-      TIDorb::core::comm::iiop::ProfileIIOP* profile = ior.profile_IIOP();
-
-      if (profile == NULL)
-        throw CORBA::INTERNAL("Cannot get IIOP Profile.");
-*/
       Connection* conn=NULL;
 
-      //TIDorb::core::comm::iiop::ListenPoint point = profile->getListenPoint();
       TIDorb::core::comm::iiop::ListenPoint point;
       getListenPoint(ior, point);
 
@@ -302,7 +292,7 @@ void TIDorb::core::comm::IIOPCommLayer::oneway_request(TIDorb::core::RequestImpl
 
     } catch (const CORBA::SystemException& se) {
       if (_orb->trace != NULL){
-        _orb->print_trace(TIDorb::util::TR_DEBUG, "SytemException in oneway remote invocation", se);
+        _orb->print_trace(TIDorb::util::TR_DEBUG, "IIOPCommLayer: SytemException in oneway remote invocation", se);
       }
     } catch (const exception& th) {
       if (_orb->trace != NULL){
@@ -328,13 +318,7 @@ void TIDorb::core::comm::IIOPCommLayer::reliable_oneway_run(TIDorb::core::Reques
     request->reliable_oneway(true);
 
     request->with_response(false);
-/*
 
-    TIDorb::core::comm::iiop::ProfileIIOP* profile = ior.profile_IIOP();
-
-    if (profile == NULL)
-      throw CORBA::INTERNAL("Cannot get IIOP Profile.");
-*/
     Connection_ref conn=NULL;
 
     int recover_count = max_recover_count;
@@ -345,7 +329,6 @@ void TIDorb::core::comm::IIOPCommLayer::reliable_oneway_run(TIDorb::core::Reques
 
       try {
 
-        //TIDorb::core::comm::iiop::ListenPoint point = profile->getListenPoint();
         TIDorb::core::comm::iiop::ListenPoint point;
         getListenPoint(ior, point);
         
@@ -410,12 +393,7 @@ TIDorb::core::comm::IIOPCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
                                                  const TIDorb::core::PolicyContext& policy_context)
   throw(TIDorb::core::ForwardRequest,CORBA::SystemException)
 {
-/*
-  TIDorb::core::comm::iiop::ProfileIIOP* profile = ior.profile_IIOP();
 
-  if (profile == NULL)
-    throw CORBA::INTERNAL("Cannot get IIOP Profile.");
-*/
   Connection_ref conn = NULL;
 
   int recover_count = max_recover_count;
@@ -425,7 +403,7 @@ TIDorb::core::comm::IIOPCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
   while (true) {
 
     try {
-      //TIDorb::core::comm::iiop::ListenPoint point = profile->getListenPoint();
+
       TIDorb::core::comm::iiop::ListenPoint point;
       getListenPoint(ior, point);
 
@@ -441,13 +419,13 @@ TIDorb::core::comm::IIOPCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
       if(recover_count <= 0) {
 
         if (_orb->trace != NULL){
-          _orb->print_trace(TIDorb::util::TR_DEBUG, "Cannot recover the communication any more: ",rcf);
+          _orb->print_trace(TIDorb::util::TR_DEBUG, "IIOPCommLayer: Cannot recover the communication any more: ",rcf);
         }
 
         rcf.comm_failure._raise();
       }
       if (_orb->trace != NULL){
-        _orb->print_trace(TIDorb::util::TR_DEBUG, "Cannot recover the communication any more: ",rcf);
+        _orb->print_trace(TIDorb::util::TR_DEBUG, "IIOPCommLayer: Cannot recover the communication any more: ",rcf);
       }
 
       TIDThr::Thread::sleep(recover_time);
@@ -457,14 +435,14 @@ TIDorb::core::comm::IIOPCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
 
     } catch (const CORBA::SystemException& se) {
       if (_orb->trace != NULL){
-        _orb->print_trace(TIDorb::util::TR_ERROR, "Exception in remote invocation", se);
+        _orb->print_trace(TIDorb::util::TR_ERROR, "IIOPCommLayer: Exception in remote invocation", se);
       }
       //throw se;
       se._raise();
 
     } catch (const exception& re) {
       if (_orb->trace != NULL){
-        _orb->print_trace(TIDorb::util::TR_ERROR, "Exception in remote invocation", re);
+        _orb->print_trace(TIDorb::util::TR_ERROR, "IIOPCommLayer: Exception in remote invocation", re);
       }
       //throw re;
       throw CORBA::INTERNAL(re.what());
@@ -569,7 +547,7 @@ TIDorb::core::comm::IIOPCommLayer::createIOR(const char* id, TIDorb::core::poa::
     components[0] = new TIDorb::core::iop::ORBComponent(ConfORB::ORB_TYPE->orb_type);
   }
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   if (server_heartbeat_enabled) {
     num_components++;
     components.resize(num_components);
@@ -585,6 +563,125 @@ TIDorb::core::comm::IIOPCommLayer::createIOR(const char* id, TIDorb::core::poa::
     }
   }
   // end FT extensions
+
+  // Add CSIComponent
+  if ( (conf.csiv2) && (! ((strcmp(conf.ssl_private_key, "") != 0) && //  == NO_SSL
+                           (strcmp(conf.ssl_certificate, "") != 0) ) )) {
+    num_components++;
+    components.resize(num_components);
+
+    CSIIOP::CompoundSecMechList mech_list;
+
+    mech_list.stateful = false;
+    mech_list.mechanism_list.length(1);
+
+    if ( (strcmp(conf.gssup_user, "") != 0) &&
+         (strcmp(conf.gssup_password, "") != 0) )
+      mech_list.mechanism_list[0].target_requires = CSIIOP::EstablishTrustInClient;
+
+    mech_list.mechanism_list[0].transport_mech.tag = IOP::TAG_NULL_TAG; 
+
+    //
+    // AS Context: client authentication functionality that the target expects
+    //
+    mech_list.mechanism_list[0].as_context_mech.target_supports = 0;
+    mech_list.mechanism_list[0].as_context_mech.target_requires = 0;
+
+    if ( (strcmp(conf.gssup_user, "") != 0) &&
+         (strcmp(conf.gssup_password, "") != 0) ) {
+      mech_list.mechanism_list[0].as_context_mech.target_supports |= CSIIOP::EstablishTrustInClient;
+      mech_list.mechanism_list[0].as_context_mech.target_requires |= CSIIOP::EstablishTrustInClient;
+    }
+
+    mech_list.mechanism_list[0].as_context_mech.client_authentication_mech.length(0);
+    // Check for GSSUP::GSSUPMechOID
+    if ( (strcmp(conf.gssup_user, "") != 0) &&
+         (strcmp(conf.gssup_password, "") != 0) ) {
+      CORBA::OctetSeq_var oid_buffer = 
+        TIDorb::core::security::sas::SASManager::convert_oid_to_asn1(GSSUP::GSSUPMechOID);
+      mech_list.mechanism_list[0].as_context_mech.client_authentication_mech.
+        length(oid_buffer->length());
+      for (CORBA::ULong i = 0; i < oid_buffer->length(); i++) 
+        mech_list.mechanism_list[0].as_context_mech.client_authentication_mech[i] = 
+          (*oid_buffer)[i];
+    }
+
+
+    mech_list.mechanism_list[0].as_context_mech.target_name.length(0);
+    if ( strcmp(conf.csiv2_target_name, "") != 0) {
+      CORBA::ULong target_name_length = strlen(conf.csiv2_target_name); 
+      CORBA::OctetSeq_var oid_type = 
+          TIDorb::core::security::sas::SASManager::convert_oid_to_asn1(CSI::GSS_NT_Export_Name_OID);
+
+      CORBA::UShort oid_type_length = oid_type->length(); 
+      CORBA::ULong i = 0;
+      mech_list.mechanism_list[0].as_context_mech.target_name.length(
+                                                                     2 + /* token_id */
+                                                                     2 + /* oid_type_length*/  
+                                                                     oid_type_length + /* oid_type*/
+                                                                     4 + /* target_name_length */
+                                                                     target_name_length /* target_name */
+                                                                     );
+      // Token_id
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x04;
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x01;
+
+      // length of type OID (TODO: hardcoded!! CSI::GSS_NT_Export_Name_OID )
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x00; 
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x08;
+
+      // OID
+      for (int j = 0; j < oid_type_length; j++)
+        mech_list.mechanism_list[0].as_context_mech.target_name[i++] = (*oid_type)[j];
+
+      // length of target_name (TODO: hardcoded!! @tid.es )
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x00;
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x00;
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x00;
+      mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 0x07;
+
+      for (CORBA::ULong j = 0; j < target_name_length; j++) {
+        mech_list.mechanism_list[0].as_context_mech.target_name[i++] = 
+          (CORBA::Octet)conf.csiv2_target_name[j];
+      }
+    }
+
+    //
+    // SAS Context: Authorization mechanims
+    //
+    mech_list.mechanism_list[0].sas_context_mech.target_supports = CSIIOP::IdentityAssertion;
+    mech_list.mechanism_list[0].sas_context_mech.target_requires = 0;
+
+    
+    mech_list.mechanism_list[0].sas_context_mech.privilege_authorities.length(0);
+
+    mech_list.mechanism_list[0].sas_context_mech.supported_naming_mechanisms.length(0);
+
+    // Check for GSSUP::GSSUPMechOID
+    if ( (strcmp(conf.gssup_user, "") != 0) &&
+         (strcmp(conf.gssup_password, "") != 0) ) {
+      mech_list.mechanism_list[0].sas_context_mech.supported_naming_mechanisms.length(1);
+      CORBA::OctetSeq_var oid_buffer = 
+        TIDorb::core::security::sas::SASManager::convert_oid_to_asn1(GSSUP::GSSUPMechOID);
+      mech_list.mechanism_list[0].sas_context_mech.supported_naming_mechanisms[0].
+        length(oid_buffer->length());
+      for (CORBA::ULong i = 0; i < oid_buffer->length(); i++) 
+        mech_list.mechanism_list[0].sas_context_mech.supported_naming_mechanisms[0][i] = 
+          (*oid_buffer)[i];
+    }
+
+    mech_list.mechanism_list[0].sas_context_mech.supported_identity_types = 
+      CSI::ITTAbsent;
+
+    if ( (strcmp(conf.gssup_user, "") != 0) &&
+         (strcmp(conf.gssup_password, "") != 0) ) {
+      mech_list.mechanism_list[0].sas_context_mech.supported_identity_types |= 
+        CSI::ITTPrincipalName;
+    }
+
+    components[num_components - 1] = 
+      new TIDorb::core::security::CSIComponent(mech_list);
+  }
 
   profiles.resize(1);
   profiles[0] = new TIDorb::core::comm::iiop::ProfileIIOP(

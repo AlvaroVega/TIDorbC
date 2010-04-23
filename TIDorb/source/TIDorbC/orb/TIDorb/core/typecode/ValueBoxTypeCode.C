@@ -129,11 +129,11 @@ void ValueBoxTypeCode::read_params
        (TIDorb::core::cdr::CDRInputStream& input)
 {
   ComplexTypeCode::read_params(input);
-//FRAN
+
   if(m_boxed_type){
     CORBA::release(m_boxed_type);
   }
-//EFRAN
+
   input.read_TypeCode(m_boxed_type);
 }
 
@@ -144,10 +144,7 @@ bool ValueBoxTypeCode::skip_value
   (TIDorb::core::cdr::CDRInputStream& input) const
 {
   TypeCodeImpl* tc = 
-  //dynamic_cast<TypeCodeImpl *> (m_boxed_type);
-  //jagd 
-  //(TypeCodeImpl*)m_boxed_type->_impl();
-  (TypeCodeImpl*)m_boxed_type;
+    (TypeCodeImpl*)m_boxed_type;
   
   return tc->skip_value(input);
 }
@@ -160,10 +157,7 @@ void ValueBoxTypeCode::remarshal_value
         TIDorb::core::cdr::CDROutputStream& output) const
 {
     TypeCodeImpl* tc = 
-    //dynamic_cast<TypeCodeImpl *> (m_boxed_type);
-    //jagd 
-    //(TypeCodeImpl*)m_boxed_type->_impl();    
-    (TypeCodeImpl*)m_boxed_type;    
+      (TypeCodeImpl*)m_boxed_type;    
     
     tc->remarshal_value(input, output);
 }
@@ -176,10 +170,7 @@ bool ValueBoxTypeCode::values_equal
         TIDorb::core::cdr::CDRInputStream& b_input) const
 {
   TypeCodeImpl* tc = 
-  //dynamic_cast<TypeCodeImpl *> (m_boxed_type);
-  //jagd 
-  //(TypeCodeImpl*)m_boxed_type->_impl();
-  (TypeCodeImpl*)m_boxed_type;
+    (TypeCodeImpl*)m_boxed_type;
 
   return tc->values_equal(a_input, b_input);
 }
@@ -192,10 +183,7 @@ void ValueBoxTypeCode::dump (ostream& output) const
 
   output << "[TYPECODE]{valuebox boxed type=";
   TypeCodeImpl* tc = 
-  //dynamic_cast<TypeCodeImpl*>(m_boxed_type);
-  //jagd
-  //(TypeCodeImpl*)m_boxed_type->_impl();
-  (TypeCodeImpl*)m_boxed_type;
+    (TypeCodeImpl*)m_boxed_type;
   
   tc->dump(output);
    output << '}';
@@ -212,10 +200,7 @@ bool ValueBoxTypeCode::dump_value
   output << "[VALUE]{valuebox " << m_name << " : ";
 
   TypeCodeImpl* tc =
-  //dynamic_cast<TypeCodeImpl*>(m_boxed_type);
-  //jagd 
-  //(TypeCodeImpl*)m_boxed_type->_impl();
-  (TypeCodeImpl*)m_boxed_type;
+    (TypeCodeImpl*)m_boxed_type;
   
   if(!tc->dump_value(input, output))
       return false;

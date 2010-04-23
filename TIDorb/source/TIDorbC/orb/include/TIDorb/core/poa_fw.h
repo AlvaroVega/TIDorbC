@@ -80,7 +80,7 @@ namespace poa {
 #include "TIDorb/core/poa/policies_fw.h"
 
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 namespace TIDorb {
 namespace core {
 namespace goa {

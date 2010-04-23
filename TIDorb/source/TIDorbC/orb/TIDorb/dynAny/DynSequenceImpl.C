@@ -228,11 +228,6 @@ void DynSequenceImpl::set_length(CORBA::ULong len)
         _components.erase(iter);
         iter = _components.begin();
       }
-//       for (iter = _components.begin(); iter != _components.end(); iter++)
-//       {
-//          (*iter)->destroy();
-//          _components.erase(iter);
-//       }
    }
 }
 
@@ -313,15 +308,9 @@ void DynSequenceImpl::_write(TIDorb::portable::OutputStream& out) const
 
       value_copy->rewind();
 
-      //jagd
-      //TIDorb::core::typecode::TypeCodeImpl* impl =
-      //   dynamic_cast<TIDorb::core::typecode::TypeCodeImpl*>((CORBA::TypeCode_ptr)_base_type);
       TIDorb::core::typecode::TypeCodeImpl* impl =
          (TIDorb::core::typecode::TypeCodeImpl*)((CORBA::TypeCode_ptr)_base_type);
 
-      //jagd
-      //TIDorb::core::cdr::CDROutputStream& out_stream =
-      //   dynamic_cast <TIDorb::core::cdr::CDROutputStream&> (out);
       TIDorb::core::cdr::CDROutputStream& out_stream =
          *(TIDorb::core::cdr::CDROutputStream*)(&out);
 

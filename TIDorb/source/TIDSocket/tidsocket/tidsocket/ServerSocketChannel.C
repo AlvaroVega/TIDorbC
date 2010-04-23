@@ -44,12 +44,14 @@
 #ifdef __sun
 #include <sys/conf.h>
 #include <inttypes.h>
+#include <sys/select.h>
+#include <string.h>
 #endif //__sun
 
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#ifdef __darwin
+#if (defined __darwin || defined __CYGWIN__)
    #include <sys/ioctl.h>
    #include <CoreServices/CoreServices.h>
 #else

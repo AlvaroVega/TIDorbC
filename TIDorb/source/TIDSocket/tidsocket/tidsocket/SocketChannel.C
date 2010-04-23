@@ -49,7 +49,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#ifdef __darwin
+#if (defined __darwin || defined __CYGWIN__)
    #include <sys/ioctl.h>
 #else
    #include <stropts.h>

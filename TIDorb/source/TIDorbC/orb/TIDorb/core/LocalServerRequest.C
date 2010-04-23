@@ -56,9 +56,7 @@ TIDorb::core::LocalServerRequest::LocalServerRequest(TIDorb::core::RequestImpl* 
     m_server_parameters(0),
     m_forward_obj(CORBA::Object::_nil())
 {
-//MLG
     m_local_request->_add_ref();
-//EMLG
 }
 
 
@@ -66,9 +64,7 @@ TIDorb::core::LocalServerRequest::LocalServerRequest(TIDorb::core::RequestImpl* 
 
 TIDorb::core::LocalServerRequest::~LocalServerRequest()
 {
-//MLG
   m_local_request->_remove_ref();
-//ELMG
   CORBA::release(m_server_parameters);
   CORBA::release(m_forward_obj);
 }
@@ -200,8 +196,6 @@ void TIDorb::core::LocalServerRequest::set_forward(CORBA::Object_ptr obj)
 
 bool TIDorb::core::LocalServerRequest::is_forwarded()
 {
-  //jagd 2
-  //return !CORBA::is_nil(m_forward_obj);
   return (bool)(m_forward_obj);
 }
 

@@ -1,0 +1,13 @@
+This release of TIDorbC++ was built on a machine with kernel:
+HP-UX bocinillo B.11.31 U ia64 0283044816 unlimited-user license
+
+using the compiler:
+gcc version 4.2.3
+
+kernel version used:
+HP-UX B.11.31 U ia64
+
+using the following libraries:
+gcc-4.2.3
+make-3.81
+TIDIdlc_1.3.11

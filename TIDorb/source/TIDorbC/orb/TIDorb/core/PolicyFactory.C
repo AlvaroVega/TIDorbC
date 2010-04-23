@@ -90,6 +90,10 @@ TIDorb::core::PolicyFactory::create_policy(CORBA::PolicyType type,
        return create_CompressionLowValuePolicyImpl(val);
     case ZIOP::COMPRESSION_MIN_RATIO_POLICY_ID:
        return create_CompressionMinRatioPolicyImpl(val);
+    case Security::SecQOPPolicy:
+       return create_QOPPolicyImpl(val);      
+    case Security::SecEstablishTrustPolicy:
+       return create_EstablishTrustPolicyImpl(val);
     default:
 	throw CORBA::PolicyError(CORBA::UNSUPPORTED_POLICY);
   }
@@ -124,6 +128,8 @@ void TIDorb::core::PolicyFactory::validate_for_orb(const CORBA::PolicyType type)
     case ZIOP::COMPRESSOR_ID_LEVEL_LIST_POLICY_ID: 
     case ZIOP::COMPRESSION_LOW_VALUE_POLICY_ID:
     case ZIOP::COMPRESSION_MIN_RATIO_POLICY_ID:
+    case Security::SecQOPPolicy:
+    case Security::SecEstablishTrustPolicy:
         return;
     default:
         throw CORBA::PolicyError(CORBA::UNSUPPORTED_POLICY);
@@ -422,6 +428,32 @@ TIDorb::core::PolicyFactory::create_CompressionMinRatioPolicyImpl(
 
   if(val >>= value)
     return new TIDorb::core::ziop::CompressionMinRatioPolicyImpl(value);
+  else
+    throw CORBA::PolicyError(CORBA::BAD_POLICY_VALUE);
+}
+
+
+TIDorb::core::security::EstablishTrustPolicyImpl*
+TIDorb::core::PolicyFactory::create_EstablishTrustPolicyImpl(const CORBA::Any& val)
+  throw(CORBA::PolicyError)
+{
+  Security::EstablishTrust establish_trust;
+
+  if(val >>= establish_trust)
+    return new TIDorb::core::security::EstablishTrustPolicyImpl(establish_trust);
+  else
+    throw CORBA::PolicyError(CORBA::BAD_POLICY_VALUE);
+}
+
+
+TIDorb::core::security::QOPPolicyImpl*
+TIDorb::core::PolicyFactory::create_QOPPolicyImpl(const CORBA::Any& val)
+  throw(CORBA::PolicyError)
+{
+  Security::QOP qop;
+
+  if(val >>= qop)
+    return new TIDorb::core::security::QOPPolicyImpl(qop);
   else
     throw CORBA::PolicyError(CORBA::BAD_POLICY_VALUE);
 }

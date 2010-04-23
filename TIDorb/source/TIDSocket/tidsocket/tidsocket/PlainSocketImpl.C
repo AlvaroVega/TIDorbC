@@ -53,7 +53,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#ifdef __darwin
+#if (defined __darwin || defined __CYGWIN__)
    #include <sys/ioctl.h>
 
    // I_NREAD was declared in CoreServices framework in OSX < 10.4
@@ -571,7 +571,7 @@ void PlainSocketImpl::accept(SocketImpl* s)
     throw(IOException)
 {
     // Variables auxiliares
-    int flags;
+    int flags = 0;
     int error;
     int new_fd;
 

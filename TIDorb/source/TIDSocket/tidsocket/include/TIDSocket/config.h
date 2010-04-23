@@ -2,7 +2,7 @@
 //
 // File:        config.h
 // Description: 
-// Rel:         01.00
+// Rel:         01.01
 // Created:     May, 2001
 // Author:      Pablo Rodriguez Archilla      ( pra@tid.es   )
 //
@@ -53,6 +53,9 @@
 #if (defined(__SUNPRO_CC) && (__SUNPRO_CC_COMPAT==5)) || \
     (defined(__HP_aCC)    && defined(_HP_NAMESPACE_STD)) || \
     (defined(__linux)) || \
+    (defined(__darwin)) || \
+    (defined(__CYGWIN__)) || \
+    (defined(__hpux)) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 //    (defined(__GNUC__))
 #ifndef TIDSOCKET_HAVE_NAMESPACE_STD

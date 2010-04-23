@@ -50,7 +50,6 @@ TIDorb::core::poa::ThreadPool::ThreadPool(TIDorb::core::poa::POAManagerImpl* poa
   _active = 0;
   _deactivated = false;
 
-  //jagd 
   _maxThreads=_poaManager->conf->getMaxThreads();
   _minThreads=_poaManager->conf->getMinThreads();
 
@@ -66,10 +65,9 @@ TIDorb::core::poa::ThreadPool::ThreadPool(TIDorb::core::poa::POAManagerImpl* poa
   pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
 
   _group = (TIDThr::ThreadGroup*) new TIDThr::ThreadGroup(NULL, "", &attr);
-  //PRA
+
   // it can be destroyed because ThreadGroup copies it inside the constructor
   pthread_attr_destroy(&attr);
-  //EPRA
 }
 
 
@@ -86,8 +84,7 @@ TIDorb::core::poa::ThreadPool::~ThreadPool()
 CORBA::Boolean TIDorb::core::poa::ThreadPool::createNewReader()
 {
   TIDThr::Synchronized synchro(recursive_mutex);
-  //jagd
-  //if ((_used < _poaManager->conf->getMaxThreads()) && (_actuallyUsed == _active)) {
+
   if ((_used < _maxThreads) && (_actuallyUsed == _active)) {
     createThread();
     return true;
@@ -101,13 +98,13 @@ CORBA::Boolean TIDorb::core::poa::ThreadPool::createNewReader()
 
 void TIDorb::core::poa::ThreadPool::createThread()
 {
-  TIDThr::Synchronized synchro(recursive_mutex);
+  //Unnecesarry: called only from synchro blocks by ThreadPool
+  //TIDThr::Synchronized synchro(recursive_mutex); 
 
   try {
      TIDorb::core::poa::ExecThread_ref t =
        new TIDorb::core::poa::ExecThread(_poaManager,_group);
 
-    //_pool->addElement(t);
     _pool.push_back(t);
     t->setThreadStateListener(this);
     t->setDaemon(false);
@@ -118,7 +115,6 @@ void TIDorb::core::poa::ThreadPool::createThread()
       TIDorb::util::StringBuffer msg;
       msg << "New thread in " << _poaManager->toString() << " created: "  
           << _used << " threads are now active"
-          //jagd << " (max " << _poaManager->conf->getMaxThreads()
           << " (max " << _maxThreads 
           << ", min " << _minThreads
           << ")";
@@ -136,10 +132,6 @@ void TIDorb::core::poa::ThreadPool::createThread()
 
 void TIDorb::core::poa::ThreadPool::setActive(TIDThr::Thread* t, CORBA::Boolean firstTime)
 {
-  //jagd que mas da que no controle exactamente el numero de threads del pool
-  // ojo que nunca me paso del numMaxThreads 
-  //TIDThr::Synchronized synchro(recursive_mutex);
-
   _active++;
   if (firstTime) _actuallyUsed++;
 }
@@ -149,9 +141,6 @@ void TIDorb::core::poa::ThreadPool::setActive(TIDThr::Thread* t, CORBA::Boolean 
 
 void TIDorb::core::poa::ThreadPool::setInactive(TIDThr::Thread* t)
 {
-  //jagd que mas da que no controle exactamente el numero de threads del pool
-  // ojo que nunca me paso del numMaxThreads 
-  //TIDThr::Synchronized synchro(recursive_mutex);
   _active--;
 }
 
@@ -172,7 +161,6 @@ void TIDorb::core::poa::ThreadPool::threadHasDied(TIDThr::Thread* t)
     TIDorb::util::StringBuffer msg;
     msg << "Finalization of " << exec_thr->toString() << ": "
         << _used << " threads are now active"
-        //jagd << " (max " << _poaManager->conf->getMaxThreads()
         << " (max " << _maxThreads 
         << ", min " << _minThreads
         << ")";

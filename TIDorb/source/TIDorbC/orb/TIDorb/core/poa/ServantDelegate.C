@@ -57,9 +57,7 @@ TIDorb::core::poa::ServantDelegate::ServantDelegate(const TIDorb::core::poa::Ser
   _poa = PortableServer::POA::_duplicate(other._poa);
   _orb_deleg = CORBA::ORB::_duplicate(other._orb_deleg);
   _oid = other._oid;
-  //PRA
   _orb = other._orb;
-  //EPRA
 }
 
 /**
@@ -72,17 +70,11 @@ TIDorb::core::poa::ServantDelegate::ServantDelegate
 const PortableServer::ObjectId& oid)
  throw (TIDThr::SystemException)
 {
-  //PRA
-  //_poa = PortableServer::POA::_duplicate(poa);
-  //_orb_deleg = CORBA::ORB::_duplicate((dynamic_cast<TIDorb::core::poa::POAImpl*>(poa))->orb);
-  //_oid = oid;
-
   TIDorb::core::TIDORB* poa_orb = (dynamic_cast<TIDorb::core::poa::POAImpl*>(poa))->orb;
   _oid = oid;
   _poa = PortableServer::POA::_duplicate(poa);
   _orb = (TIDorb::portable::ORB*) poa_orb;
   _orb_deleg = CORBA::ORB::_duplicate(poa_orb);
-  //EPRA
 }
 
 TIDorb::core::poa::ServantDelegate::~ServantDelegate()
@@ -96,10 +88,8 @@ TIDorb::core::poa::ServantDelegate::~ServantDelegate()
 * @param self The servant.
 * @return The ORB.
 */
-//PRA
 const CORBA::ORB_ptr TIDorb::core::poa::ServantDelegate::orb(PortableServer::ServantBase* self)
 {
-  //return CORBA::ORB::_duplicate(_orb_deleg);
   return (const CORBA::ORB_ptr) _orb_deleg;
 }
 
@@ -108,7 +98,6 @@ const TIDorb::portable::ORB* TIDorb::core::poa::ServantDelegate::orb()
   return (const TIDorb::portable::ORB*) _orb;
 }
 
-//EPRA
 
 /**
 * @param self The servant.
@@ -171,9 +160,9 @@ const char* repository_id) {
   const CORBA::RepositoryIdSeq_ptr reps = self->_all_interfaces(_poa,_oid);
 
   for (size_t i=0; i<reps->length(); i++) {
-//MLG  	
+
     if (repository_id && (strcmp(repository_id,(*reps)[i])==0))
-//EMLG    
+
     return true;
   }
   

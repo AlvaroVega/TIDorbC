@@ -36,7 +36,8 @@
 #define _TIDORB_CORE_COMM_IIOP_PROFILEIIOP_H_
 
 #include "TIDThr.h"
-
+#include "SSLIOP.h"
+#include "CSIIOP.h"
 #include <vector>
 
 #ifdef TIDORB_HAVE_NAMESPACE_STD
@@ -55,19 +56,21 @@ namespace iiop {
 class ProfileIIOP : public TIDorb::core::iop::TaggedProfile 
 {
 private:
-  typedef vector<TIDorb::core::comm::iiop::ListenPoint> ListenPointList;
 
-  TIDorb::core::comm::iiop::Version        _version;
-  //TIDorb::core::comm::iiop::ListenPoint  _listen_point;
-  ListenPointList                          _listen_points;
-  TIDorb::core::comm::iiop::ObjectKey_ref  _object_key;
+  TIDorb::core::comm::iiop::Version           _version;
+  TIDorb::core::comm::iiop::VectorListenPoint _listen_points;
+  TIDorb::core::comm::iiop::ObjectKey_ref     _object_key;
 
-  bool _components_extracted;
+  bool                                     _components_extracted;
   TIDorb::core::iop::VectorTaggedComponent _components;
 	
-  TIDorb::core::cdr::CDRInputStream* _profile_data;
+  TIDorb::core::cdr::CDRInputStream*       _profile_data;
 
-  TIDorb::core::PolicyContext*	_policies;
+  TIDorb::core::PolicyContext*	           _policies;
+
+  SSLIOP::SSL*                             _ssl;
+
+  CSIIOP::CompoundSecMechList*             _compound_sec_mechs;
 
 protected:
 	
@@ -100,7 +103,7 @@ public:
 	
   const TIDorb::core::comm::iiop::ListenPoint& getListenPoint() const;
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   const TIDorb::core::comm::iiop::ListenPoint& getAnyListenPoint() const;
   // end FT extensions
 	
@@ -117,6 +120,10 @@ public:
   char* toString() const;
 
   TIDorb::core::PolicyContext* getPolicies() const;
+
+  SSLIOP::SSL* get_SSL() const;
+
+  CSIIOP::CompoundSecMechList* get_CompoundSecMechList() const;
 	
 };
 }// iiop

@@ -70,7 +70,7 @@
 #include "TIDorb/core/poa/ServantDelegate.h"
 #include "TIDorb/core/poa/ExecThread.h"
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 #include "TIDorb/core/goa/GOAImpl.h"
 #include "TIDorb/core/goa/AbstractMIOPRequest.h"
 #include "TIDorb/core/goa/MIOPRequest.h"

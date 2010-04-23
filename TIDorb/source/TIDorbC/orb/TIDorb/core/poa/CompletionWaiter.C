@@ -36,19 +36,14 @@
 /////////////////////////////////////////////////////////////////////////
 
 #include "TIDorb/core/poa/CompletionWaiter.h"
-//MLG
-//TIDorb::core::poa::CompletionWaiter::CompletionWaiter(TIDorb::core::TIDORB* orb) throw (TIDThr::SystemException) {
+
 TIDorb::core::poa::CompletionWaiter::CompletionWaiter(TIDorb::core::TIDORB* orb) {
-//EMLG
         _orb = orb;
         _active_requests = 0;
         _stopWaiting = false;
 };
  
-//MLG 
-//TIDorb::core::poa::CompletionWaiter::~CompletionWaiter() throw(TIDThr::SystemException) {
 TIDorb::core::poa::CompletionWaiter::~CompletionWaiter() {
-//EMLG
         delete _orb;
 };
 

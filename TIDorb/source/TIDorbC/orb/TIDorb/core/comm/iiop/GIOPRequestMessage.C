@@ -38,7 +38,6 @@
 
 #include "TIDorb/core/comm/iiop/GIOPRequestMessage.h"
 
-//MLG
 void* TIDorb::core::comm::iiop::GIOPRequestMessage::_impl()
 {
 	return this;
@@ -49,23 +48,22 @@ const char* TIDorb::core::comm::iiop::GIOPRequestMessage::_typeid()
 	//return CORBA::string_dup("GIOPRequestMessage");
 	return "GIOPRequestMessage";
 }
-//EMLG
 
 
 TIDorb::core::comm::iiop::GIOPRequestMessage::GIOPRequestMessage
   (const TIDorb::core::comm::iiop::GIOPHeader& header)
   : GIOPFragmentedMessage(header)
 {
-  service_context_list = NULL;
-  service_context_list_owner = false;
+  _service_context_list = NULL;
+  _service_context_list_owner = false;
 }
 
 TIDorb::core::comm::iiop::GIOPRequestMessage::GIOPRequestMessage
   (const TIDorb::core::comm::iiop::Version& ver)
   : GIOPFragmentedMessage(GIOPHeader(ver, TIDorb::core::comm::iiop::Request))
 {
-  service_context_list = NULL;
-  service_context_list_owner = false;
+  _service_context_list = NULL;
+  _service_context_list_owner = false;
 }
 
 TIDorb::core::comm::iiop::GIOPRequestMessage::GIOPRequestMessage
@@ -75,14 +73,14 @@ TIDorb::core::comm::iiop::GIOPRequestMessage::GIOPRequestMessage
    : GIOPFragmentedMessage(GIOPHeader(ver, TIDorb::core::comm::iiop::Request), 
                            id, fragment_size)
 {
-  service_context_list = NULL;
-  service_context_list_owner = false;
+  _service_context_list = NULL;
+  _service_context_list_owner = false;
 }
 
 TIDorb::core::comm::iiop::GIOPRequestMessage::~GIOPRequestMessage()
 {
-  if (service_context_list_owner && service_context_list)
-    delete service_context_list;
+  if (_service_context_list_owner && _service_context_list)
+    delete _service_context_list;
 }
 
 
@@ -93,7 +91,7 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::insert_request_header_1_0
    const TIDorb::core::iop::IOR& ior)
 {
   // service context
-  TIDorb::core::comm::iiop::ServiceContextList::write(service_context_list, *message_buffer_out);
+  TIDorb::core::comm::iiop::ServiceContextList::write(_service_context_list, *message_buffer_out);
 
   // request_id
   message_buffer_out->write_ulong(_request_id);
@@ -103,7 +101,7 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::insert_request_header_1_0
 
   // object key
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   // Pre-GIOP 1.2 support: 'MIOP' octets followed by encapsulated UIPMC profile
   ior.object_key()->write(*message_buffer_out);
   // end MIOP extensions
@@ -123,7 +121,7 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::insert_request_header_1_1
    const TIDorb::core::iop::IOR& ior)
 {
   // service context
-  TIDorb::core::comm::iiop::ServiceContextList::write(service_context_list, *message_buffer_out);
+  TIDorb::core::comm::iiop::ServiceContextList::write(_service_context_list, *message_buffer_out);
 
   // request_id
   message_buffer_out->write_ulong(_request_id);
@@ -191,14 +189,13 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::insert_request_header_1_2
     {
       throw CORBA::INTERNAL();
     }
-//EMLG    
   }
 
   // operation name
   message_buffer_out->write_string(request->operation());
 
   // service context list
-  TIDorb::core::comm::iiop::ServiceContextList::write(service_context_list, *message_buffer_out);
+  TIDorb::core::comm::iiop::ServiceContextList::write(_service_context_list, *message_buffer_out);
 
   // parameters alignment for Version 1.2
   message_buffer_out->fix_next_aligned_position(TIDorb::core::cdr::CDR::LONGLONG_SIZE);
@@ -211,8 +208,8 @@ TIDorb::core::ServerRequestImpl*
 TIDorb::core::comm::iiop::GIOPRequestMessage::extract_request_1_0()
 {
   // service_context_list
-  service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
-  service_context_list_owner = true;
+  _service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
+  _service_context_list_owner = true;
 
   // request_id
   message_buffer_in->read_ulong(_request_id);
@@ -257,8 +254,8 @@ TIDorb::core::ServerRequestImpl*
 TIDorb::core::comm::iiop::GIOPRequestMessage::extract_request_1_1()
 {
   // service_context_list
-  service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
-  service_context_list_owner = true;
+  _service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
+  _service_context_list_owner = true;
 
   // request_id
   message_buffer_in->read_ulong(_request_id);
@@ -329,8 +326,8 @@ TIDorb::core::comm::iiop::GIOPRequestMessage::extract_request_1_2()
   message_buffer_in->read_string(operation);
 
   // service_context_list
-  service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
-  service_context_list_owner = true;
+  _service_context_list = TIDorb::core::comm::iiop::ServiceContextList::read(*message_buffer_in);
+  _service_context_list_owner = true;
 
   try {
     message_buffer_in->go_next_aligned_position(TIDorb::core::cdr::CDR::LONGLONG_SIZE);
@@ -358,8 +355,8 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::set_service_context_list(
                                              TIDorb::core::comm::iiop::ServiceContextList* list,
                                              bool owner)
 {
-  service_context_list = list;
-  service_context_list_owner = owner;
+  _service_context_list = list;
+  _service_context_list_owner = owner;
 }
 
 
@@ -368,7 +365,7 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::set_service_context_list(
 const TIDorb::core::comm::iiop::ServiceContextList*
   TIDorb::core::comm::iiop::GIOPRequestMessage::get_service_context_list() const
 {
-  return service_context_list;
+  return _service_context_list;
 }
 
 
@@ -442,7 +439,7 @@ void TIDorb::core::comm::iiop::GIOPRequestMessage::insert_heartbeat_request
   create_message_buffer_output(orb);
 
   // service context
-  TIDorb::core::comm::iiop::ServiceContextList::write(service_context_list, *message_buffer_out);
+  TIDorb::core::comm::iiop::ServiceContextList::write(_service_context_list, *message_buffer_out);
 
   // request_id
   message_buffer_out->write_ulong(_request_id);
@@ -473,14 +470,14 @@ TIDorb::core::PolicyContext*
 TIDorb::core::comm::iiop::GIOPRequestMessage::getRequestInvocationPolicies()
 {
 
-  if(service_context_list != NULL) {
+  if(_service_context_list != NULL) {
 
-    for(size_t i = 0; i < service_context_list->components.size(); i++) {
+    for(size_t i = 0; i < _service_context_list->components.size(); i++) {
 
-      if (service_context_list->components[i]->_context_id == IOP::INVOCATION_POLICIES ){
+      if (_service_context_list->components[i]->_context_id == IOP::INVOCATION_POLICIES ){
 
         const TIDorb::core::comm::iiop::ServiceContext* service_context =
-          service_context_list->components[i];
+          _service_context_list->components[i];
 
         TIDorb::core::comm::iiop::InvocationPoliciesContext* context =
           (TIDorb::core::comm::iiop::InvocationPoliciesContext*)service_context;

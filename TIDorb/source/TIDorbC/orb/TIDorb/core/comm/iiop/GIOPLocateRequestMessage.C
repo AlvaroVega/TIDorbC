@@ -38,7 +38,6 @@
 
 #include "TIDorb/core/comm/iiop/GIOPLocateRequestMessage.h"
 
-//MLG
 void* TIDorb::core::comm::iiop::GIOPLocateRequestMessage::_impl()
 {
 	return this;
@@ -49,7 +48,6 @@ const char* TIDorb::core::comm::iiop::GIOPLocateRequestMessage::_typeid()
 	//return CORBA::string_dup("GIOPLocateRequestMessage");
 	return "GIOPLocateRequestMessage";
 }
-//EMLG
 
 
 TIDorb::core::comm::iiop::GIOPLocateRequestMessage::GIOPLocateRequestMessage

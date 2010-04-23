@@ -43,8 +43,8 @@ namespace iiop {
 class GIOPRequestMessage : public GIOPFragmentedMessage {
 private:
 
-  ServiceContextList* service_context_list;
-  bool service_context_list_owner;
+  ServiceContextList*     _service_context_list;
+  bool                    _service_context_list_owner;
 protected:
 
   void insert_request_header_1_0(const TIDorb::core::RequestImpl* request,

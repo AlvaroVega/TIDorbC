@@ -46,7 +46,7 @@ namespace TIDorb {
 namespace core {
   
   class EnvironmentImpl : public CORBA::Environment
-                        //jagd  public TIDThr::RecursiveMutex
+                        // public TIDThr::RecursiveMutex
   {
     public:
 

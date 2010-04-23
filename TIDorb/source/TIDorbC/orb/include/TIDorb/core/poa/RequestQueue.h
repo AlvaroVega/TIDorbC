@@ -204,6 +204,7 @@ private:
 
   TIDorb::core::poa::QueueReaderManager* _reader;
   TIDorb::core::poa::POAManagerImpl* _poaManager;
+  TIDorb::core::poa::ThreadPool* _thread_pool;
   bool _deactivation;
   
   typedef priority_queue<QueuedRequest*, deque<QueuedRequest*>,

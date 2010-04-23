@@ -48,8 +48,6 @@ CORBA::Object_ptr PortableServer::DynamicImplementation::_this()
   {
     PortableServer::POA_var poa = _default_POA();
 
-    //jagd
-    //if(CORBA::is_nil(poa))
     if(!(poa))
       throw PortableServer::POA::WrongPolicy();
 

@@ -97,15 +97,12 @@ void TIDorb::core::comm::miop::GroupIIOPProfile::write(TIDorb::core::cdr::CDROut
   TIDThr::Synchronized synchro(*((GroupIIOPProfile*) this));
   
   if (!_component_data) {
-    //TIDorb::core::TIDORB* orb = dynamic_cast<TIDorb::core::TIDORB*>(out.orb());
     TIDorb::core::TIDORB* orb = (TIDorb::core::TIDORB*)(out.orb());
     TIDorb::core::cdr::CDROutputStream encapsulation(orb, new TIDorb::core::cdr::BufferCDR(TIDorb::core::ConfORB::DEFAULT_BLOCK_SIZE));
                        
     encapsulation.write_boolean(encapsulation.get_byte_order());
     _iiop_profile.partial_write(encapsulation);
     
-//     ((GroupIIOPProfile*) this)->_component_data = dynamic_cast<TIDorb::core::cdr::CDRInputStream*>
-//                                                   (encapsulation.create_input_stream());
     ((GroupIIOPProfile*) this)->_component_data = (TIDorb::core::cdr::CDRInputStream*)
                                                   (encapsulation.create_input_stream());
   }

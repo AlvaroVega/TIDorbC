@@ -292,8 +292,10 @@ ThreadGroup::attrCopy(const pthread_attr_t* from, pthread_attr_t* to)
     size_t size;
     
 // #if !defined(__linux__)
+#if !defined(__CYGWIN__)
     pthread_attr_getguardsize(from, &size);
     pthread_attr_setguardsize(to, size);
+#endif
 // #endif
     pthread_attr_getstacksize(from, &size);
     pthread_attr_setstacksize(to, size);

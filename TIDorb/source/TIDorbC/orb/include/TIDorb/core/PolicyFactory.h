@@ -45,6 +45,8 @@
 #include "FT.h"
 #include "Messaging.h"
 #include "ZIOP.h"
+#include "SecurityLevel2.h"
+#include "Security.h"
 
 namespace TIDorb {
 namespace core {
@@ -141,6 +143,14 @@ class PolicyFactory {
 
     static TIDorb::core::ziop::CompressionMinRatioPolicyImpl*
       create_CompressionMinRatioPolicyImpl(const CORBA::Any& val)
+      throw(CORBA::PolicyError);
+
+    static TIDorb::core::security::QOPPolicyImpl*
+      create_QOPPolicyImpl(const CORBA::Any& val)
+      throw(CORBA::PolicyError);
+
+    static TIDorb::core::security::EstablishTrustPolicyImpl*
+      create_EstablishTrustPolicyImpl(const CORBA::Any& val)
       throw(CORBA::PolicyError);
 
 };

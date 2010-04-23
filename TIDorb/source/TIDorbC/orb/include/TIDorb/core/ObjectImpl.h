@@ -59,6 +59,8 @@ class ObjectImpl : public virtual TIDorb::portable::Stub
                                             CORBA::SetOverrideType set_or_add);
     CORBA::PolicyList_ptr _get_policy_overrides(const CORBA::PolicyTypeSeq& types);
 
+    CORBA::DomainManagerList* _get_domain_managers();
+
   protected:
     static CORBA::RepositoryIdSeq_ptr __init_ids();
     static const CORBA::RepositoryIdSeq_ptr __ids;

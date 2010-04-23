@@ -1,0 +1,19 @@
+This release of TIDorbC++ was built on a machine with kernel:
+Linux jack 2.6.18-128.el5xen #1 SMP Wed Dec 17 12:01:40 EST 2008 x86_64 x86_64 x86_64 GNU/Linux
+
+using the compiler:
+gcc version 4.1.2 20080704 (Red Hat 4.1.2-46)
+
+kernel source package used:
+linux-source-2.6.18 x86_64
+
+applied kernel patches:
+2.6.18-128.el5xen
+
+using the following libraries:
+gcc-4.1.2-46.el5_4.1
+make-3.81-3.el5
+binutils-2.17.50.0.6-12.el5
+glibc-2.5-42
+glibc-devel-2.5-42
+TIDIdlc_1.3.11

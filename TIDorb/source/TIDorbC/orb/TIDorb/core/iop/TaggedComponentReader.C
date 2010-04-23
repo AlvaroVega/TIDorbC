@@ -50,7 +50,6 @@ TIDorb::core::iop::TaggedComponentReader::read(TIDorb::core::cdr::CDRInputStream
         switch(profile_id) {
                 case TAG_ORB_TYPE:
                 {
-                  //PENDIENTE - MCPG
                   ORBComponent* orb_component = new ORBComponent();
                   orb_component->partial_read(input);
                   return orb_component;
@@ -98,6 +97,22 @@ TIDorb::core::iop::TaggedComponentReader::read(TIDorb::core::cdr::CDRInputStream
                   policies = new TIDorb::core::messaging::PoliciesComponent();
                   policies->partial_read(input);
                   return policies;
+                }
+
+                case TAG_SSL_SEC_TRANS:
+                {
+                  TIDorb::core::comm::ssliop::SSLComponent* ssl_component;
+                  ssl_component = new TIDorb::core::comm::ssliop::SSLComponent();
+                  ssl_component->partial_read(input);
+                  return ssl_component;
+                }
+
+                case TAG_CSI_SEC_MECH_LIST:
+                {
+                  TIDorb::core::security::CSIComponent* csi_component;
+                  csi_component = new TIDorb::core::security::CSIComponent();
+                  csi_component->partial_read(input);
+                  return csi_component;
                 }
 
                 default:

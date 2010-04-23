@@ -55,6 +55,9 @@ class SocketImpl : public virtual SocketOptions
     friend class ServerSocket;
     friend class PlainSocketImpl;
 
+    friend class SSLSocket;
+    friend class SSLServerSocket;
+
     protected:
         // Virtual destructor
         virtual ~SocketImpl()

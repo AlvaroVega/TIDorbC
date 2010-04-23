@@ -153,11 +153,10 @@ void TIDorb::core::typecode::ArrayTypeCode::partial_unmarshal(TIDorb::core::cdr:
 {
   TIDorb::core::cdr::CDRInputStream* encapsulation = input.read_encapsulation();
 
-//FRAN
   if(m_element_type){
     CORBA::release(m_element_type);
   }
-//EFRAN
+
   encapsulation->read_TypeCode(m_element_type);
   encapsulation->read_ulong(m_length);
 
@@ -180,10 +179,7 @@ void TIDorb::core::typecode::ArrayTypeCode::remarshal_value
    TIDorb::core::cdr::CDROutputStream& output) const
 {
   TypeCodeImpl* tc_impl = 
-  //dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd 
-  //(TypeCodeImpl*)m_element_type->_impl();
-  (TypeCodeImpl*)m_element_type;
+    (TypeCodeImpl*)m_element_type;
 
   for (CORBA::ULong i = 0; i < m_length; i++)
     tc_impl->remarshal_value(input, output);
@@ -197,10 +193,7 @@ bool TIDorb::core::typecode::ArrayTypeCode::values_equal
    TIDorb::core::cdr::CDRInputStream& b_input) const
 {
   TypeCodeImpl* tc_impl =
-  //dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd 
-  //(TypeCodeImpl*)m_element_type->_impl();
-  (TypeCodeImpl*)m_element_type;
+    (TypeCodeImpl*)m_element_type;
 
   for (CORBA::ULong i = 0; i < m_length; i++) {
     if (!tc_impl->values_equal(a_input, b_input))
@@ -215,10 +208,7 @@ bool TIDorb::core::typecode::ArrayTypeCode::values_equal
 void TIDorb::core::typecode::ArrayTypeCode::dump (ostream& output) const
 {
   TypeCodeImpl* tc_impl = 
-  //dynamic_cast<TypeCodeImpl*>(m_element_type);
-  // jagd 
-  //(TypeCodeImpl*)m_element_type->_impl();
-  (TypeCodeImpl*)m_element_type;
+    (TypeCodeImpl*)m_element_type;
   
   output << "[TYPECODE]{";
   tc_impl->dump(output);
@@ -233,10 +223,7 @@ bool TIDorb::core::typecode::ArrayTypeCode::dump_value
    ostream& output) const
 {
   TypeCodeImpl* tc_impl =
-  //dynamic_cast<TypeCodeImpl*>(m_element_type);
-  //jagd
-  //(TypeCodeImpl*)m_element_type->_impl();  
-  (TypeCodeImpl*)m_element_type;  
+    (TypeCodeImpl*)m_element_type;  
 
   output << "[VALUE]{";
 

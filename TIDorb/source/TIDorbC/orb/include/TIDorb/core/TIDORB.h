@@ -41,9 +41,7 @@
 #include "DynamicAny.h"
 
 #include "TIDorb/core.h"
-//MLG
 #include "TIDorb/core/typecode/TypeCodeCache.h"
-//EMLG
 #include "TIDorb/core/compression.h"
 
 #ifndef _TIDorb_core_TIDORB_H_
@@ -79,10 +77,14 @@ namespace TIDorb {
 namespace core {
 
 
+void init();
+
+
 class TIDORB : public TIDorb::portable::ORB,
                public TIDThr::Monitor
 {
   friend class CORBA::ORB;
+  friend void init ();
 
   public:
 
@@ -98,12 +100,8 @@ class TIDORB : public TIDorb::portable::ORB,
 
     static ::CORBA::ORB_ptr default_ORB();
 
-    //PRA
-    //::TIDorb::portable::OutputStream* create_output_stream();
-    //::CORBA::Any* create_any();
     ::TIDorb::portable::OutputStream* create_output_stream() const;
     ::CORBA::Any* create_any() const;
-    //EPRA
 
     const ConfORB& conf() const;
 
@@ -156,6 +154,10 @@ class TIDORB : public TIDorb::portable::ORB,
     TIDorb::core::PolicyContextManagerImpl* getPolicyContextManager();
 
     TIDorb::core::compression::CompressionManagerImpl* getCompressionManager();
+
+    TIDorb::core::DomainManagerImpl* getDefaultDomainManager();
+
+    TIDorb::core::security::SecurityManagerImpl* getSecurityManager();
 
     TIDorb::core::RequestCounter* getRequestCounter();
 
@@ -255,6 +257,8 @@ class TIDORB : public TIDorb::portable::ORB,
     CORBA::Object_ptr init_PolicyManager();
     CORBA::Object_ptr init_PolicyCurrent();
     CORBA::Object_ptr init_CompressionManager();
+    CORBA::Object_ptr init_DefaultDomainManager();
+    CORBA::Object_ptr init_SecurityManager();
 
     void remove_POA();
 
@@ -271,9 +275,7 @@ class TIDORB : public TIDorb::portable::ORB,
 
     void print_dump(TIDorb::util::TraceLevel level, const unsigned char* message, size_t length);
                      
-//MLG
     typecode::TypeCodeCache* getTypeCodeCache();
-//EMLG
     
     /* Trace Service */
     TIDorb::util::Trace* trace;
@@ -291,10 +293,10 @@ class TIDORB : public TIDorb::portable::ORB,
     CORBA::Object_ptr corbaname_url_to_object(const char* str) throw(CORBA::SystemException);
     CORBA::Object_ptr tidorb_url_to_object(const char* str) throw(CORBA::SystemException);
     CORBA::Object_ptr iiop_url_to_object(const char* str) throw(CORBA::SystemException);
-    // pra@tid.es - MIOP extensions
+    // MIOP extensions
     CORBA::Object_ptr miop_url_to_object(const char* str) throw(CORBA::SystemException);
     // end MIOP extensions
-
+    CORBA::Object_ptr ssliop_url_to_object(const char* str) throw(CORBA::SystemException);
 
     //ORB instances tracking
 
@@ -303,9 +305,10 @@ class TIDORB : public TIDorb::portable::ORB,
     static ORBTable st_orb_instances;
     static TIDThr::RecursiveMutex* st_init_mutex;
 
-//MLG
+    // Library correctly initializated
+    static bool st_initialized;
+
     typecode::TypeCodeCache* m_typecode_cache;
-//EMLG
     
     ConfORB m_conf;
 
@@ -341,6 +344,10 @@ class TIDORB : public TIDorb::portable::ORB,
     TIDorb::core::PolicyContextManagerImpl* policy_context_manager;
     
     TIDorb::core::compression::CompressionManagerImpl* compression_manager;
+
+    TIDorb::core::DomainManagerImpl* default_domain_manager;
+
+    TIDorb::core::security::SecurityManagerImpl* security_manager;
 
     /* Maintains the order which the request was created */
     TIDorb::core::RequestCounter* requestCounter;

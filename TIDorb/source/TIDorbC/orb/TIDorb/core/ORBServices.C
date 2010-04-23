@@ -52,6 +52,7 @@ const char*  TIDorb::core::ORBServices::TYPED_NOTIFICATION_SERVICE_ID = "TypedNo
 const char*  TIDorb::core::ORBServices::CODEC_FACTORY_ID              = "CodecFactory";
 const char*  TIDorb::core::ORBServices::PI_CURRENT_ID                 = "PICurrent";
 const char*  TIDorb::core::ORBServices::COMPRESSION_MANAGER_ID        = "CompressionManager";
+const char*  TIDorb::core::ORBServices::SECURITY_MANAGER_ID           = "SecurityManager";
 
 
 const TIDorb::core::ORBServices::ServiceCodeTable*  TIDorb::core::ORBServices::st_service_code_table =
@@ -77,6 +78,7 @@ TIDorb::core::ORBServices::ServiceCodeTable* TIDorb::core::ORBServices::int_serv
   (*table)[CODEC_FACTORY_ID]              = CODEC_FACTORY;
   (*table)[PI_CURRENT_ID]                 = PI_CURRENT;
   (*table)[COMPRESSION_MANAGER_ID]        = COMPRESSION_MANAGER;
+  (*table)[SECURITY_MANAGER_ID]           = SECURITY_MANAGER;
 
   return table;
 }
@@ -88,23 +90,6 @@ TIDorb::core::ORBServices::ORBServices(TIDorb::core::TIDORB* orb)
  : m_orb(orb)
 
 {
-  //jagd 2
-  /*
-  m_service_table[ROOT_POA_ID] = CORBA::Object::_nil();
-  m_service_table[POA_CURRENT_ID] = CORBA::Object::_nil();
-  m_service_table[INTERFACE_REPOSITORY_ID] = CORBA::Object::_nil();
-  m_service_table[NAME_SERVICE_ID] = CORBA::Object::_nil();
-  m_service_table[TRADING_SERVICE_ID] = CORBA::Object::_nil();
-  m_service_table[SECURITY_CURRENT_ID] = CORBA::Object::_nil();
-  m_service_table[TRANSACTION_CURRENT_ID] = CORBA::Object::_nil();
-  m_service_table[DYN_ANY_FACTORY_ID] = CORBA::Object::_nil();
-  m_service_table[ORB_POLICY_MANAGER_ID] = CORBA::Object::_nil();
-  m_service_table[POLICY_CURRENT_ID] = CORBA::Object::_nil();
-  m_service_table[NOTIFICATION_SERVICE_ID] = CORBA::Object::_nil();
-  m_service_table[TYPED_NOTIFICATION_SERVICE_ID] = CORBA::Object::_nil();
-  m_service_table[CODEC_FACTORY_ID] = CORBA::Object::_nil();
-  m_service_table[PI_CURRENT_ID] = CORBA::Object::_nil();
-  */ 
   m_service_table[ROOT_POA_ID] = 0;
   m_service_table[POA_CURRENT_ID] =0; 
   m_service_table[INTERFACE_REPOSITORY_ID] = 0;
@@ -120,6 +105,7 @@ TIDorb::core::ORBServices::ORBServices(TIDorb::core::TIDORB* orb)
   m_service_table[CODEC_FACTORY_ID] = 0;
   m_service_table[PI_CURRENT_ID] = 0;
   m_service_table[COMPRESSION_MANAGER_ID] = 0;
+  m_service_table[SECURITY_MANAGER_ID] = 0;
 }
 
 void TIDorb::core::ORBServices::destroy()
@@ -130,9 +116,7 @@ void TIDorb::core::ORBServices::destroy()
   while(p != endp)
   {
     CORBA::release((*p).second);
-//MLG
     p++;
-//EMLG        
   }
   
   ValueFactoryTable::iterator q = m_value_factory_table.begin();
@@ -140,9 +124,7 @@ void TIDorb::core::ORBServices::destroy()
   while(q != endq)
   {
     ((*q).second)->_remove_ref();
-//MLG
     q++;
-//EMLG        
   }
   
   m_service_table.clear();
@@ -201,8 +183,6 @@ throw (CORBA::ORB::InvalidName, CORBA::SystemException)
 
   ORBServiceCode orb_service_val = (*p).second;
 
-  //jagd 2
-  //CORBA::Object_ptr obj = CORBA::Object::_nil();
   CORBA::Object_ptr obj = 0;
 
   switch (orb_service_val)
@@ -249,6 +229,12 @@ throw (CORBA::ORB::InvalidName, CORBA::SystemException)
       m_service_table[COMPRESSION_MANAGER_ID] = obj;
       return CORBA::Object::_duplicate(obj);
     }
+    case SECURITY_MANAGER:
+    {
+      obj = m_orb->init_SecurityManager();
+      m_service_table[SECURITY_MANAGER_ID] = obj;
+      return CORBA::Object::_duplicate(obj);
+    }
     case INTERFACE_REPOSITORY:
     case NAME_SERVICE:
     case TRADING_SERVICE:
@@ -276,8 +262,6 @@ throw (CORBA::ORB::InvalidName, CORBA::SystemException)
   if(!object_name)
   throw CORBA::BAD_PARAM(0, CORBA::COMPLETED_NO);
 
-  //jagd 2
-  //  if(CORBA::is_nil(obj))
   if(!(obj))
   throw CORBA::BAD_PARAM(24, CORBA::COMPLETED_NO);
 
@@ -327,8 +311,6 @@ CORBA::Object_ptr obj)
   if(!object_name)
   throw CORBA::BAD_PARAM(0, CORBA::COMPLETED_NO);
 
-   //jagd 2
-   //if(CORBA::is_nil(obj))
   if(!(obj))
   throw CORBA::BAD_PARAM(24, CORBA::COMPLETED_NO);
 

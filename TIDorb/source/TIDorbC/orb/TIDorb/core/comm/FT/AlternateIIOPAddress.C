@@ -95,7 +95,6 @@ void TIDorb::core::comm::FT::AlternateIIOPAddress::write(TIDorb::core::cdr::CDRO
   TIDThr::Synchronized synchro(*((AlternateIIOPAddress*) this));
   
   if (!_component_data) {
-    //TIDorb::core::TIDORB* orb = dynamic_cast<TIDorb::core::TIDORB*>(out.orb());
     TIDorb::core::TIDORB* orb = (TIDorb::core::TIDORB*)(out.orb());
     TIDorb::core::cdr::CDROutputStream encapsulation(orb, new TIDorb::core::cdr::BufferCDR(TIDorb::core::ConfORB::DEFAULT_BLOCK_SIZE));
                        

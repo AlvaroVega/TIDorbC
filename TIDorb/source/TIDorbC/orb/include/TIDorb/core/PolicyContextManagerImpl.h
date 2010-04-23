@@ -57,19 +57,19 @@
 namespace TIDorb {
 namespace core {
 
-class PolicyContextManagerImpl: public virtual TIDThr::Mutex
+class PolicyContextManagerImpl: public virtual TIDThr::RecursiveMutex
 {
 protected:
   TIDorb::core::TIDORB* m_orb;
   
   int CLEANUP_ROUND;
 
-  // typedef map<TIDThr::Thread*, TIDorb::core::PolicyContext*> ThreadContextMapT;
   typedef map<TIDThr::ThreadHandle, TIDorb::core::PolicyContext*> ThreadContextMapT;
   ThreadContextMapT m_thread_contexts;   
   
   int m_cleanup_round;
 
+  TIDorb::core::ConfORB& m_conf;
 
 public:
  
@@ -83,6 +83,7 @@ public:
 
   TIDorb::core::PolicyContext* tryToGetThreadContext(TIDThr::Thread* th);
 
+private:
   void clear_contexts();
 
 };

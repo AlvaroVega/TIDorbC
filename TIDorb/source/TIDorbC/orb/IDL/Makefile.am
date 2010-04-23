@@ -10,6 +10,7 @@ SUBDIRS = \
    09_PortableGroup \
    10_Messaging \
    11_Compression \
+   12_Security \
    .
 
 AM_CPPFLAGS = \
@@ -42,7 +43,8 @@ libTIDorbIdl_la_LIBADD = \
    $(top_builddir)/source/TIDorbC/orb/IDL/08_FT/libTIDorbIdl_FT.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/09_PortableGroup/libTIDorbIdl_PortableGroup.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/10_Messaging/libTIDorbIdl_Messaging.la \
-   $(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/libTIDorbIdl_Compression.la
+   $(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/libTIDorbIdl_Compression.la \
+   $(top_builddir)/source/TIDorbC/orb/IDL/12_Security/libTIDorbIdl_Security.la
 
 libTIDorbIdl_la_LDFLAGS = \
 	-avoid-version

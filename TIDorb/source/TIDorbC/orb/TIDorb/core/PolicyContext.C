@@ -406,6 +406,31 @@ void PolicyContext::write(TIDorb::core::cdr::CDROutputStream& output) const
         delete encapsulation;
         break;
       }
+    case Security::SecQOPPolicy:
+      {
+        SecurityLevel2::QOPPolicy_ptr policy = 
+          SecurityLevel2::QOPPolicy::_narrow((*it).second);
+        output.write_ulong(policy->policy_type());
+        TIDorb::core::cdr::CDROutputStream* encapsulation = output.create_encapsulation();
+        encapsulation->write_ulong(policy->qop());
+        output.write_buffer(*(encapsulation->get_buffer()));
+        CORBA::release(policy);
+        delete encapsulation;
+        break;
+      }
+    case Security::SecEstablishTrustPolicy:
+      {
+        SecurityLevel2::EstablishTrustPolicy_ptr policy = 
+          SecurityLevel2::EstablishTrustPolicy::_narrow((*it).second);
+        output.write_ulong(policy->policy_type());
+        TIDorb::core::cdr::CDROutputStream* encapsulation = output.create_encapsulation();
+        encapsulation->write_boolean(policy->trust().trust_in_client);
+        encapsulation->write_boolean(policy->trust().trust_in_target);
+        output.write_buffer(*(encapsulation->get_buffer()));
+        CORBA::release(policy);
+        delete encapsulation;
+        break;
+      }
 
     default:
       {
@@ -468,10 +493,10 @@ void PolicyContext::dump(ostream& out)
         Messaging::RequestStartTimePolicy_ptr policy = 
           Messaging::RequestStartTimePolicy::_narrow((*it).second);
         out << "\t\tMESSAGING::REQUEST_START_TIME" << "=";
-//         encapsulation->write_ulonglong(policy->start_time().time);
-//         encapsulation->write_ulong(policy->start_time().inacclo);
-//         encapsulation->write_ushort(policy->start_time().inacchi);
-//         encapsulation->write_short(policy->start_time().tdf);
+        out << " ( " << policy->start_time().time << " , ";
+        out << policy->start_time().inacclo << " , ";
+        out << policy->start_time().inacchi << " , ";
+        out << policy->start_time().tdf << " )";
         out << endl;
         CORBA::release(policy);
         break;
@@ -481,8 +506,8 @@ void PolicyContext::dump(ostream& out)
         Messaging::RequestPriorityPolicy_ptr policy = 
           Messaging::RequestPriorityPolicy::_narrow((*it).second);
         out << "\t\tMESSAGING::REQUEST_PRIORITY_POLICY_TYPE" << "=";
-//         encapsulation->write_short(policy->priority_range().min);
-//         encapsulation->write_short(policy->priority_range().max);
+        out << "( " << policy->priority_range().min << " , ";
+        out << policy->priority_range().max << " )";
         out << endl;
         CORBA::release(policy);
         break;
@@ -492,10 +517,10 @@ void PolicyContext::dump(ostream& out)
         Messaging::RequestEndTimePolicy_ptr policy = 
           Messaging::RequestEndTimePolicy::_narrow((*it).second);
         out << "\t\tMESSAGING::REQUEST_END_TIME_POLICY_TYPE" << "=";
-//         encapsulation->write_ulonglong(policy->end_time().time);
-//         encapsulation->write_ulong(policy->end_time().inacclo);
-//         encapsulation->write_ushort(policy->end_time().inacchi);
-//         encapsulation->write_short(policy->end_time().tdf);
+        out << " ( " << policy->end_time().time << " , ";
+        out << policy->end_time().inacclo << " , ";
+        out << policy->end_time().inacchi << " , ";
+        out << policy->end_time().tdf << " )";
         out << endl;
         CORBA::release(policy);
         break;
@@ -518,6 +543,25 @@ void PolicyContext::dump(ostream& out)
           out << "NORMAL" << endl;
         else
           out << "BOTH" << endl;
+        CORBA::release(policy);
+        break;
+      }
+    case Security::SecQOPPolicy:
+      {
+        SecurityLevel2::QOPPolicy_ptr policy = 
+          SecurityLevel2::QOPPolicy::_narrow((*it).second);
+        out << "\t\tSecurityLevel2::QOP_POLICY" << "=";
+        out << policy->qop() << endl;
+        CORBA::release(policy);
+        break;
+      }
+    case Security::SecEstablishTrustPolicy:
+      {
+        SecurityLevel2::EstablishTrustPolicy_ptr policy = 
+          SecurityLevel2::EstablishTrustPolicy::_narrow((*it).second);
+        out << "\t\tSecurityLevel2::QOP_POLICY" << "=";
+        out << policy->trust().trust_in_client << endl;
+        out << policy->trust().trust_in_target << endl;
         CORBA::release(policy);
         break;
       }

@@ -43,7 +43,6 @@ namespace core {
 namespace comm {
 namespace iiop {
     
-//MLG
 void* GIOPFragmentMessage::_impl()
 {
 	return this;
@@ -54,7 +53,6 @@ const char* GIOPFragmentMessage::_typeid()
 	//return CORBA::string_dup("GIOPFragmentMessage");
 	return "GIOPFragmentMessage";
 }
-//EMLG
 
 CORBA::ULong
 GIOPFragmentMessage::FRAGMENT_HEADER_SIZE_1_1 =

@@ -1,6 +1,6 @@
 /*//////////////////////////////////////////////////////////////////////////////////
 //
-// File:        BooleanHolder.h
+// File:        TIDorb/core/util/BooleanHolder.h
 // Description: 
 //
 // Rel:         01.00
@@ -73,7 +73,6 @@ class BooleanHolder : public TIDorb::portable::Streamable {
 
     CORBA::TypeCode_ptr _type() const {
         return CORBA::TypeCode::_duplicate(CORBA::_tc_boolean);
-	//return TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(CORBA::tk_boolean);
     }
 
 };

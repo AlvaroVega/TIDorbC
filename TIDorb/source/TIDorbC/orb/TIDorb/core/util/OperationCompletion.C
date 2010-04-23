@@ -65,10 +65,7 @@ void TIDorb::core::util::OperationCompletion::wait_for_completion(int timeout)
   throw (TIDThr::InterruptedException, TIDorb::core::util::OnlyOneThreadCanWait)
 {
 
-//TODO: revisar esta solucion temporal al problema de los throws
-//PRA: bug #66 de TIDorbC en babel.hi.inet
 try {
-//EPRA  
 
   TIDThr::Synchronized synchro (*this);
 
@@ -82,11 +79,9 @@ try {
   // else do nothing, is completed
 
 
-//PRA: bug #66 de TIDorbC en babel.hi.inet
 } catch (const TIDThr::Exception& exc) {
   throw TIDThr::InterruptedException(exc.what());
 }
-//EPRA
 
 
 }

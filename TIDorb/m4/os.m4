@@ -21,6 +21,11 @@ AC_DEFUN([TID_CHECK_OS],
         AC_DEFINE([__darwin])
         AC_MSG_RESULT([Darwin])
         ;;
+      HP-UX)
+        AC_DEFINE([__hpux__])
+        AC_DEFINE([__hpux])
+        AC_MSG_RESULT([HP-UX])
+        ;;
       *)
         AC_MSG_RESULT([Unknown])
         ;;

@@ -585,8 +585,6 @@ DynamicAny::DynAny_ptr DynUnionImpl::current_component()
 
    if (_current == -1)
    {
-      //jagd
-      //return DynamicAny::DynAny::_nil();
       return 0;
    }
 
@@ -704,8 +702,6 @@ void DynUnionImpl::assign(DynamicAny::DynAny_ptr dyn_any)
       throw CORBA::OBJECT_NOT_EXIST("DynAny destroyed", 0, CORBA::COMPLETED_NO);
    }
 
-   //jagd
-   //if (CORBA::is_nil(dyn_any))
    if (!(dyn_any))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference", 0, CORBA::COMPLETED_NO);
@@ -816,8 +812,6 @@ CORBA::Boolean DynUnionImpl::equal(DynamicAny::DynAny_ptr dyn_any)
       throw CORBA::OBJECT_NOT_EXIST("DynAny destroyed", 0, CORBA::COMPLETED_NO);
    }
 
-   //jagd 
-   //if (CORBA::is_nil(dyn_any))
    if (!(dyn_any))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference", 0, CORBA::COMPLETED_NO);

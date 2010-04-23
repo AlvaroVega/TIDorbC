@@ -46,10 +46,7 @@ namespace TIDorb {
 namespace core {
 namespace poa {
 
-//PRA
-//class CompletionWaiter : public TIDThr::Monitor {
 class CompletionWaiter {
-//EPRA
 
 private:  
 
@@ -61,31 +58,22 @@ private:
   
 public:
 
-//MLG
-	//PRA
-	//CompletionWaiter(TIDorb::core::TIDORB* orb) throw(TIDThr::SystemException);
-	//~CompletionWaiter() throw(TIDThr::SystemException);
 	CompletionWaiter(TIDorb::core::TIDORB* orb);
 	~CompletionWaiter();
-	//EPRA
-//EMLG
 	
 	/**
    	* Begins a new request (increments active request counter).
    	*/
-  	//synchronized protected void beginRequest();
   	void beginRequest();
     
   	/**
    	* Ends a request (decrements active request counter and notifies).
    	*/
-  	//synchronized protected void endRequest();
   	void endRequest();
   	
   	/**
    	* @return Number of active requests.
    	*/
-  	//synchronized protected int getActiveRequests();
   	CORBA::ULong getActiveRequests();
   	
   	/**
@@ -97,13 +85,11 @@ public:
 	/**
    	* Waits until there are no active requests.
    	*/
-  	//synchronized protected void waitForCompletion();
   	void waitForCompletion();
   	
   	/**
    	* Stops waiting for completion.
    	*/
-  	//synchronized protected void stopWaiting();
   	void stopWaiting();
   	
    

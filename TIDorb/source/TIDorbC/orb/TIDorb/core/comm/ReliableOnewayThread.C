@@ -40,7 +40,7 @@
 
  
 TIDorb::core::comm::ReliableOnewayThread::ReliableOnewayThread 
-  (TIDorb::core::comm::IIOPCommLayer* commi, 
+  (TIDorb::core::comm::CommunicationLayer* commi, 
    TIDorb::core::RequestImpl* req,
    TIDorb::core::iop::IOR* iori, 
    TIDThr::ThreadGroup* group)

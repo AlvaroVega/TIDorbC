@@ -97,11 +97,7 @@ bool TIDorb::core::typecode::ObjectRefTypeCode::values_equal
   a_input.read_Object(obj_a);
   b_input.read_Object(obj_b);
 
-  //jagd
-  //if(CORBA::is_nil(obj_a)){
   if(!(obj_a)){
-    //jagd 
-    //if(CORBA::is_nil(obj_b)) {
     if(!(obj_b)) {
       return true;
     } else {
@@ -109,8 +105,6 @@ bool TIDorb::core::typecode::ObjectRefTypeCode::values_equal
     }
   }
 
-  //jagd
-  //if(CORBA::is_nil(obj_b))
   if(!(obj_b))
     return false;
 

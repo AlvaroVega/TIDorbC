@@ -20,7 +20,6 @@ namespace CORBA {
   
 inline char *string_alloc(ULong len)
 {
-  //  return new char[len+1];
   return (char*) malloc(len+1); // asumimos sizeof(char) = 1 !!
 }
 
@@ -31,15 +30,6 @@ inline char *string_dup(const char* str)
     return NULL;
   }
   else{
-    //     char *aux = NULL;
-    //     CORBA::ULong length = strlen(str);
-    
-    //     aux = CORBA::string_alloc(length);
-    //     if (length)
-    //       memcpy(aux, str, length);
-    //     aux[length] = '\0';
-    
-    //     return aux;
     return strdup(str);
   }
 
@@ -48,7 +38,6 @@ inline char *string_dup(const char* str)
 inline void string_free(char * str)
 {
   if (str != NULL){
-    //    delete[] str;
     free(str);
     str = NULL;
   }
@@ -56,8 +45,9 @@ inline void string_free(char * str)
 
 class String_var
 {
+#ifndef TIDORB_OLD_STRING_OUT
   friend class String_out;
-  
+#endif
   public:
     String_var(): m_ptr(0){}
     
@@ -134,7 +124,7 @@ class String_var
   private:
     char* m_ptr;
 };
-
+#ifndef TIDORB_OLD_STRING_OUT
 class String_out
 {
   public:
@@ -178,6 +168,9 @@ class String_out
       // assignment from String_var disallowed
       void operator=(const String_var&){}
 };
+#else
+typedef char*& String_out;
+#endif
 
 } // CORBA
 
@@ -187,11 +180,13 @@ inline ostream& operator<<(ostream& os, const ::CORBA::String_var& s)
   return os;  
 }
 
+#ifndef TIDORB_OLD_STRING_OUT
 inline ostream& operator<<(ostream& os, const ::CORBA::String_out& s)
 {
   os << (const char *) s;
   return os;  
 }
+#endif
 
 inline istream& operator>>(istream& is, ::CORBA::String_var& s)
 {
@@ -199,11 +194,12 @@ inline istream& operator>>(istream& is, ::CORBA::String_var& s)
   return is;  
 }
 
+#ifndef TIDORB_OLD_STRING_OUT
 inline istream& operator>>(istream& is, ::CORBA::String_out& s)
 {
   is >> (char *) s;
   return is;  
 }
-
+#endif
 
 #endif

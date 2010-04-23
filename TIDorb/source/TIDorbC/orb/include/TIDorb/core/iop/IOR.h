@@ -41,6 +41,9 @@
 #ifndef _TIDORB_CORE_IOP_IOR_H_
 #define _TIDORB_CORE_IOP_IOR_H_
 
+#include "SSLIOP.h"
+#include "CSIIOP.h"
+
 #include "TIDorb/util.h"
 #include "TIDThr.h"
 
@@ -135,6 +138,10 @@ public:
   TIDorb::core::comm::iiop::ObjectKey* object_key() const;
 
   TIDorb::core::PolicyContext* policies() const;
+
+  SSLIOP::SSL* get_SSL() const;
+
+  CSIIOP::CompoundSecMechList* get_CompoundSecMechList() const; 
 
 };
 }// iop

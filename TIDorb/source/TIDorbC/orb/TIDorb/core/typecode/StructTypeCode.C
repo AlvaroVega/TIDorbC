@@ -64,10 +64,8 @@ TIDorb::core::typecode::StructTypeCode::StructTypeCode(const char* id,
 TIDorb::core::typecode::StructTypeCode::~StructTypeCode()
   throw (TIDThr::SystemException)
 {
-//MLG
   if (m_members)
         delete m_members;
-//EMLG
 }
 
 

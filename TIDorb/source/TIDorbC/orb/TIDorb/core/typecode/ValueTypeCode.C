@@ -101,10 +101,8 @@ CORBA::Boolean ValueTypeCode::equal(CORBA::TypeCode_ptr tc) const
   if (m_value_modifier != value_tc->m_value_modifier)
     return false;
 
-  // pra@tid.es
   if (m_concrete_base == NULL)
     return (value_tc->m_concrete_base == NULL);
-  // end pra@tid.es
 
   if (!m_concrete_base->equal(value_tc->m_concrete_base))
     return false;
@@ -125,7 +123,7 @@ CORBA::Boolean ValueTypeCode::equal(CORBA::TypeCode_ptr tc) const
       return false;
   }
 
-  // alright
+  // allright
   return true;
 }
 
@@ -147,10 +145,8 @@ CORBA::Boolean ValueTypeCode::equivalent(CORBA::TypeCode_ptr tc) const
   if (m_value_modifier != value_tc->m_value_modifier)
     return false;
 
-  // pra@tid.es
   if (m_concrete_base == NULL)
     return (value_tc->m_concrete_base == NULL);
-  // end pra@tid.es
 
   if (!m_concrete_base->equal(value_tc->m_concrete_base))
     return false;
@@ -171,7 +167,7 @@ CORBA::Boolean ValueTypeCode::equivalent(CORBA::TypeCode_ptr tc) const
       return false;
   }
 
-  // alright
+  // allright
   return true;
 }
 
@@ -278,11 +274,9 @@ void ValueTypeCode::read_params
   CORBA::ULong length;
   input.read_ulong(length);
 
-//FRAN
   if (m_members) {
     delete m_members;
   }
-//EFRAN
  
   m_members = new CORBA::ValueMemberSeq();
 
@@ -319,8 +313,6 @@ bool ValueTypeCode::partial_skip_value
   TypeCodeImpl* tc = 0;
   for (CORBA::ULong i = 0; i < length; i++) {
     tc = NULL;
-    //jagd 
-    //tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)((*m_members)[i]).type)->_impl();
     tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)((*m_members)[i]).type);
     if (!tc || !tc->skip_value(input))
       return false;
@@ -353,8 +345,6 @@ void ValueTypeCode::partial_remarshal_value
   TypeCodeImpl* tc =0;
   for (CORBA::ULong i = 0; i < length; i++) {
     tc = NULL;
-    //jagd 
-    //tc =(TypeCodeImpl*)((CORBA::TypeCode_ptr)((*m_members)[i]).type)->_impl();
     tc =(TypeCodeImpl*)((CORBA::TypeCode_ptr)((*m_members)[i]).type);
     if (tc)
 	    tc->remarshal_value(input, output);
@@ -372,9 +362,7 @@ bool ValueTypeCode::values_equal
 
   TypeCodeImpl* tc =0;
   for (CORBA::ULong i = 0; i < length; i++) {
-  	tc = NULL;
-    //jagd 
-    //tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)((*m_members)[i]).type)->_impl();
+    tc = NULL;
     tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)((*m_members)[i]).type);
     if (!tc || !tc->values_equal(a_input, b_input))
       return false;
@@ -412,8 +400,6 @@ void ValueTypeCode::dump(ostream& output) const
 
   output << ", concrete base= ";
   tc = NULL;
-  //jagd 
-  //tc = (TypeCodeImpl*)(m_concrete_base)->_impl();
   tc = (TypeCodeImpl*)(m_concrete_base);
   if (tc)
     tc->dump(output);
@@ -424,8 +410,6 @@ void ValueTypeCode::dump(ostream& output) const
   for (CORBA::ULong i = 0; i < length; i++) {
     CORBA::ValueMember& member = (*m_members)[i];
     tc = NULL;
-    //jagd
-    //tc = (TypeCodeImpl*) ((CORBA::TypeCode_ptr) member.type)->_impl();
     tc = (TypeCodeImpl*) ((CORBA::TypeCode_ptr) member.type);
     output << member.name << ": ";
     if (tc)
@@ -450,8 +434,6 @@ bool ValueTypeCode::dump_value
   for (CORBA::ULong i = 0; i < length; i++) {
     CORBA::ValueMember& member = (*m_members)[i];
     tc = NULL;
-    //jagd
-    //tc = (TypeCodeImpl*) ((CORBA::TypeCode_ptr) member.type)->_impl();
     tc = (TypeCodeImpl*) ((CORBA::TypeCode_ptr) member.type);
     output << '(' << i << ") " << member.name << ": ";
     if (!tc || !tc->dump_value(input, output))

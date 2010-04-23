@@ -66,7 +66,7 @@ CORBA::OctetSeq* TIDorb::core::CodecImpl::encode(const CORBA::Any& data)
 
   TIDorb::core::cdr::CDRInputStream input(m_orb, out.get_buffer());
 
-/* pra@tid.es: available() solo cuenta los bytes disponibles del chunk actual
+  /* available() solo cuenta los bytes disponibles del chunk actual
   CORBA::ULong length = input.available(); */
   CORBA::ULong length = input.buffer_available();
 
@@ -132,7 +132,7 @@ CORBA::OctetSeq* TIDorb::core::CodecImpl::encode_value(const CORBA::Any& data)
 
   TIDorb::core::cdr::CDRInputStream input(m_orb, out.get_buffer());
 
-/* pra@tid.es: available() solo cuenta los bytes disponibles del chunk actual
+  /* available() solo cuenta los bytes disponibles del chunk actual
   CORBA::ULong length = input.available(); */
   CORBA::ULong length = input.buffer_available();
 
@@ -148,8 +148,6 @@ CORBA::Any* TIDorb::core::CodecImpl::decode_value(const ::CORBA::OctetSeq& data,
                                                   CORBA::TypeCode_ptr tc)
   throw (IOP::Codec::FormatMismatch, IOP::Codec::TypeMismatch)
 {
-  //jagd 2
-  //if(CORBA::is_nil(tc))
   if(!(tc))
     throw CORBA::BAD_PARAM(0,CORBA::COMPLETED_NO);
 

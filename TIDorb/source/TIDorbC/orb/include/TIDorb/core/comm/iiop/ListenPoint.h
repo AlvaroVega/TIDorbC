@@ -55,11 +55,12 @@ private:
 public:
         char*         _host;
         CORBA::UShort _port;
+        CORBA::UShort _ssl_port;
         char*         _interface;
         char*         _incoming_interface;
         char*         _outgoing_interface;
 
-        // pra@tid.es - FT extensions
+        // FT extensions
         CORBA::Boolean _heartbeat_enabled;
         // end FT extensions
 

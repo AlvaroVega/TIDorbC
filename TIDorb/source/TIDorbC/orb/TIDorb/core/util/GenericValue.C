@@ -55,13 +55,9 @@ GenericValue::GenericValue(const GenericValue& value)
    
 void GenericValue::_read(TIDorb::portable::InputStream& input)
 {    
-    //jagd
-    //CDRInputStream& cdr_input = dynamic_cast< CDRInputStream& > (input);    
     CDRInputStream& cdr_input =  * ( CDRInputStream *)  (&input);    
     m_marshaled_value = cdr_input.get_pointer();
      
-    //jagd       
-    //ValueTypeCode* type = dynamic_cast<ValueTypeCode*> (m_type.in());
     ValueTypeCode* type = (ValueTypeCode*) (m_type.in());
         
     type->partial_skip_value(cdr_input);
@@ -72,11 +68,8 @@ void GenericValue::_write(TIDorb::portable::OutputStream& out) const
     if(m_marshaled_value.get_buffer()) {
         
         ValueTypeCode* type =
-            //jagd
-            //dynamic_cast<ValueTypeCode*> (m_type.in());
             (ValueTypeCode*) (m_type.in());
         
-        //CDROutputStream& cdr_output = dynamic_cast <CDROutputStream& > (out);
         CDROutputStream& cdr_output = *(CDROutputStream* )  (&out);
         
         CDRInputStream cdr_input (cdr_output.tidorb(), 

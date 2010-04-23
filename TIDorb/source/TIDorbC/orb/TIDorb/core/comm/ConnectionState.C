@@ -45,7 +45,6 @@ TIDorb::core::comm::ConnectionState::ConnectionState()
   connection_error = NULL;
 } 
 
-//FRAN
 TIDorb::core::comm::ConnectionState::~ConnectionState()
   throw (TIDThr::SystemException)
 {
@@ -54,7 +53,6 @@ TIDorb::core::comm::ConnectionState::~ConnectionState()
       connection_error = NULL;
   }
 }
-//EFRAN
 
 bool TIDorb::core::comm::ConnectionState::set_closing()
 {
@@ -68,9 +66,6 @@ bool TIDorb::core::comm::ConnectionState::set_closing()
 
 bool TIDorb::core::comm::ConnectionState::is_open()
 {
-  //jagd
-  //TIDThr::Synchronized synchro(*this);
-  
   return state == OPEN_STATE;
 }
   
@@ -83,20 +78,16 @@ bool TIDorb::core::comm::ConnectionState::set_error(const CORBA::COMM_FAILURE& t
     return false;
   } else if(state == CLOSING_STATE) {
     state = ERROR_STATE;
-//FRAN
     if (connection_error){
        delete connection_error;
     }
-//EFRAN
     connection_error = new CORBA::COMM_FAILURE(the_error);
     return false;
   } else { // OPEN_STATE
     state = ERROR_STATE;
-//FRAN
     if (connection_error){
        delete connection_error;
     }
-//EFRAN
     connection_error = new CORBA::COMM_FAILURE(the_error);
     return true;
   }
@@ -104,9 +95,6 @@ bool TIDorb::core::comm::ConnectionState::set_error(const CORBA::COMM_FAILURE& t
 
 short TIDorb::core::comm::ConnectionState::get_value()
 {
-  //jagd lector no necesita mutex
-  // TIDThr::Synchronized synchro(*this);
-    
   return state;
 }
 
@@ -120,8 +108,6 @@ const CORBA::COMM_FAILURE* TIDorb::core::comm::ConnectionState::get_error()
  */
 void TIDorb::core::comm::ConnectionState::verify_reply()
 {
-  //jagd lector no necesita mutex
-  //TIDThr::Synchronized synchro(*this);
   switch (state){
     case OPEN_STATE:
       return;
@@ -137,10 +123,6 @@ void TIDorb::core::comm::ConnectionState::verify_reply()
  */
 void TIDorb::core::comm::ConnectionState::verify_request() throw(TIDorb::core::comm::RECOVERABLE_COMM_FAILURE)
 {
-  
-  //jagd lector no necesita mutex
-  //TIDThr::Synchronized synchro(*this);
-
   switch (state){
     case OPEN_STATE:
       return;

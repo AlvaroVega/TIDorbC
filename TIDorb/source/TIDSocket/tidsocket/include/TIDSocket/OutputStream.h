@@ -63,6 +63,7 @@ namespace TIDSocket
 class OutputStream // caceres@tid.es 14/7/2004 : public virtual ofstream
 {
     friend class Socket;
+    friend class SSLSocket;
 
     public:
         // Constructor (timeout in milliseconds)
@@ -78,7 +79,7 @@ class OutputStream // caceres@tid.es 14/7/2004 : public virtual ofstream
     public:
         // Closes this output stream and releases any system resources
         // associated with this stream
-        void close()
+        virtual void close()
             throw(IOException);
 
         // Flushes this output stream and forces any buffered output bytes to
@@ -96,7 +97,7 @@ class OutputStream // caceres@tid.es 14/7/2004 : public virtual ofstream
 
         // Writes len bytes from the specified byte array starting at offset
         // off to this output stream
-        ssize_t write(const unsigned char* b,size_t size,size_t off,size_t len)
+        virtual ssize_t write(const unsigned char* b,size_t size,size_t off,size_t len)
             throw(IOException, IllegalBlockingModeException,
                   IndexOutOfBoundsException);
 

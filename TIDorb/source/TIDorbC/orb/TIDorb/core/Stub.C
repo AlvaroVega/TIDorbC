@@ -42,9 +42,8 @@ using TIDorb::core::ObjectDelegateImpl;
 TIDorb::portable::Stub::Stub()
   : m_delegate(0)
 {
-//MLG hereda de TIDorb::portable::RefCounter y empieza en 1
+  //  hereda de TIDorb::portable::RefCounter y empieza en 1
   //_count(1);
-//EMLG
 }
 
 
@@ -83,9 +82,8 @@ TIDorb::portable::Stub::~Stub()
 
   // search in known interface
 
-//MLG
   CORBA::RepositoryIdSeq* interf_ids = _ids();
-//EMLG
+
   if (interf_ids != NULL) {
     CORBA::ULong size = interf_ids->length();
 
@@ -102,11 +100,9 @@ TIDorb::portable::Stub::~Stub()
   CORBA::Any& pin_any = request->add_in_arg();
   pin_any <<= logical_type_id;
 
-//FRAN
   request->set_return_type(CORBA::_tc_boolean);
-//EFRAN
-  // Perform the invocation:
 
+  // Perform the invocation:
   request->invoke();
 
   CORBA::Exception* _exception = request->env()->exception();

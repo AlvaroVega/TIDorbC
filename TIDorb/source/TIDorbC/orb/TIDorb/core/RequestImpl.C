@@ -46,100 +46,53 @@ TIDorb::core::RequestImpl::RequestImpl(TIDorb::portable::Stub* target,
                                        ::CORBA::ExceptionList_ptr ex_list,
                                        ::CORBA::ContextList_ptr ctx_list,
                                        ::CORBA::Flags req_flags)
-  throw (TIDThr::SystemException): m_result("",0,0) //jagd 4
+  throw (TIDThr::SystemException): m_result("",0,0) 
 {
-//MLG
-//TODO cambiar que herede de monitor a que lo tenga como miembro
-//y hacer que herede de la TIDORB::portable::RefCounter
+
+  //TODO cambiar que herede de monitor a que lo tenga como miembro
+  //y hacer que herede de la TIDORB::portable::RefCounter
   _count(1);
-//EMLG
-  //jagd quita dynamic_cast
-  //m_target = dynamic_cast<TIDorb::portable::Stub*> (CORBA::Object::_duplicate(target));
+
   m_target=target;
   target->_add_ref();
-//MLG it owns the list
-//TODO is it necessary the dynamic_cast?
-  //m_orb = dynamic_cast<TIDorb::core::TIDORB*> (CORBA::ORB::_duplicate(m_target->_orb()));
-  //jagd 
-  //m_orb = dynamic_cast<TIDorb::core::TIDORB*> (m_target->_orb());
+  // it owns the list
   m_orb = (TIDorb::core::TIDORB*) (m_target->_orb());
-  //m_context = dynamic_cast<ContextImpl*>(CORBA::Context::_duplicate(ctx));
-  //jagd 
-  //m_context = dynamic_cast<ContextImpl*>(ctx);
+
   m_context = (ContextImpl*)(ctx);
   m_operation_name = operation;
-  //m_arguments = dynamic_cast<NVListImpl*>(CORBA::NVList::_duplicate(arg_list));
-  //m_arguments = dynamic_cast<NVListImpl*>(arg_list);
   m_arguments = (NVListImpl*)arg_list->_impl();
-  //m_result = dynamic_cast<NamedValueImpl*>(CORBA::NamedValue::_duplicate(result));
   if (result)
   {
-  //jagd
-  //	m_result = (NamedValueImpl*)CORBA::NamedValue::_duplicate(result)->_impl();
-  	//jagd 3m_result = (NamedValueImpl*)CORBA::NamedValue::_duplicate((NamedValueImpl*)result);
-  	//jagd 4 m_result = (NamedValueImpl*)result;
   	m_result = *(NamedValueImpl*)result;
-        ((NamedValueImpl*)result)->m_release_out=false; //nos hemos copiado el any y no lo queremos borrar
+        //nos hemos copiado el any y no lo queremos borrar
+        ((NamedValueImpl*)result)->m_release_out=false; 
   }
-  //jagd 4 else
-  //    m_result =NULL;
 
-
-  //m_exceptions = dynamic_cast<ExceptionListImpl*>(CORBA::ExceptionList::_duplicate(ex_list));
-  //jagd cambio por cast normal 
-  //m_exceptions = dynamic_cast<ExceptionListImpl*>(ex_list);
   m_exceptions = (ExceptionListImpl*)(ex_list);
-  //m_context_list = dynamic_cast<ContextListImpl*>(CORBA::ContextList::_duplicate(ctx_list));
-  //jagd
-  //m_context_list = dynamic_cast<ContextListImpl*>(ctx_list);
+
   m_context_list = (ContextListImpl*)(ctx_list);
- //EMLG 
+  
   m_release_out_params = req_flags & CORBA::OUT_LIST_MEMORY;
   
   m_completed = CORBA::COMPLETED_NO;
-  //jagd 3 m_env = new EnvironmentImpl();
   m_with_response = false;
   m_reliable_oneway = false; 
   m_request_id = 0;
  
-  /* jagd 4 codigo que no se usa  
-  if(m_arguments && (!m_release_out_params)) {
-    CORBA::ULong length = m_arguments->count();
-    for(CORBA::ULong i = 0; i < length; i++) {
-      //(dynamic_cast<NamedValueImpl*>(m_arguments->item(i)))->release_out(false);
-     //jagd
-     // ((NamedValueImpl*)m_arguments->item(i)->_impl())->release_out(false);
-     ((NamedValueImpl*)m_arguments->item(i))->release_out(false);
-    }
-  }
-  */ 
-
   m_policy_context = NULL;
 }
 
                 
 TIDorb::core::RequestImpl::~RequestImpl()  throw (TIDThr::SystemException)
 {
-  //jagd 2
-  //CORBA::release(m_context);
+
   delete (m_context);
-  //jagd
-  //CORBA::string_free(m_operation_name);
   CORBA::release(m_arguments);
-  //jagd 3
-  //CORBA::release(m_result);
-  //jagd 4 delete m_result;
-  //jagd
-  //CORBA::release(m_exceptions);
+
   delete m_exceptions;
   CORBA::release(m_context_list);
-  //jagd 3 CORBA::release(m_env);
-//MLG  
-  //CORBA::release(m_orb);
-//EMLG  
-//FRAN
+
   CORBA::release(m_target);
-//EFRAN
   
   if (m_policy_context != NULL)
     delete m_policy_context;
@@ -163,25 +116,17 @@ const char* TIDorb::core::RequestImpl::operation() const
 
 ::CORBA::NamedValue_ptr TIDorb::core::RequestImpl::result()
 {
-  //jagd 3 return CORBA::NamedValue::_duplicate(m_result);
-  //jagd 4return m_result;
   return &m_result;
 }
 
 ::CORBA::Environment_ptr TIDorb::core::RequestImpl::env()
 {
-//FRAN
-  //return CORBA::Environment::_duplicate(m_env);
   return &m_env;
-//EFRAN
 }
 
 ::CORBA::ExceptionList_ptr TIDorb::core::RequestImpl::exceptions()
 {
-//FRAN
-//  return CORBA::ExceptionList::_duplicate(m_exceptions);
   return m_exceptions;
-//EFRAN
 }
 
 ::CORBA::ContextList_ptr TIDorb::core::RequestImpl::contexts()
@@ -191,23 +136,12 @@ const char* TIDorb::core::RequestImpl::operation() const
 
 void TIDorb::core::RequestImpl::ctx(::CORBA::Context_ptr context)
 {
-  // jagd 2
-  //if(!CORBA::is_nil(m_context))
-  //if((m_context))
-  // jagd 2
-    //CORBA::release(m_context);
-    delete m_context;
-  //jagd
-  //m_context = dynamic_cast<ContextImpl*> (CORBA::Context::_duplicate(context));
-  //jagd 2 
-  //m_context = (ContextImpl*) (CORBA::Context::_duplicate(context));
+  delete m_context;
   m_context = (ContextImpl*) ((context));
 }
 
 ::CORBA::Context_ptr TIDorb::core::RequestImpl::ctx() const
 {
-  //jagd 2
-  //return CORBA::Context::_duplicate(m_context);  
   return (m_context);  
 }
 
@@ -244,51 +178,26 @@ void TIDorb::core::RequestImpl::ctx(::CORBA::Context_ptr context)
 ::CORBA::Any& TIDorb::core::RequestImpl::add_arg(const char* name, CORBA::Flags flags)
 {
   if(!m_arguments)
-    //jagd
-    //m_arguments = new NVListImpl(dynamic_cast< TIDORB* > (m_target->_orb()));
     m_arguments = new NVListImpl(m_orb);
   
-  //jagd 3 CORBA::NamedValue_var nv = m_arguments->add_item(name, flags);
   CORBA::NamedValue * nv = m_arguments->add_item(name, flags);
  
-  /* jagd 4 codigo que no se usa 
-  if((flags == CORBA::ARG_OUT) && (!m_release_out_params))
-    //(dynamic_cast<NamedValueImpl*>((CORBA::NamedValue_ptr) nv))->release_out(false);
-    //jagd ((NamedValueImpl*)((CORBA::NamedValue_ptr) nv)->_impl())->release_out(false);
-    ((NamedValueImpl*)nv)->release_out(false);
-  */ 
   return *(nv->value());
 
 }
 
 void TIDorb::core::RequestImpl::set_return_type(::CORBA::TypeCode_ptr tc)
 {
-  //jagd 4 if(m_result)
-  //jagd 3  CORBA::release(m_result);
-  //  delete (m_result);
-  
   CORBA::Any* any = m_target->_orb()->create_any();
-  // Fix bug [#392] Any::type(tc) reset any value
-  //any->type(tc);
   any->delegate().set_type(tc);
- //MLG _duplicate needed because NamedValueImpl should inherit from TIDorb::portable::RefCounter 
-  //m_result =  dynamic_cast<NamedValueImpl*>(CORBA::NamedValue::_duplicate(new NamedValueImpl(CORBA::string_dup(""), any, CORBA::ARG_OUT)));
-  //jagd 
-  //m_result =  (NamedValueImpl*)CORBA::NamedValue::_duplicate(new NamedValueImpl(CORBA::string_dup(""), any, CORBA::ARG_OUT))->_impl();
-  //jagd 3 m_result =  new NamedValueImpl(CORBA::string_dup(""), any, CORBA::ARG_OUT);
-  // jagd 4 m_result =  new NamedValueImpl("", any, CORBA::ARG_OUT);
+
   m_result.m_value= any;
   m_result.m_flags= CORBA::ARG_OUT;
-  //jagd 3 
-  //m_result->_add_ref(); 
-//EMLG
   
 }
 
 ::CORBA::Any& TIDorb::core::RequestImpl::return_value()
 {
-  //jagd 4if(m_result)
-  //  return *(m_result->value());
   if(m_result.m_value)
     return *(m_result.m_value);
   
@@ -301,8 +210,6 @@ void TIDorb::core::RequestImpl::invoke()
   try {
     m_with_response = true;
   
-    //jagd	
-    //ObjectDelegateImpl* delegate = dynamic_cast <ObjectDelegateImpl* > (m_target->_get_delegate());
     ObjectDelegateImpl* delegate = (ObjectDelegateImpl*) (m_target->_get_delegate());
       
     delegate->invoke(this); 
@@ -319,12 +226,7 @@ void TIDorb::core::RequestImpl::invoke()
     }
   }
 
-  //jagd 3 CORBA::Exception* e = m_env->exception();
   CORBA::Exception* e = m_env.exception();
-  
-  //jagd 
-  //CORBA::SystemException* se = CORBA::SystemException::_downcast(e);
-  //TODO jagd CORBA::SystemException* se = (CORBA::SystemException*)(e);
   
   if (e)
   {
@@ -344,8 +246,6 @@ void TIDorb::core::RequestImpl::send_oneway()
   
     m_with_response = false;
   
-    //jagd	
-    //ObjectDelegateImpl* delegate = dynamic_cast <ObjectDelegateImpl* > (m_target->_get_delegate());
     ObjectDelegateImpl* delegate = (ObjectDelegateImpl*)  (m_target->_get_delegate());
       
     delegate->oneway_request(this);
@@ -385,22 +285,16 @@ CORBA::CompletionStatus TIDorb::core::RequestImpl::get_completed() const
 
 void TIDorb::core::RequestImpl::set_user_exception(const CORBA::Any& exc) 
 {
-  //jagd 3 m_env->exception(new CORBA::UnknownUserException(exc));
   m_env.exception(new CORBA::UnknownUserException(exc));
 }
 
 void TIDorb::core::RequestImpl::set_system_exception(CORBA::SystemException* exc)
 {
-  //jagd 3 m_env->exception(exc);
   m_env.exception(exc);
 }
 
 void TIDorb::core::RequestImpl::read_result(TIDorb::portable::InputStream& input) 
 {
-  //jagd 4 if(m_result) {  
-  //  CORBA::TypeCode_var tc = m_result->value()->type(); 		
-  //  m_result->value()->delegate().read_value(input,tc);
-  //}
   if(m_result.m_value) {  
     CORBA::TypeCode_var tc = m_result.m_value->type(); 		
     m_result.m_value->delegate().read_value(input,tc);
@@ -472,9 +366,7 @@ TIDorb::core::PolicyContext* TIDorb::core::RequestImpl::getPolicyContext()
   if (m_policy_context == NULL) {
     
     ObjectDelegateImpl* delegate = (ObjectDelegateImpl*) (m_target->_get_delegate());
-//     ObjectDelegateImpl* delegate = 
-//       dynamic_cast <ObjectDelegateImpl* > (m_target->_get_delegate());
-    
+
     m_policy_context = delegate->createRequestPolicyContext();
   }
 
@@ -487,10 +379,9 @@ CORBA::Request_ptr CORBA::Request::_duplicate(CORBA::Request_ptr req)
 {
   try {
     
-    //TIDorb::core::RequestImpl* req_impl = dynamic_cast<TIDorb::core::RequestImpl*> (req);
     TIDorb::core::RequestImpl* req_impl = NULL;
-      //jagd
-    	req_impl = (TIDorb::core::RequestImpl*)req;
+    
+    req_impl = (TIDorb::core::RequestImpl*)req;
     
     if(req_impl)
       req_impl->_add_ref();
@@ -511,10 +402,9 @@ void CORBA::release(CORBA::Request_ptr req)
 {
   try {
     
-    //TIDorb::core::RequestImpl* req_impl= dynamic_cast<TIDorb::core::RequestImpl*> (req);
     TIDorb::core::RequestImpl* req_impl = NULL;
-    //jagd
-    	req_impl = (TIDorb::core::RequestImpl*)req;
+    
+    req_impl = (TIDorb::core::RequestImpl*)req;
     
     if(req_impl)
       req_impl->_remove_ref();

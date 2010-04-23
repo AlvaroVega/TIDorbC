@@ -58,7 +58,7 @@ namespace core {
   
 
   class NVListImpl: public CORBA::NVList //,
-                 //jagd 2 public TIDThr::RecursiveMutex
+                 // public TIDThr::RecursiveMutex
 {
   public:
     NVListImpl(){};
@@ -75,7 +75,7 @@ namespace core {
     CORBA::NamedValue_ptr add_value_consume(const char* item_name,CORBA::Any* value, CORBA::Flags flags);
     CORBA::NamedValue_ptr item(CORBA::ULong index);
     void remove(CORBA::ULong index);
-//MCPG
+
     static void read_params_out(CORBA::NVList_ptr list, TIDorb::core::cdr::CDRInputStream& input);
     static void write_params_out(CORBA::NVList_ptr list, TIDorb::core::cdr::CDROutputStream& output);
     static void read_params_in(CORBA::NVList_ptr list, TIDorb::core::cdr::CDRInputStream& input);

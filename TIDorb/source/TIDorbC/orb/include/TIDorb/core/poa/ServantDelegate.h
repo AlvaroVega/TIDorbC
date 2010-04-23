@@ -54,9 +54,7 @@ private:
     CORBA::ORB_ptr           _orb_deleg;
     PortableServer::POA_var  _poa;
     PortableServer::ObjectId _oid;
-    //PRA
     TIDorb::portable::ORB*   _orb;
-    //EPRA
 
 public:
 
@@ -80,10 +78,8 @@ public:
     * @param self The servant.
     * @return The ORB.
     */
-    //PRA
     const CORBA::ORB_ptr         orb(PortableServer::ServantBase* self);
     const TIDorb::portable::ORB* orb();
-    //EPRA
     
     /**
     * @param self The servant.

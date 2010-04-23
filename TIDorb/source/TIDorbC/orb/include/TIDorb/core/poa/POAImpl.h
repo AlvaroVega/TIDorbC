@@ -71,12 +71,8 @@ protected:
   TIDThr::RecursiveMutexHandle single_thread_recursive_mutex;
 
   CORBA::String_var _name;
-  //pra@tid.es
-  //CORBA::String_var _poa_string_name;
   char* _poa_string_name;
   CORBA::ULongLong _poa_id;
-  //jagd 
-  //vector<PortableServer::POA_var> _children;
   vector<POAImpl *> _children;
   PortableServer::POA_var _parent;
   TIDorb::core::poa::POAPath _path;
@@ -120,8 +116,6 @@ protected:
     * Find a POA among the POA's children.
     * @param poa_name The POA name.
     */
-    //jagd
-    //PortableServer::POA_ptr find_children(const char* poa_name);
     POAImpl* find_children(const char* poa_name);
 
     /**
@@ -479,7 +473,7 @@ public:
     *            If the object reference does not belong to this POA.
     * @exception PortableServer::POA::WrongPolicy
     *            If POA policies do not allow this operation.
-    * // pra@tid.es - MIOP extensions
+    * // MIOP extensions
     * @exception CORBA::INV_OBJREF
     *            If  reference is a Group Object reference.
     * // end MIOP extensions
@@ -496,7 +490,7 @@ public:
     *            If the object reference does not belong to this POA.
     * @exception PortableServer::POA::WrongPolicy
     *            If POA policies do not allow this operation.
-    * // pra@tid.es - MIOP extensions
+    * // MIOP extensions
     * @exception CORBA::INV_OBJREF
     *            If reference is a Group Object reference.
     * // end MIOP extensions

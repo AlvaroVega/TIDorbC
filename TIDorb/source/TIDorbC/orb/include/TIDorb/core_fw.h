@@ -81,6 +81,8 @@ namespace core {
   class PolicyManagerImpl;
   class PolicyCurrentImpl;
   class PolicyContextManagerImpl;
+  class ConstructionPolicyImpl;
+  class DomainManagerImpl;
 
   // FT extensions
   class HeartbeatPolicyImpl;
@@ -99,6 +101,7 @@ namespace core {
 #include "TIDorb/core/compression_fw.h"
 #include "TIDorb/core/ziop_fw.h"
 #include "TIDorb/core/poa_fw.h"
+#include "TIDorb/core/security_fw.h"
 
 
 

@@ -38,7 +38,6 @@
 #include "TIDorb/core.h"
 
 
-//MLG
 void* TIDorb::core::NamedValueImpl::_impl()
 {
 	return this;
@@ -49,7 +48,6 @@ const char* TIDorb::core::NamedValueImpl::_typeid()
 	//return CORBA::string_dup("NamedValueImpl");
 	return "NamedValueImpl";
 }
-//EMLG
 
 TIDorb::core::NamedValueImpl::NamedValueImpl(char* name,
                                              CORBA::Any* value, CORBA::Flags flags)  
@@ -78,16 +76,8 @@ TIDorb::core::NamedValueImpl::~NamedValueImpl()  throw (TIDThr::SystemException)
   if (m_consume_name)
     CORBA::string_free(m_name);
   
-// jagd 3
-//  CORBA::string_free(m_name);
-//MLG
-//TODO revisar condicion de borrado  
-//FRAN
-//  if(!((m_flags == CORBA::ARG_OUT) && m_release_out ))
-  if(m_release_out) //jagd 4
+  if(m_release_out)
   	delete m_value;
-//FRAN
-//EMLG
 }
 
 const char* TIDorb::core::NamedValueImpl::name() const
@@ -110,25 +100,6 @@ void TIDorb::core::NamedValueImpl::release_out(bool value)
 
 CORBA::NamedValue_ptr CORBA::NamedValue::_duplicate(CORBA::NamedValue_ptr nv)
 {
- /* 
-  try {
-    
-    //TIDorb::core::NamedValueImpl* nv_impl = dynamic_cast<TIDorb::core::NamedValueImpl*> (nv);
-    TIDorb::core::NamedValueImpl* nv_impl = NULL;
-   
-    //jagd 
-    	//nv_impl = (TIDorb::core::NamedValueImpl*)nv->_impl();
-    	nv_impl = (TIDorb::core::NamedValueImpl*)nv;
-
-    if(nv_impl)
-      nv_impl->_add_ref();
-    
-    return nv;
-    
-  } catch (const TIDThr::Exception& ex) {
-    throw CORBA::INTERNAL();
-  }
- */ 
   return nv;
 }
 
@@ -140,22 +111,7 @@ CORBA::NamedValue_ptr CORBA::NamedValue::_nil()
 
 void CORBA::release(CORBA::NamedValue_ptr nv)
 {
-/*  
-  try {
-    
-    //TIDorb::core::NamedValueImpl* nv_impl = dynamic_cast<TIDorb::core::NamedValueImpl*> (nv);
-    TIDorb::core::NamedValueImpl* nv_impl = NULL;
-    //jagd
-	//nv_impl = (TIDorb::core::NamedValueImpl*)nv->_impl();
-	nv_impl = (TIDorb::core::NamedValueImpl*)nv;
-    
-    if(nv_impl)
-      nv_impl->_remove_ref();
-    
-  } catch (const TIDThr::Exception& ex) {
-    throw CORBA::INTERNAL();
-  }
- */ 
+
 }
 
 CORBA::Boolean CORBA::is_nil(CORBA::NamedValue_ptr nv)

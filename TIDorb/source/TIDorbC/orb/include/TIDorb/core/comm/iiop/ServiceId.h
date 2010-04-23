@@ -55,6 +55,7 @@ public:
 	static const CORBA::ULong INVOCATION_POLICIES;
 	static const CORBA::ULong FORWARDED_ENTITY;
 	static const CORBA::ULong UnknownExceptionInfo;
+	static const CORBA::ULong SecurityAttributeService;
 };
 
 } //iiop

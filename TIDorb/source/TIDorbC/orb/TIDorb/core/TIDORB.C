@@ -72,12 +72,33 @@
 
 TIDorb::core::TIDORB::ORBTable TIDorb::core::TIDORB::st_orb_instances;
 
+TIDThr::RecursiveMutex* TIDorb::core::TIDORB::st_init_mutex(NULL);
+
+const char* TIDorb::core::TIDORB::st_version(NULL);
+
+bool TIDorb::core::TIDORB::st_initialized(false);
 
 
-TIDThr::RecursiveMutex* TIDorb::core::TIDORB::st_init_mutex =
-  TIDorb::core::TIDORB::create_init_mutex();
+void
+TIDorb::core::init()
+{
+  if(TIDorb::core::TIDORB::st_initialized) {
+    return;
+  }
+  
+  TIDorb::core::TIDORB::st_init_mutex =
+    TIDorb::core::TIDORB::create_init_mutex();
+  
+  TIDorb::core::TIDORB::st_version = "6.4.2";
+  
+  TIDorb::core::TIDORB::st_orb_instances = TIDorb::core::TIDORB::ORBTable();
 
-const char* TIDorb::core::TIDORB::st_version = "6.3.3_ose";
+  TIDorb::core::TIDORB::st_initialized = true;
+
+  TIDorb::core::ORBServices::st_service_code_table =
+    TIDorb::core::ORBServices::int_service_code_table();
+}
+
 
 
 TIDThr::RecursiveMutex* TIDorb::core::TIDORB::create_init_mutex()
@@ -94,18 +115,17 @@ TIDThr::RecursiveMutex* TIDorb::core::TIDORB::create_init_mutex()
 
 
 
-//MLG
 TIDorb::core::TIDORB::TIDORB()
   throw (TIDThr::SystemException)
   : trace(NULL), m_typecode_cache(NULL), m_services(this), m_state(this), 
     m_destroyed(false), commManager(NULL), rootPOA(NULL), current(NULL), 
     dyn_factory(NULL), codec_factory(NULL), policy_manager(NULL), 
     policy_current(NULL), policy_context_manager(NULL), 
-    compression_manager(NULL), requestCounter(NULL)
+    compression_manager(NULL), default_domain_manager(NULL), 
+    requestCounter(NULL)
 {
   _add_ref();
 }
-//EMLG
 
 
 
@@ -113,27 +133,22 @@ TIDorb::core::TIDORB::TIDORB()
 TIDorb::core::TIDORB::~TIDORB()
   throw (TIDThr::SystemException)
 {
-//PRA
-//MLG
 //if (m_typecode_cache)
 //  	delete m_typecode_cache;
-//EMLG  	
-//EPRA
   if(!m_destroyed)
     destroy();
 
 
 }
 
-//MLG
 TIDorb::core::typecode::TypeCodeCache* TIDorb::core::TIDORB::getTypeCodeCache()
 {
 	return m_typecode_cache;
 }
-//EMLG
 
 ::CORBA::ORB_ptr CORBA::ORB_init(int& argc, char** argv, const char* orb_identifier)
 {
+  TIDorb::core::init();
   return TIDorb::core::TIDORB::init(argc, argv, orb_identifier);
 }
 
@@ -165,8 +180,8 @@ TIDorb::core::typecode::TypeCodeCache* TIDorb::core::TIDORB::getTypeCodeCache()
 
  ::CORBA::ORB_ptr TIDorb::core::TIDORB::default_ORB()
 {
-  //jagd 2
-  //CORBA::ORB_ptr default_orb = CORBA::ORB::_nil();
+  TIDorb::core::init();
+
   CORBA::ORB_ptr default_orb = 0;
 
   {
@@ -185,8 +200,6 @@ TIDorb::core::typecode::TypeCodeCache* TIDorb::core::TIDORB::getTypeCodeCache()
     }
   }
 
-  //jagd 2
-  //if(CORBA::is_nil(default_orb))
   if(!(default_orb))
      throw CORBA::BAD_INV_ORDER();
 
@@ -205,10 +218,8 @@ void TIDorb::core::TIDORB::init_orb(int& argc, char** argv, const char* orb_iden
 
   setup_initial_references();
 
-//MLG  
   if (m_conf.typecode_cache_size > 0)
   	m_typecode_cache = new TIDorb::core::typecode::TypeCodeCache(m_conf.typecode_cache_size);
-//EMLG  
 
 
   // Initialize random number generator
@@ -268,10 +279,7 @@ void TIDorb::core::TIDORB::setup_initial_references()
   }
 }
 
-//PRA
-//::TIDorb::portable::OutputStream* TIDorb::core::TIDORB::create_output_stream()
 ::TIDorb::portable::OutputStream* TIDorb::core::TIDORB::create_output_stream() const
-//EPRA
 {
   if (m_destroyed)
     throw CORBA::OBJECT_NOT_EXIST(0, CORBA::COMPLETED_NO);
@@ -279,21 +287,18 @@ void TIDorb::core::TIDORB::setup_initial_references()
   return new TIDorb::core::cdr::CDROutputStream((TIDORB*) this);
 }
 
-//PRA
-//CORBA::Any* TIDorb::core::TIDORB::create_any()
 CORBA::Any* TIDorb::core::TIDORB::create_any() const
-//EPRA
 {
   if (m_destroyed)
     throw CORBA::OBJECT_NOT_EXIST(0, CORBA::COMPLETED_NO);
 
   CORBA::Any* any =  new CORBA::Any();
-  //jagd 
-  //(dynamic_cast<AnyImpl&> (any->delegate())).orb((TIDORB*) this);
   ((AnyImpl*)&(any->delegate()))->orb((TIDORB*)this);
   return any;
 }
 
+//inline const TIDorb::core::ConfORB& TIDorb::core::TIDORB::conf() const
+// TODO: undefined symbol conf() in RHEL 5.3 (GCC 4.1)
 const TIDorb::core::ConfORB& TIDorb::core::TIDORB::conf() const
 {
   return m_conf;
@@ -309,19 +314,13 @@ char* TIDorb::core::TIDORB::object_to_string(::CORBA::Object_ptr obj)
   if (m_destroyed)
     throw CORBA::OBJECT_NOT_EXIST(0, CORBA::COMPLETED_NO);
  
-  //jagd 0
-  //if(CORBA::is_nil(obj)) {
   if(!(obj)) {
-    //PRA
     //return (char*)TIDorb::core::iop::IOR::null_ior()->toString();
     return CORBA::string_dup(TIDorb::core::iop::IOR::null_ior()->toString());
-    //EPRA
   }
 
   CORBA::LocalObject_var local = CORBA::LocalObject::_narrow(obj);
 
-  //jagd 2
-  //if(!CORBA::is_nil(local))
   if((local))
     throw CORBA::MARSHAL("Impossible to marshal a local object.",
                          4 , CORBA::COMPLETED_NO);
@@ -335,10 +334,8 @@ char* TIDorb::core::TIDORB::object_to_string(::CORBA::Object_ptr obj)
   TIDorb::core::ObjectDelegateImpl *delegate =
     dynamic_cast < ObjectDelegateImpl* > (stub->_get_delegate());
 
-  //PRA
   //return (char*) delegate->getReference()->toString();
   return CORBA::string_dup(delegate->getReference()->toString());
-  //EPRA
 }
 
 /*
@@ -403,13 +400,19 @@ char* TIDorb::core::TIDORB::object_to_string(::CORBA::Object_ptr obj)
     return iiop_url_to_object(str);
   }
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   if (strncmp(str, TIDorb::core::util::URL::MIOP_PROTOCOL,
              strlen(TIDorb::core::util::URL::MIOP_PROTOCOL)) == 0)
   {
     return miop_url_to_object(str);
   }
   // end MIOP extensions
+
+  if (strncmp(str, TIDorb::core::util::URL::SSLIOP_PROTOCOL,
+             strlen(TIDorb::core::util::URL::SSLIOP_PROTOCOL)) == 0)
+  {
+    return ssliop_url_to_object(str);
+  }
 
   return ior_to_object(str);
 }
@@ -522,6 +525,24 @@ CORBA::Object_ptr TIDorb::core::TIDORB::miop_url_to_object(const char* str) thro
 /*
  * end MIOP extensions
  */
+
+
+// PRE str starts with corbaloc:ssliop:
+CORBA::Object_ptr TIDorb::core::TIDORB::ssliop_url_to_object(const char* str) throw(CORBA::SystemException)
+{
+  TIDorb::core::iop::IOR* ior = NULL;
+
+  try
+  {
+    ior = TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_IOR(str);
+  }
+  catch(const CORBA::Exception& e)
+  {
+    throw CORBA::BAD_PARAM("Invalid corbaloc:ssliop URL", 0, CORBA::COMPLETED_NO);
+  }
+
+  return TIDorb::core::ObjectImpl::fromIOR(this, ior);
+}
 
 
 // PRE str starts with file:
@@ -727,7 +748,6 @@ void TIDorb::core::TIDORB::do_complete_shutdown()
     }
   }
   	
-  //PRA
   try {
     if (rootPOA != NULL)
       rootPOA->destroy(false, true);
@@ -739,7 +759,6 @@ void TIDorb::core::TIDORB::do_complete_shutdown()
       commManager->shutdown();
   } catch (...) { /*NO_CONTEXT*/
   }
-  //EPRA
 
   m_state.shutdowned();
 }
@@ -789,7 +808,6 @@ void TIDorb::core::TIDORB::destroy()
     TIDThr::Synchronized synchro(*this);
 
     /*
-      pra@tid.es
       if (!commManager)
       return;
       
@@ -848,9 +866,6 @@ void TIDorb::core::TIDORB::destroy()
     }
     
     if(dyn_factory) {
-      //jagd
-      //TIDorb::dynAny::DynAnyFactoryImpl* dyn_impl =
-      //  dynamic_cast< TIDorb::dynAny::DynAnyFactoryImpl* > (dyn_factory);
       TIDorb::dynAny::DynAnyFactoryImpl* dyn_impl =
         ( TIDorb::dynAny::DynAnyFactoryImpl* ) (dyn_factory);
       dyn_impl->destroy();
@@ -1168,13 +1183,13 @@ CORBA::Object_ptr TIDorb::core::TIDORB::init_POA()
 
   if(rootPOA == NULL)
   {
-    // pra@tid.es - MIOP extensions
-    // rootPOA = TIDorb::core::poa::POAImpl::createRootPOA(this);
     rootPOA = TIDorb::core::goa::GOAImpl::createRootPOA(this);
-    // end MIOP extensions
 
     // init the orb listening point
     commManager->getExternalLayer()->init_server_listener();
+
+//     // TODO: Always? or only without ExternalLayer?
+//     commManager->getSecureLayer()->init_server_listener();
 
     m_state.running();
   }
@@ -1232,6 +1247,16 @@ CORBA::Object_ptr TIDorb::core::TIDORB::init_CompressionManager()
   return getCompressionManager();
 }
 
+CORBA::Object_ptr TIDorb::core::TIDORB::init_DefaultDomainManager()
+{
+  return getDefaultDomainManager();
+}
+
+CORBA::Object_ptr TIDorb::core::TIDORB::init_SecurityManager()
+{
+  return getSecurityManager();
+}
+
 void TIDorb::core::TIDORB::remove_POA()
 {
   TIDThr::Synchronized synchro (*this);
@@ -1284,7 +1309,31 @@ TIDorb::core::TIDORB::getCompressionManager()
   return compression_manager;
 }
 
+TIDorb::core::DomainManagerImpl* TIDorb::core::TIDORB::getDefaultDomainManager()
+{
+  TIDThr::Synchronized synchro(*this);
 
+  if (default_domain_manager == NULL) {
+    default_domain_manager = new DomainManagerImpl(this);
+    
+    // TODO: Stablish policies
+    //default_domain_manager->set_domain_policy();        
+  }
+
+  return default_domain_manager;
+}
+
+TIDorb::core::security::SecurityManagerImpl* 
+TIDorb::core::TIDORB::getSecurityManager()
+{
+  TIDThr::Synchronized synchro(*this);
+
+  if (security_manager == NULL) {
+    security_manager = new TIDorb::core::security::SecurityManagerImpl(this);
+  }
+
+  return security_manager;
+}
 
 TIDorb::core::RequestCounter* TIDorb::core::TIDORB::getRequestCounter()
 {
@@ -1302,8 +1351,6 @@ CORBA::ORB_ptr CORBA::ORB::_duplicate(CORBA::ORB_ptr orb)
 
   try {
   
-    //jagd
-    //TIDorb::core::TIDORB* tidorb = dynamic_cast<TIDorb::core::TIDORB*> (orb);
     TIDorb::core::TIDORB* tidorb = (TIDorb::core::TIDORB*) (orb);
 
     if(tidorb)
@@ -1325,8 +1372,6 @@ void CORBA::release(CORBA::ORB_ptr orb)
 {
   try {
  
-    //jagd
-    //TIDorb::core::TIDORB* tidorb = dynamic_cast< TIDorb::core::TIDORB* > (orb);
     TIDorb::core::TIDORB* tidorb = ( TIDorb::core::TIDORB* ) (orb);
 
     if(tidorb)

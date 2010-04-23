@@ -148,6 +148,16 @@ CORBA::Policy_ptr TIDorb::core::ObjectImpl::_get_policy(CORBA::PolicyType policy
     throw CORBA::INTERNAL("ObjectDelegate not found");
 }
 
+CORBA::DomainManagerList* TIDorb::core::ObjectImpl::_get_domain_managers()
+{
+  ObjectDelegateImpl* delegate = (ObjectDelegateImpl*) (m_delegate);
+  
+  if(delegate)
+    return delegate->getDomainManagerList();   
+  else
+    throw CORBA::INTERNAL("ObjectDelegate not found");
+}
+
 
 
 CORBA::Object_ptr 
@@ -165,6 +175,8 @@ TIDorb::core::ObjectImpl::_set_policy_overrides(const CORBA::PolicyList& policie
 
     TIDorb::core::PolicyContext* policy_context = NULL;
     policy_context = delegate_copy->getPolicyContext();
+
+    ///delegate_copy->_remove_ref(); /// ?????
 
     if (policy_context != NULL){
 

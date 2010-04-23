@@ -106,7 +106,6 @@ TIDorb::core::iop::IOR::IOR(const char* id, const VectorTaggedProfile* profiles)
   _ZIOP_searched = false;
   _has_ZIOP_policies = false;
 
-  //jagd
   // Profile IIOP
   {
     CORBA::ULong count = member_count();
@@ -115,9 +114,6 @@ TIDorb::core::iop::IOR::IOR(const char* id, const VectorTaggedProfile* profiles)
       if (get_profile(number)->_tag == TIDorb::core::iop::TAG_INTERNET_IOP){
         ((IOR*) this)->_profile_IIOP_searched = false;
         ((IOR*) this)->_profile_IIOP_position = number;
-        //jagd
-        //((IOR*) this)->_profile_IIOP = 
-        //  dynamic_cast<TIDorb::core::comm::iiop::ProfileIIOP*>(get_profile(number));
         ((IOR*) this)->_profile_IIOP = 
           (TIDorb::core::comm::iiop::ProfileIIOP*)(get_profile(number));
       }
@@ -132,15 +128,12 @@ TIDorb::core::iop::IOR::IOR(const char* id, const VectorTaggedProfile* profiles)
     for (CORBA::ULong number = 0; number < count; number++) {
       if (get_profile(number)->_tag == TIDorb::core::iop::TAG_UIPMC) {
         ((IOR*) this)->_profile_MIOP_position = number;
-        //jagd
-        //((IOR*) this)->_profile_MIOP = 
-        //  dynamic_cast<TIDorb::core::comm::miop::ProfileMIOP*>(get_profile(number));
         ((IOR*) this)->_profile_MIOP = 
           (TIDorb::core::comm::miop::ProfileMIOP*)(get_profile(number));
         ((IOR*) this)->_profile_MIOP_searched = false;
       }
     }
-    //jagd cambia el orden
+
   }
 
 }
@@ -267,7 +260,6 @@ CORBA::ULong TIDorb::core::iop::IOR::hashCode() const
     
 const char* TIDorb::core::iop::IOR::toString(TIDorb::core::TIDORB* orb) const
 {
-  //  TIDThr::Synchronized synchro (*((IOR*) this));
   if(_ior_string == NULL) {
 	  
     TIDThr::Synchronized synchro (*((IOR*) this));
@@ -286,9 +278,6 @@ const char* TIDorb::core::iop::IOR::toString(TIDorb::core::TIDORB* orb) const
     CORBA::ULong available = cdr_buffer->get_available_bytes();
 	    
     CORBA::ULong buffer_length=(2* available)+ 5; // "IOR:" plus '/0' at the end
-    //PRA
-    //char* buffer = new char[buffer_length];
-    //EPRA
     char* buffer = CORBA::string_alloc(buffer_length);
 	    
     CORBA::ULong i = 0;
@@ -435,12 +424,6 @@ void TIDorb::core::iop::IOR::write(TIDorb::core::cdr::CDROutputStream& out) cons
     
 void TIDorb::core::iop::IOR::read(TIDorb::core::cdr::CDRInputStream& input) 
 {
-//PRA
-//TODO: posible memory leak
-//if (_type_id) {
-//  CORBA::string_free(_type_id);
-//}
-//EPRA
   input.read_string(_type_id);
 	
   CORBA::ULong size;
@@ -457,7 +440,6 @@ void TIDorb::core::iop::IOR::read(TIDorb::core::cdr::CDRInputStream& input)
     _profiles[i] = TaggedProfileReader::read(input);
   }
 
-  //jagd 
   // Ya que esta llamada no es simultanea aprovechamos para leer aqui los profiles 
   // y tenerlos precarcargados sin condiciones de carrera
 
@@ -469,9 +451,6 @@ void TIDorb::core::iop::IOR::read(TIDorb::core::cdr::CDRInputStream& input)
       if (get_profile(number)->_tag == TIDorb::core::iop::TAG_INTERNET_IOP){
         ((IOR*) this)->_profile_IIOP_searched = false;
         ((IOR*) this)->_profile_IIOP_position = number;
-        //jagd
-        //((IOR*) this)->_profile_IIOP = 
-        //  dynamic_cast<TIDorb::core::comm::iiop::ProfileIIOP*>(get_profile(number));
         ((IOR*) this)->_profile_IIOP = 
           (TIDorb::core::comm::iiop::ProfileIIOP*)(get_profile(number));
       }
@@ -487,15 +466,12 @@ void TIDorb::core::iop::IOR::read(TIDorb::core::cdr::CDRInputStream& input)
     for (CORBA::ULong number = 0; number < count; number++) {
       if (get_profile(number)->_tag == TIDorb::core::iop::TAG_UIPMC) {
         ((IOR*) this)->_profile_MIOP_position = number;
-        //jagd
-        //((IOR*) this)->_profile_MIOP = 
-        // dynamic_cast<TIDorb::core::comm::miop::ProfileMIOP*>(get_profile(number));
+
         ((IOR*) this)->_profile_MIOP = 
           (TIDorb::core::comm::miop::ProfileMIOP*)(get_profile(number));
         ((IOR*) this)->_profile_MIOP_searched = false;
       }
     }
-    //jagd cambia el orden
   }
 
 }
@@ -522,39 +498,8 @@ void TIDorb::core::iop::IOR::skip(TIDorb::core::cdr::CDRInputStream& input)
 bool TIDorb::core::iop::IOR::is_IIOP() const
 {
   return !_profile_IIOP_searched;
-  //TIDThr::Synchronized sync(*((IOR *)this));
- 
-  /* 
-  if (! _profile_IIOP.is_null())
-  //  jagd  
-  //  return _profile_IIOP;
-      return true;
-  
-
-  if (_profile_IIOP_searched)
-    return false;
-
-  //jagd
-  
-  CORBA::ULong count = member_count();
-
-  for (int number = 0; number < count; number++) {
-    if (get_profile(number)->_tag == TIDorb::core::iop::TAG_INTERNET_IOP){
-      ((IOR*) this)->_profile_IIOP_searched = true;
-      ((IOR*) this)->_profile_IIOP_position = number;
-      //jagd
-      //((IOR*) this)->_profile_IIOP = dynamic_cast<TIDorb::core::comm::iiop::ProfileIIOP*>(get_profile(number));
-      ((IOR*) this)->_profile_IIOP = (TIDorb::core::comm::iiop::ProfileIIOP*)(get_profile(number));
-      return true;
-    }
-  }
-
-  ((IOR*) this)->_profile_IIOP_searched = true;
-  return false;
-  */
 }
 
-//MLG
 TIDorb::core::comm::iiop::ProfileIIOP*
 TIDorb::core::iop::IOR::profile_IIOP() const
 {
@@ -619,34 +564,6 @@ bool TIDorb::core::iop::IOR::is_ZIOP()
 bool TIDorb::core::iop::IOR::is_group_reference() const
 {
   return !_profile_MIOP_searched;
-  //jagd
-  /* 
-  TIDThr::Synchronized sync(*((IOR*) this));
-  
-  if (! _profile_MIOP.is_null())
-    return true;
-
-  if (_profile_MIOP_searched)
-     return false;
-
-
-  CORBA::ULong count = member_count();
-
-  for (int number = 0; number < count; number++) {
-    if (get_profile(number)->_tag == TIDorb::core::iop::TAG_UIPMC) {
-      ((IOR*) this)->_profile_MIOP_position = number;
-      //jagd 
-      //((IOR*) this)->_profile_MIOP = dynamic_cast<TIDorb::core::comm::miop::ProfileMIOP*>(get_profile(number));
-      ((IOR*) this)->_profile_MIOP = (TIDorb::core::comm::miop::ProfileMIOP*)(get_profile(number));
-      //jagd 
-      //((IOR*) this)->_profile_MIOP_searched = true;
-      return true;
-    }
-  }
-  //jagd cambia el orden
-  ((IOR*) this)->_profile_MIOP_searched = true;
-  return false;
-  */
 }
 
 
@@ -700,5 +617,22 @@ TIDorb::core::PolicyContext* TIDorb::core::iop::IOR::policies() const
   else 
     throw CORBA::INV_OBJREF();
   
+}
+
+
+SSLIOP::SSL* TIDorb::core::iop::IOR::get_SSL() const
+{
+  if (!_profile_IIOP_searched) 
+    return _profile_IIOP->get_SSL();
+  else 
+    throw CORBA::INV_OBJREF(); 
+}
+
+CSIIOP::CompoundSecMechList* TIDorb::core::iop::IOR::get_CompoundSecMechList() const
+{
+  if (!_profile_IIOP_searched) 
+    return _profile_IIOP->get_CompoundSecMechList();
+  else 
+    throw CORBA::INV_OBJREF(); 
 }
 

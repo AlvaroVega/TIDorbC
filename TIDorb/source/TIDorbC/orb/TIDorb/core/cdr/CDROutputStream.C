@@ -247,14 +247,9 @@ void CDROutputStream::write_pair(unsigned int digit1, unsigned int digit2)
 
 void CDROutputStream::write_TypeCode(const ::CORBA::TypeCode_ptr v)
 {
-  //jagd
-  //if (CORBA::is_nil(v))
   if (!(v))
     throw CORBA::BAD_PARAM();
 
-  //jagd
-  //TIDorb::core::typecode::TypeCodeImpl* tc =     
-  //  (TIDorb::core::typecode::TypeCodeImpl*)v->_impl();
   TIDorb::core::typecode::TypeCodeImpl* tc =     
     (TIDorb::core::typecode::TypeCodeImpl*)v;
   if(m_orb)
@@ -267,8 +262,6 @@ void CDROutputStream::write_TypeCode(const ::CORBA::TypeCode_ptr v)
 
 void CDROutputStream::write_Object(const ::CORBA::Object_ptr v)
 {
-  //jagd
-  //if (CORBA::is_nil(v)){
   if (!(v)){
     TIDorb::core::iop::IOR* null_ior = ::TIDorb::core::iop::IOR::null_ior();
     null_ior->write(*this);
@@ -286,9 +279,6 @@ void CDROutputStream::write_Object(const ::CORBA::Object_ptr v)
   TIDorb::portable::Stub* _stub = dynamic_cast<TIDorb::portable::Stub*> (v);
   TIDorb::portable::ObjectDelegate* delegate = _stub->_get_delegate();
 
-  //jagd
-  //TIDorb::core::ObjectDelegateImpl* _obj_del_impl =
-  //  dynamic_cast<TIDorb::core::ObjectDelegateImpl*> (delegate);
   TIDorb::core::ObjectDelegateImpl* _obj_del_impl =
     (TIDorb::core::ObjectDelegateImpl*) (delegate);
 
@@ -299,8 +289,6 @@ void CDROutputStream::write_Object(const ::CORBA::Object_ptr v)
     // write IOR from another ORB object
     TIDorb::core::iop::IOR ref;
     TIDorb::portable::ORB* _orb = delegate->orb();
-    //jagd 
-    //TIDorb::core::TIDORB* _tidorb = dynamic_cast<TIDorb::core::TIDORB*> (_orb);
     TIDorb::core::TIDORB* _tidorb = (TIDorb::core::TIDORB*) (_orb);
     ref.fromString(_tidorb, _orb->object_to_string(v));
     ref.write(*this);
@@ -349,7 +337,6 @@ void CDROutputStream::write_any(const ::CORBA::Any& v)
 //   // numero de octetos que quedan por escribir
 //   ::CORBA::ULong remain_octets = length;
 
-// //MLG
 //   while (true)
 //     {
 //       octets_can_write = (::CORBA::ULong)
@@ -362,7 +349,6 @@ void CDROutputStream::write_any(const ::CORBA::Any& v)
 //       m_next+= octets_can_write;
 //       v+= octets_can_write;
 //       remain_octets -= octets_can_write;
-// //EMLG
 //       if(remain_octets > 0)
 //         {
 //           get_next_chunk();
@@ -678,8 +664,6 @@ void CDROutputStream::write_Abstract(const CORBA::AbstractBase_ptr value)
 
     CORBA::Object_var ref = value->_to_object();
 
-    //jagd
-    //if (!CORBA::is_nil(ref)) {
     if ((ref)) {
         // is an object ref
         write_boolean(true);

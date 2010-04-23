@@ -66,7 +66,6 @@ TIDorb::core::comm::TCPConnection::TCPConnection(ConnectionManager* mngr,
     throw CORBA::INTERNAL("IOException", 0, CORBA::COMPLETED_NO);
   }
 
-   //jagd  
   _root_POA = dynamic_cast<TIDorb::core::poa::POAImpl*>(_orb->init_POA());
   _poamanager = _root_POA->the_POAManager();
 }
@@ -78,9 +77,7 @@ TIDorb::core::comm::TCPConnection::~TCPConnection() throw (TIDThr::SystemExcepti
 {
   delete in;
   delete out;
-//FRAN
   delete socket;
-//EFRAN
 
   if (_orb->trace != NULL) {
     TIDorb::util::StringBuffer msg;
@@ -100,10 +97,8 @@ CORBA::ULongLong TIDorb::core::comm::TCPConnection::hashCode()
 {
   //return my_port;
   //return socket->hashCode();
-//MLG  
   //return socket->getLocalPort();
   return ((CORBA::ULongLong)this);
-//EMLG  
 }
 
 
@@ -123,7 +118,7 @@ const char* TIDorb::core::comm::TCPConnection::toString()
     switch(mode) {
       case CLIENT_MODE: 
         {
-          buffer << "Client";
+          buffer << "Client" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
           buffer << " connection at " << initial_point.toString() << ends;
           break;
         }
@@ -301,7 +296,17 @@ void TIDorb::core::comm::TCPConnection::dispatch_request(TIDorb::core::comm::iio
   
   TIDorb::core::ServerRequestImpl* request = message->extract_request();
 
-  // pra@tid.es - FT extensions
+  // Check SSL: all TCP request are not dispached
+  if ( (strcmp(conf.ssl_private_key, "") != 0) && 
+       (strcmp(conf.ssl_certificate, "") != 0) ) {
+    const CORBA::NO_PERMISSION ex("SSL target can not dispatch TCP requests ");
+    request->set_system_exception(ex);
+    send_reply(request);
+    delete request;
+    return;
+  }
+
+  // FT extensions
   if (strcmp(request->operation(), TIDorb::core::comm::FT::FT::OPERATION_NAME)==0) {
     send_reply(request);
     delete request;
@@ -325,55 +330,8 @@ void TIDorb::core::comm::TCPConnection::dispatch_request(TIDorb::core::comm::iio
 
   encapsulation.fix_starting();
 
-  /* jagd lo movemos de sitio
-  if (request->with_response())
-  {
-    requests_in_POA.inc();
-
-    // is a url??
-    try
-    {
-      // TODO cambiar a tratamiento de TIDorbJ 
-  	 
-      CORBA::String_var url;
-//PRA
-//FRAN
-//      encapsulation.read_string(url.out());
-//      encapsulation.read_string(url);
-      encapsulation.read_string(url.out());
-//EFRAN           
-//EPRA
-      CORBA::Object_var obj = NULL;
-
-//FRAN
-      obj = _orb->resolve_initial_references(url);      
-//EFRAN
-
-      //jagd
-      //if (! CORBA::is_nil(obj))
-      if ((obj))
-      {
-         request->set_forward(obj);
-         send_reply(request);
-         return;
-      }
-
-    } catch (...) {
-    }
-  }
-
-    //TODO: revisar esta solucion temporal al OBJECT_NOT_EXIST de un corbaloc
-    //PRA
-   */ 
-    //
-    //TIDorb::core::poa::POAKey_ref key = obj_key->get_key();
-    //
-    
-    //encapsulation.rewind();
-    //obj_key->getMarshaledKey()->rewind();
     if (request->with_response())
     {
-      //jagd requests_in_POA.inc();
       requests_in_POA++;
     }   
 
@@ -383,10 +341,9 @@ void TIDorb::core::comm::TCPConnection::dispatch_request(TIDorb::core::comm::iio
       key = obj_key->get_key();
     } catch (const CORBA::MARSHAL& m) {
 
-      //jagd a?adimos las corbaloc si ha fallado al desaplanar el key
+      //a?adimos las corbaloc si ha fallado al desaplanar el key
         if (request->with_response())
         {
-          //requests_in_POA.inc();
       
           // is a url??
           try
@@ -394,14 +351,11 @@ void TIDorb::core::comm::TCPConnection::dispatch_request(TIDorb::core::comm::iio
             // TODO cambiar a tratamiento de TIDorbJ
       
             CORBA::String_var url;
-            // encapsulation.read_string(url.out()); // Fix bug #353 OBJECT_NOT_EXISTS dispaching request with corbaloc instead of POAkey
             url = obj_key->get_url();
 
             CORBA::Object_var obj = NULL;     
             obj = _orb->resolve_initial_references(url);
       
-            //jagd
-            //if (! CORBA::is_nil(obj))
             if ((obj))
             {
                request->set_forward(obj);
@@ -428,7 +382,6 @@ void TIDorb::core::comm::TCPConnection::dispatch_request(TIDorb::core::comm::iio
       delete request;
       return;
     }
-    //EPRA
     
       if (_orb->trace != NULL) {
         TIDorb::util::StringBuffer msg;
@@ -436,21 +389,19 @@ void TIDorb::core::comm::TCPConnection::dispatch_request(TIDorb::core::comm::iio
             << ") operation \"" << request->operation() << "\"" << ends;
         _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
       }
-    
-      service_context_received(message->get_service_context_list());
+
+      service_context_received(message->get_service_context_list(), request);
+      // TO-DO: Stop here if SAS contains a ErrorContext and it was send by 
+      // service_context_received:  // (two replies are send to client)
    
-      //jagd 
-      //TIDorb::core::poa::POAImpl* root_POA= dynamic_cast<TIDorb::core::poa::POAImpl*>(_orb->init_POA());
-    
       TIDorb::core::poa::IIOPRequest* poa_request =
         new TIDorb::core::poa::IIOPRequest(key, _root_POA, this, request);
     
       // QueueRequest (poa_request) take responsability about free InvocationPolicies)
       poa_request->setPolicyContext(message->getRequestInvocationPolicies());
 
-      //jagd PortableServer::POAManager_ptr poamanager = root_POA->the_POAManager();
-      //jagd
-      //TIDorb::core::poa::POAManagerImpl* poamanagerimpl = dynamic_cast<TIDorb::core::poa::POAManagerImpl*>(poamanager);
+      // TODO: store sas_context_body
+
       TIDorb::core::poa::POAManagerImpl* poamanagerimpl = (TIDorb::core::poa::POAManagerImpl*)(_poamanager);
       poamanagerimpl->put(poa_request);
 }
@@ -472,11 +423,9 @@ void TIDorb::core::comm::TCPConnection::read(unsigned char* buffer, size_t buffe
         throw CORBA::COMM_FAILURE("Broken Connection",0,CORBA::COMPLETED_NO);
       }
 
-//MLG
       if (numReadNow == 0) {
         throw CORBA::COMM_FAILURE("Close Connection by pair",0,CORBA::COMPLETED_MAYBE);
       }
-//EMLG
 
       offset += numReadNow;
       length -= numReadNow;
@@ -497,7 +446,6 @@ void TIDorb::core::comm::TCPConnection::write(unsigned char* buffer, size_t buff
                                               size_t offset, size_t length)
 {
   try {
-//MLG
         size_t written = 0;
   	int chunk_written = 0;
   	
@@ -507,10 +455,8 @@ void TIDorb::core::comm::TCPConnection::write(unsigned char* buffer, size_t buff
 		offset += chunk_written;
 		written += chunk_written;
   	}
-//EMLG  	
   } catch(const TIDSocket::IOException& ioe) {
     CORBA::COMM_FAILURE connection_error( "IOException", 0, CORBA::COMPLETED_NO);
-                                         //ioe.toString(), 0, CORBA::COMPLETED_NO);
     close_by_broken_connection(connection_error);
     throw connection_error;
   }

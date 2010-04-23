@@ -108,7 +108,7 @@ class Socket : public virtual RefCounter
             throw(IOException, IllegalArgumentException);
 
         // Close this socket
-        void close()
+        virtual void close()
             throw(IOException);
 
         // Connect this socket to the server
@@ -132,7 +132,7 @@ class Socket : public virtual RefCounter
 
         // Return an input stream for this socket
         // (caller must delete istream object)
-        InputStream* getInputStream()
+        virtual InputStream* getInputStream()
             throw(IOException);
 
         // Test if SO_KEEPALIVE is enabled
@@ -160,7 +160,7 @@ class Socket : public virtual RefCounter
 
         // Return an output stream for this socket
         // (caller must delete ostream object)
-        OutputStream* getOutputStream()
+        virtual OutputStream* getOutputStream()
             throw(IOException);
 
         // Return the remote port to which this socket is connected
@@ -285,7 +285,7 @@ class Socket : public virtual RefCounter
     protected:
         static SocketImplFactory* _factory;
 
-    private:
+    protected:
         void setConnected()
             throw();
 };

@@ -49,7 +49,7 @@ TIDorb::core::iop::TaggedProfileReader::read(TIDorb::core::cdr::CDRInputStream& 
         TIDorb::core::comm::iiop::ProfileIIOP* profile_iiop;
         ProfileMultipleComponents*             multi_comp;
 
-        // pra@tid.es - MIOP extensions
+        // MIOP extensions
         TIDorb::core::comm::miop::ProfileMIOP* profile_miop;
         // end MIOP extensions
 
@@ -64,7 +64,7 @@ TIDorb::core::iop::TaggedProfileReader::read(TIDorb::core::cdr::CDRInputStream& 
                         multi_comp->partial_read(input);
                         return (TaggedProfile*) multi_comp;
 
-                // pra@tid.es - MIOP extensions
+                // MIOP extensions
                 case TAG_UIPMC:
                         profile_miop = new TIDorb::core::comm::miop::ProfileMIOP();
                         profile_miop->partial_read(input);

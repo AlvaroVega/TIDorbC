@@ -86,8 +86,6 @@ class StructTypeCode : public ComplexTypeCode
     virtual bool skip_value(TIDorb::core::cdr::CDRInputStream& input) const
 		{
 		  CORBA::ULong length = m_members->length();
-		  //TypeCodeImpl* tc = 0;
-                  //jagd 5
                   CORBA::StructMember * buffer= m_members->get_buffer(); 
                   for(CORBA::ULong i = 0; i < length; i++)
                   {
@@ -97,17 +95,6 @@ class StructTypeCode : public ComplexTypeCode
                   }
                   return true; 
 
-                /*
-		  for(CORBA::ULong i = 0; i < length; i++) {
-		    //tc = dynamic_cast<TypeCodeImpl*>((CORBA::TypeCode_ptr)((*m_members)[i]).type);
-		    //jagd 5 tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[i].type)->_impl();
-		    tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[i].type);
-		    if(!tc->skip_value(input))
-		      return false;
-		  }
-		
-		  return true;
-                */
 		}    	
 
     virtual void remarshal_value(TIDorb::core::cdr::CDRInputStream& input,

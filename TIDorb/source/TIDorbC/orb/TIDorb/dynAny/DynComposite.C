@@ -207,20 +207,15 @@ void DynComposite::get_streams(const CORBA::Any& any)
    TIDorb::portable::InputStream* is;
 
   
-   //jagd 
-   // TIDorb::core::AnyImpl& impl =
-   //      dynamic_cast<TIDorb::core::AnyImpl&>(any.delegate());
     TIDorb::core::AnyImpl& impl =
          *(TIDorb::core::AnyImpl*)(&any.delegate());
     
     is = impl.create_input_stream();   
 
-   //jagd
-   //_complete_value = dynamic_cast<TIDorb::core::cdr::CDRInputStream*>(is);
    _complete_value = (TIDorb::core::cdr::CDRInputStream*)(is);
-   //PRA
+
    _complete_value->orb(_orb);
-   //EPRA
+
    _next_value = _complete_value->copy();
 }
 
@@ -514,8 +509,6 @@ void DynComposite::assign(DynamicAny::DynAny_ptr dyn_any)
    {
       reset();
       dyn_any->seek(other_aux_current);
-      //PRA
-      //throw tm;
       throw;
    }
 
@@ -534,8 +527,6 @@ CORBA::Boolean DynComposite::equal(DynamicAny::DynAny_ptr dyn_any)
       throw CORBA::OBJECT_NOT_EXIST("DynAny destroyed", 0, CORBA::COMPLETED_NO);
    }
 
-   //jagd
-   //if (CORBA::is_nil(dyn_any))
    if (!(dyn_any))
    {
       throw CORBA::BAD_PARAM("Null DynAny reference");

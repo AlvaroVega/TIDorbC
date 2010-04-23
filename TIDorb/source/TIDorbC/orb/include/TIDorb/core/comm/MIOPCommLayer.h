@@ -92,6 +92,9 @@ class MIOPCommLayer : public TIDorb::core::comm::CommunicationLayer
     void oneway_request(TIDorb::core::RequestImpl* request,
                         TIDorb::core::iop::IOR* ior);
 
+    void reliable_oneway_run(TIDorb::core::RequestImpl* request,
+                             TIDorb::core::iop::IOR* ior);
+
     /**
      * Sends a object existence request.
      * @param ior the object IOR.

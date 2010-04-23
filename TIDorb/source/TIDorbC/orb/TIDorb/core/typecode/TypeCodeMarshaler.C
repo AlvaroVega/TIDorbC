@@ -81,9 +81,6 @@ bool TIDorb::core::typecode::TypeCodeMarshaler::skip_value_array(CORBA::TypeCode
 			break;
     default:
     {
-      //TypeCodeImpl* tc_impl = dynamic_cast<TypeCodeImpl*>(type);
-      //jagd 
-      //TypeCodeImpl* tc_impl = (TypeCodeImpl*)type->_impl();
       TypeCodeImpl* tc_impl = (TypeCodeImpl*)type;
     	for (CORBA::ULong i = 0; i < n; i++) 
     		if(!tc_impl->skip_value(input))

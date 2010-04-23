@@ -125,9 +125,6 @@ void TIDorb::core::typecode::ExceptionTypeCode::dump (ostream& output) const
   TypeCodeImpl* tc =0;
 
   for(CORBA::ULong i = 0; i < length; i++) {
-    //tc = dynamic_cast<TypeCodeImpl *>((CORBA::TypeCode_ptr)((*m_members)[i]).type);
-    //jagd 
-    //tc = (TypeCodeImpl*)((CORBA::TypeCode*)(*m_members)[i].type)->_impl();
     tc = (TypeCodeImpl*)((CORBA::TypeCode*)(*m_members)[i].type);
     output << ((*m_members)[i]).name << ": ";
     tc->dump(output);
@@ -144,10 +141,7 @@ bool TIDorb::core::typecode::ExceptionTypeCode::dump_value
         ostream& output) const
 {
   CORBA::ULong length = m_members->length();
-  //PRA
-  //char* id;
   CORBA::String_var id;
-  //EPRA
 
   input.read_string(id.out());
 
@@ -157,9 +151,6 @@ bool TIDorb::core::typecode::ExceptionTypeCode::dump_value
   TypeCodeImpl* tc =0;
 
   for(CORBA::ULong i = 0; i < length; i++) {
-    //tc = dynamic_cast<TypeCodeImpl *>((CORBA::TypeCode_ptr)((*m_members)[i]).type);
-    //jagd 
-    //tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[i].type)->_impl();
     tc = (TypeCodeImpl*)((CORBA::TypeCode_ptr)(*m_members)[i].type);
 
     output << '(' << i << ") " << ((*m_members)[i]).name << ": ";

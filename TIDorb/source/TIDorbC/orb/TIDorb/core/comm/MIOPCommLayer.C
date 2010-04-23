@@ -121,8 +121,7 @@ void TIDorb::core::comm::MIOPCommLayer::request(TIDorb::core::RequestImpl* reque
   for (iter = components.begin(); iter != components.end(); iter++) {
     TIDorb::core::iop::TaggedComponent* comp = (TIDorb::core::iop::TaggedComponent*) *iter;
     if (comp->_tag == TIDorb::core::iop::TAG_GROUP_IIOP) {
-      //jagd
-      //group_iiop_profile = dynamic_cast<TIDorb::core::comm::miop::GroupIIOPProfile*>(comp);
+
       group_iiop_profile = (TIDorb::core::comm::miop::GroupIIOPProfile*)(comp);
     }
   }
@@ -185,6 +184,14 @@ void TIDorb::core::comm::MIOPCommLayer::oneway_request(TIDorb::core::RequestImpl
 
 
 
+void TIDorb::core::comm::MIOPCommLayer::reliable_oneway_run(
+                                             TIDorb::core::RequestImpl* request,
+                                             TIDorb::core::iop::IOR* ior)
+{
+
+}
+
+
 
 /**
  * Sends a object existence request.
@@ -204,8 +211,6 @@ TIDorb::core::comm::MIOPCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
   for (iter = components.begin(); iter != components.end(); iter++) {
     TIDorb::core::iop::TaggedComponent* comp = (TIDorb::core::iop::TaggedComponent*) *iter;
     if (comp->_tag == TIDorb::core::iop::TAG_GROUP_IIOP) {
-      //jagd
-      //group_iiop_profile = dynamic_cast<TIDorb::core::comm::miop::GroupIIOPProfile*>(comp);
       group_iiop_profile = (TIDorb::core::comm::miop::GroupIIOPProfile*)(comp);
     }
   }
@@ -265,7 +270,6 @@ void TIDorb::core::comm::MIOPCommLayer::destroy()
       connection_manager = NULL;
     }
 */    
-//EMLG          
    } catch (...) {
      }
 }
@@ -275,7 +279,6 @@ void TIDorb::core::comm::MIOPCommLayer::destroy()
 
 void TIDorb::core::comm::MIOPCommLayer::join_group(const TIDorb::core::comm::miop::ListenPoint& listen_point)
 {
-  //TIDThr::Synchronized sync(recursive_mutex);
   connection_manager->getMIOPServerConnection(listen_point); // synchronized
 }
 

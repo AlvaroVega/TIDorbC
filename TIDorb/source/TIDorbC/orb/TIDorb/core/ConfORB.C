@@ -138,7 +138,24 @@ TIDorb::core::ConfORB::ConfORB()
 
   qos_enabled(DEFAULT_QOS_ENABLED),
   ziop_chunk_size(DEFAULT_ZIOP_CHUNK_SIZE),
-  assume_ziop_server(DEFAULT_ASSUME_ZIOP_SERVER)
+  assume_ziop_server(DEFAULT_ASSUME_ZIOP_SERVER),
+
+
+  // Security extensions
+  ssl_private_key(CORBA::string_dup(DEFAULT_SSL_PRIVATE_KEY)),
+  ssl_certificate(CORBA::string_dup(DEFAULT_SSL_CERTIFICATE)),
+  ssl_ca(CORBA::string_dup(DEFAULT_SSL_CA)), // -> SSL_CTX_load_verify_locations at SSLContext
+  csiv2(DEFAULT_CSIv2),
+  ssl_session_timeout(DEFAULT_SSL_SESSION_TIMEOUT),
+  ssl_port(DEFAULT_SSL_PORT),
+  ssl_version(DEFAULT_SSL_VERSION),
+  gssup_user(CORBA::string_dup(DEFAULT_GSSUP_USER)),
+  gssup_password(CORBA::string_dup(DEFAULT_GSSUP_PASSWORD)),
+  csiv2_target_name(CORBA::string_dup(DEFAULT_CSIV2_TARGET_NAME))
+
+  // TODO:
+  // Options for ciphers: NULL cipher will be taken in acount ???
+  // Oprtions for SSL version: 2.0, 3.0, TLS 1.0 ??
 
 {}
 
@@ -162,6 +179,13 @@ TIDorb::core::ConfORB::~ConfORB()
   //CORBA::string_free(multicast_group_gateway);
   // end MIOP extensions
 
+  CORBA::string_free(ssl_private_key);
+  CORBA::string_free(ssl_certificate);
+  CORBA::string_free(ssl_ca);
+
+  CORBA::string_free(gssup_user);
+  CORBA::string_free(gssup_password);
+  CORBA::string_free(csiv2_target_name);
 }
   
 
@@ -281,7 +305,7 @@ const char* TIDorb::core::ConfORB::trace_num_files_name = "-ORB_trace_num_files"
 
 const char* TIDorb::core::ConfORB::DEFAULT_TRACE_NAME = "TIDorb";
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 const int TIDorb::core::ConfORB::DEFAULT_SOCKET_TIME_TO_LIVE = 1;
 const char* TIDorb::core::ConfORB::socket_time_to_live_name = "-ORB_miop_socket_time_to_live";
 
@@ -318,7 +342,7 @@ const char* TIDorb::core::ConfORB::multicast_group_gateway_name = "-ORB_miop_mul
 */
 // end MIOP extensions
 
-// pra@tid.es - FT extensions
+// FT extensions
 const bool TIDorb::core::ConfORB::DEFAULT_FAULT_TOLERANT = false;
 const char* TIDorb::core::ConfORB::fault_tolerant_name = "-ORB_fault_tolerant";
 
@@ -340,7 +364,38 @@ const char* TIDorb::core::ConfORB::ziop_chunk_size_name = "-ORB_ziop_chunk_size"
 const bool TIDorb::core::ConfORB::DEFAULT_ASSUME_ZIOP_SERVER = false;
 const char* TIDorb::core::ConfORB::assume_ziop_server_name = "-ORB_assume_ziop_server";
 
-//PRA
+
+const char* TIDorb::core::ConfORB::ssl_private_key_name = "-ORB_ssl_private_key";
+const char* TIDorb::core::ConfORB::DEFAULT_SSL_PRIVATE_KEY = "";
+
+const char* TIDorb::core::ConfORB::ssl_certificate_name = "-ORB_ssl_certificate";
+const char* TIDorb::core::ConfORB::DEFAULT_SSL_CERTIFICATE = "";
+
+const char* TIDorb::core::ConfORB::ssl_ca_name = "-ORB_ssl_ca";
+const char* TIDorb::core::ConfORB::DEFAULT_SSL_CA = "";
+
+const bool TIDorb::core::ConfORB::DEFAULT_CSIv2 = false;
+const char* TIDorb::core::ConfORB::csiv2_name = "-ORB_CSIv2";
+
+const unsigned int TIDorb::core::ConfORB::DEFAULT_SSL_SESSION_TIMEOUT = 300;
+const char* TIDorb::core::ConfORB::ssl_session_timeout_name = "-ORB_ssl_session_timeout";
+
+const unsigned short TIDorb::core::ConfORB::DEFAULT_SSL_PORT = 0;
+const char* TIDorb::core::ConfORB::ssl_port_name = "-ORB_ssl_port";
+
+const unsigned int TIDorb::core::ConfORB::DEFAULT_SSL_VERSION = 2;
+const char* TIDorb::core::ConfORB::ssl_version_name = "-ORB_ssl_version";
+
+const char* TIDorb::core::ConfORB::gssup_user_name = "-ORB_gssup_user";
+const char* TIDorb::core::ConfORB::DEFAULT_GSSUP_USER = "";
+
+const char* TIDorb::core::ConfORB::gssup_password_name = "-ORB_gssup_password";
+const char* TIDorb::core::ConfORB::DEFAULT_GSSUP_PASSWORD = "";
+
+const char* TIDorb::core::ConfORB::csiv2_target_name_name = "-ORB_CSIv2_target_name";
+const char* TIDorb::core::ConfORB::DEFAULT_CSIV2_TARGET_NAME = "";
+
+
 int TIDorb::core::ConfORB::modify_parameters(int& argc, char** argv, int currpos, int numparams)
 {
   for (int i = currpos + numparams; i < argc; i++) {
@@ -349,7 +404,6 @@ int TIDorb::core::ConfORB::modify_parameters(int& argc, char** argv, int currpos
   argc -= numparams;
   return (currpos - 1);
 }
-//EPRA
 
 
 
@@ -865,6 +919,72 @@ void TIDorb::core::ConfORB::get_parameters(int& argc, char** argv, const char* o
         throw CORBA::INITIALIZE("assume_ziop_server value must be true or false.");
     }
 
+    else if (strcmp(argv[i], ssl_private_key_name)==0) {
+      CORBA::string_free(ssl_private_key);
+      ssl_private_key = CORBA::string_dup(argv[i+1]);
+    }
+
+    else if (strcmp(argv[i], ssl_certificate_name)==0) {
+      CORBA::string_free(ssl_certificate);
+      ssl_certificate = CORBA::string_dup(argv[i+1]);
+    }
+
+    else if (strcmp(argv[i], ssl_ca_name)==0) {
+      CORBA::string_free(ssl_ca);
+      ssl_ca = CORBA::string_dup(argv[i+1]);
+    }
+
+    else if (strcmp(argv[i], csiv2_name)==0) {
+      if (strcasecmp(argv[i+1], "true")==0)
+        csiv2 = true;
+      else if (strcasecmp(argv[i+1], "false")==0)
+        csiv2 = false;
+      else
+        throw CORBA::INITIALIZE("csiv2 value must be true or false.");
+    }
+
+    else if (strcmp(argv[i], ssl_session_timeout_name)==0) {
+      ulaux = strtoul(argv[i+1], &ptr, 10);
+      if (errno || *ptr || ulaux > UINT_MAX) {
+        throw CORBA::INITIALIZE("ssl_session_timeout value must be greater or equal than 0.");
+      }
+      else
+        ssl_session_timeout = ulaux;
+    }
+
+    else if (strcmp(argv[i], ssl_port_name)==0) {
+      ulaux = strtoul(argv[i+1], &ptr, 10);
+      if (errno || *ptr || ulaux > USHRT_MAX) {
+        throw CORBA::INITIALIZE("ssl_port value must be greater or equal than 0.");
+      }
+      else
+        ssl_port = ulaux;
+    }
+
+    else if (strcmp(argv[i], ssl_version_name)==0) {
+      ulaux = strtoul(argv[i+1], &ptr, 10);
+      if (errno || *ptr || ulaux > 3) {
+        throw CORBA::INITIALIZE("ssl_version value must be 0 (SSLv2), 1 (SSLv3), 2 (SSLv23) or 3 (TLSv1).");
+      }
+      else
+        ssl_version = ulaux;
+    }
+
+    else if (strcmp(argv[i], gssup_user_name)==0) {
+      CORBA::string_free(gssup_user);
+      gssup_user = CORBA::string_dup(argv[i+1]);
+    }
+
+    else if (strcmp(argv[i], gssup_password_name)==0) {
+      CORBA::string_free(gssup_password);
+      gssup_password = CORBA::string_dup(argv[i+1]);
+    }
+
+    else if (strcmp(argv[i], csiv2_target_name_name)==0) {
+      CORBA::string_free(csiv2_target_name);
+      csiv2_target_name = CORBA::string_dup(argv[i+1]);
+    }
+
     else if (strncmp("-ORB", argv[i], 4) == 0) { // Not a valid option
       TIDorb::util::StringBuffer msg;
       msg << "Option not found: " << argv[i];
@@ -915,6 +1035,26 @@ void TIDorb::core::ConfORB::get_parameters(int& argc, char** argv, const char* o
   }
 
 
+  // Security policies: QOP and EstablishTrust
+  if (ssl_private_key && ssl_certificate) {
+    try {
+      TIDorb::core::security::QOPPolicyImpl* policy;
+      policy = new TIDorb::core::security::QOPPolicyImpl(
+                                Security::SecQOPIntegrityAndConfidentiality);
+      policy_context.setPolicy(policy);
+    }
+    catch (CORBA::PolicyError& pe) {}
+  }
+
+  if (csiv2) {
+    try {
+      TIDorb::core::security::EstablishTrustPolicyImpl* policy;
+      policy = new TIDorb::core::security::EstablishTrustPolicyImpl(
+                                         Security::EstablishTrust(true, false));
+      policy_context.setPolicy(policy);
+    }
+    catch (CORBA::PolicyError& pe) {}
+  }
 
 }
 
@@ -973,7 +1113,17 @@ void TIDorb::core::ConfORB::dump(ostream& os)
      << "\ttrace_level=" << trace_level << endl
      << "\ttrace_file=" << trace_file << endl
      << "\ttrace_file_size=" << trace_file_size << endl
-     << "\ttrace_num_files=" << trace_num_files << endl;
+     << "\ttrace_num_files=" << trace_num_files << endl
+     << "\tssl_private_key=" << ssl_private_key << endl
+     << "\tssl_certificate=" << ssl_certificate << endl
+     << "\tssl_ca=" << ssl_ca << endl
+     << "\tcsiv2=" << csiv2 << endl
+     << "\tssl_session_timeout=" << ssl_session_timeout << endl
+     << "\tssl_port=" << ssl_port << endl
+     << "\tssl_version=" << ssl_version << endl
+     << "\tgssup_user=" << gssup_user << endl
+     << "\tgssup_password=" << gssup_password << endl
+     << "\tcsiv2_target_name=" << csiv2_target_name << endl;
   
   os << "\tDefault Policies: " << endl;
   st_default_policy_context->dump(os);

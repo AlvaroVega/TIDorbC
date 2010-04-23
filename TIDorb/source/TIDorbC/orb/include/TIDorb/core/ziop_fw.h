@@ -43,15 +43,11 @@ namespace TIDorb {
 namespace core {
 namespace ziop {
 
-  // class ZIOPPoliciesComponent;
-  // typedef TIDThr::HandleT<ZIOPPoliciesComponent> ZIOPPoliciesComponent_ref;
   class CompressorIdLevelListPolicyImpl;
   class CompressionEnablingPolicyImpl;
   class CompressionLowValuePolicyImpl;
   class CompressionMinRatioPolicyImpl;
  
-  //class ZIOPInvocationPoliciesContext;
-
 }
 }
 }

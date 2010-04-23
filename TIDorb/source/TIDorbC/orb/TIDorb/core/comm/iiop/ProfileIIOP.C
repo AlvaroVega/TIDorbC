@@ -49,6 +49,8 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP() throw (TIDThr::SystemExcept
         _profile_data = NULL;
         _policies = NULL;
         _components_extracted = false;
+        _ssl = NULL;
+        _compound_sec_mechs = NULL;
 }
 
 
@@ -66,6 +68,8 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP
         _profile_data = NULL;
         _policies = NULL;
         _components_extracted = true;
+        _ssl = NULL;
+        _compound_sec_mechs = NULL;
 }
 
 
@@ -86,6 +90,31 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP
         _components = tagged_components;
         _profile_data = NULL;
         _components_extracted = true;
+        _ssl = NULL;
+        _compound_sec_mechs = NULL;
+
+        // Check for _ssl and _csi info in components
+        size_t size = _components.size();
+        for (size_t i = 0; i < size; i++) {
+          TIDorb::core::iop::TaggedComponent* comp = _components[i];
+
+          if ((_components[i])->_tag == TIDorb::core::iop::TAG_SSL_SEC_TRANS) {
+            TIDorb::core::comm::ssliop::SSLComponent* ssl_component =
+              dynamic_cast<TIDorb::core::comm::ssliop::SSLComponent*>(comp);
+            //point._ssl_port = ssl_component->getSSLPort();
+            _ssl = new SSLIOP::SSL((const SSLIOP::SSL&)*(ssl_component->getSSL()));
+          }
+
+          if (comp->_tag == TIDorb::core::iop::TAG_CSI_SEC_MECH_LIST) {
+            TIDorb::core::security::CSIComponent* csi_component =
+              dynamic_cast<TIDorb::core::security::CSIComponent*>(comp);
+            _compound_sec_mechs = 
+              new CSIIOP::CompoundSecMechList((const  CSIIOP::CompoundSecMechList&)
+                                              *(csi_component->getCompoundSecMechList()));
+          }
+        } // for
+        
+        
 }
 
 
@@ -106,6 +135,29 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP
         _components = other._components;
         _profile_data = NULL;
         _components_extracted = true;
+        _ssl = NULL;
+        _compound_sec_mechs = NULL;
+
+        // Check for _ssl and _csi info in components
+        size_t size = _components.size();
+        for (size_t i = 0; i < size; i++) {
+          TIDorb::core::iop::TaggedComponent* comp = _components[i];
+
+          if ((_components[i])->_tag == TIDorb::core::iop::TAG_SSL_SEC_TRANS) {
+            TIDorb::core::comm::ssliop::SSLComponent* ssl_component =
+              dynamic_cast<TIDorb::core::comm::ssliop::SSLComponent*>(comp);
+            //point._ssl_port = ssl_component->getSSLPort();
+            _ssl = new SSLIOP::SSL((const SSLIOP::SSL&)*(ssl_component->getSSL()));
+          }
+
+          if (comp->_tag == TIDorb::core::iop::TAG_CSI_SEC_MECH_LIST) {
+            TIDorb::core::security::CSIComponent* csi_component =
+              dynamic_cast<TIDorb::core::security::CSIComponent*>(comp);
+            _compound_sec_mechs = 
+              new CSIIOP::CompoundSecMechList((const  CSIIOP::CompoundSecMechList&)
+                                              *(csi_component->getCompoundSecMechList()));
+          }
+        } // for
 }
 
 
@@ -114,6 +166,8 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP
 TIDorb::core::comm::iiop::ProfileIIOP::~ProfileIIOP() throw(TIDThr::SystemException)
 {
         delete _profile_data;
+        delete _ssl;
+        delete _compound_sec_mechs;
 }
 
 
@@ -156,8 +210,8 @@ void TIDorb::core::comm::iiop::ProfileIIOP::extract_members()
         //_listen_point.read(*_profile_data);
         TIDorb::core::comm::iiop::ListenPoint point;
         point.read(*_profile_data);
-        _listen_points.clear();
-        _listen_points.push_back(point);
+//         _listen_points.clear();
+//         _listen_points.push_back(point);
 
         _object_key = new ObjectKey();
         _object_key->read(*_profile_data);
@@ -185,12 +239,33 @@ void TIDorb::core::comm::iiop::ProfileIIOP::extract_members()
                                 _policies = policies_component->getPolicies();
                               }
 
+                              if (comp->_tag == TIDorb::core::iop::TAG_SSL_SEC_TRANS) {
+                                TIDorb::core::comm::ssliop::SSLComponent* ssl_component =
+                                  dynamic_cast<TIDorb::core::comm::ssliop::SSLComponent*>(comp);
+                                point._ssl_port = ssl_component->getSSLPort();
+                                _ssl = new SSLIOP::SSL((const SSLIOP::SSL&)*(ssl_component->getSSL()));
+                              }
+                              
+                              if (comp->_tag == TIDorb::core::iop::TAG_CSI_SEC_MECH_LIST) {
+                                TIDorb::core::security::CSIComponent* csi_component =
+                                  dynamic_cast<TIDorb::core::security::CSIComponent*>(comp);
+                                _compound_sec_mechs = 
+                                  new CSIIOP::CompoundSecMechList((const  CSIIOP::CompoundSecMechList&)
+                                                                  *(csi_component->getCompoundSecMechList()));
+
+                                
+                              }
+
+                              
                               TIDorb::core::comm::FT::AlternateIIOPAddress* addr;
                               addr = dynamic_cast<TIDorb::core::comm::FT::AlternateIIOPAddress*>(comp);
 			      if (addr) _listen_points.push_back(addr->_listen_point);
                         }
                 }
         }
+
+        _listen_points.clear();
+        _listen_points.push_back(point);
 
         _components_extracted = true;
   }
@@ -289,16 +364,10 @@ void TIDorb::core::comm::iiop::ProfileIIOP::partial_write(TIDorb::core::cdr::CDR
 {
   TIDThr::Synchronized synchro (*((ProfileIIOP*) this));
 
-/* pra@tid.es - MIOP extensions
-  // write tag
-  out.write_ulong(_tag); //tag variable heredada de TaggedProfile
-*/
-
   // write profile data
 
   if(_profile_data == NULL)
   {
-    //TIDorb::core::cdr::CDROutputStream encapsulation(dynamic_cast <TIDorb::core::TIDORB*> (out.orb()));
     TIDorb::core::cdr::CDROutputStream encapsulation((TIDorb::core::TIDORB*) (out.orb()));
 
     encapsulation.write_boolean(encapsulation.get_byte_order());
@@ -316,7 +385,6 @@ void TIDorb::core::comm::iiop::ProfileIIOP::partial_write(TIDorb::core::cdr::CDR
 
     ((ProfileIIOP*) this)->_profile_data =
       (TIDorb::core::cdr::CDRInputStream*)(encapsulation.create_input_stream());
-    //dynamic_cast <TIDorb::core::cdr::CDRInputStream*>(encapsulation.create_input_stream());
   }
 
   out.write_buffer(*(_profile_data->get_buffer()));
@@ -371,4 +439,23 @@ TIDorb::core::PolicyContext* TIDorb::core::comm::iiop::ProfileIIOP::getPolicies(
         if(! _components_extracted )
                 ((ProfileIIOP*) this)->extract_members();
         return _policies;
+}
+
+
+
+SSLIOP::SSL* 
+TIDorb::core::comm::iiop::ProfileIIOP::get_SSL() const
+{
+        if(! _components_extracted )
+                ((ProfileIIOP*) this)->extract_members();
+        return _ssl;
+}
+ 
+
+CSIIOP::CompoundSecMechList* 
+TIDorb::core::comm::iiop::ProfileIIOP::get_CompoundSecMechList() const
+{
+        if(! _components_extracted )
+                ((ProfileIIOP*) this)->extract_members();
+        return _compound_sec_mechs;
 }

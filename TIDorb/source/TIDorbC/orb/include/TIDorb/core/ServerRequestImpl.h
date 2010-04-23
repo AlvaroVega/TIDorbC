@@ -41,7 +41,7 @@
 #ifndef _TIDORB_CORE_SERVER_REQUEST_IMPL_H_
 #define _TIDORB_CORE_SERVER_REQUEST_IMPL_H_
 
-//MCPG
+
 #include "TIDorb/core/comm/iiop.h"
 
 
@@ -61,9 +61,7 @@ class ServerRequestImpl : public virtual CORBA::ServerRequest
 
     ServerRequestImpl(const ServerRequestImpl&  other);
 
-    //PRA
     virtual ~ServerRequestImpl();
-    //EPRA
 
     const char* operation() const;
     void arguments(CORBA::NVList_ptr& parameters);
@@ -90,6 +88,8 @@ class ServerRequestImpl : public virtual CORBA::ServerRequest
     const TIDorb::core::comm::iiop::Version& getVersion() const;
     Compression::CompressorIdLevel get_compressor() const;
     void set_compressor(Compression::CompressorIdLevel compressor);
+    CSI::SASContextBody_ptr get_sas_context_body() const;
+    void set_sas_context_body(CSI::SASContextBody_ptr sas_context);
     
   protected:
 
@@ -108,6 +108,7 @@ class ServerRequestImpl : public virtual CORBA::ServerRequest
     CORBA::Object_ptr                        m_forward_obj;
     TIDorb::core::cdr::CDRInputStream*       m_marshaled_parameters;
     Compression::CompressorIdLevel           m_compressor;
+    CSI::SASContextBody_ptr                  m_sas_context;
 
 };
 

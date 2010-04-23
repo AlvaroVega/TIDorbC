@@ -64,9 +64,9 @@ class CommunicationLayer : public TIDThr::RefCounter
   virtual ~CommunicationLayer() throw(TIDThr::SystemException) {}
 
   TIDorb::core::TIDORB* orb()
-  {
-    return _orb;
-  } 
+	{
+	  return _orb;
+	} 
 	
   /**
    * Sends a request.
@@ -82,6 +82,10 @@ class CommunicationLayer : public TIDThr::RefCounter
    */
   virtual void oneway_request(TIDorb::core::RequestImpl* request,
                               TIDorb::core::iop::IOR* ior) = 0;
+
+
+  virtual void reliable_oneway_run(TIDorb::core::RequestImpl* request,
+                                   TIDorb::core::iop::IOR* ior) = 0;
 
   /**
    * Sends a object existence request.

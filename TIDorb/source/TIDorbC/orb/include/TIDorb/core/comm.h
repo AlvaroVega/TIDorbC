@@ -57,7 +57,7 @@
 #include "TIDorb/core/comm/ConnectionManager.h"
 #include "TIDorb/core/comm/ConnectionThread.h"
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 #include "TIDorb/core/comm/miop.h"
 #include "TIDorb/core/comm/TCPConnection.h"
 #include "TIDorb/core/comm/UDPConnection.h"
@@ -65,11 +65,19 @@
 #include "TIDorb/core/comm/MIOPCommLayer.h"
 // end MIOP extensions
 
-// pra@tid.es - FT extensions
+// FT extensions
 #include "TIDorb/core/comm/FT.h"
 #include "TIDorb/core/comm/HeartbeatThread.h"
 // end FT extensions
 
 #include "TIDorb/core/comm/ziop.h"
+
+#include "TIDorb/core/security.h"
+#include "TIDorb/core/security/sas.h"
+#include "TIDorb/core/comm/ssliop.h"
+#include "TIDorb/core/comm/SSLConnection.h"
+#include "TIDorb/core/comm/SSLIIOPCommLayer.h"
+#include "TIDorb/core/comm/SSLServerListener.h"
+
 
 #endif

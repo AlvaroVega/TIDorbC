@@ -110,7 +110,6 @@ class ContextCDR {
     const char*               lookup_string(CDR::AbsolutePosition position) const;
     const ValueTypeInfo&      lookup_value(CDR::AbsolutePosition position) const;
     
-    //EPRA
     
     CDR::AbsolutePosition lookup(const CORBA::TypeCode_ptr tc) const;
     CDR::AbsolutePosition lookup(const char* id) const;
@@ -136,8 +135,6 @@ class ContextCDR {
     void put(CDR::AbsolutePosition position, 
              const CORBA::ValueBase* value);
        
-    //EPRA       
-
     void duplicate(ContextCDR* newContextCDR);
 
   protected:

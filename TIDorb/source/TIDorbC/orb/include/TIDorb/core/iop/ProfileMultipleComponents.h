@@ -64,7 +64,6 @@ private:
 
 protected:
 
-        //synchronized void extract_members(); //ATENCION - MCPG
         void extract_members();
 
 public:

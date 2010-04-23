@@ -41,19 +41,21 @@
 TIDorb::core::comm::iiop::ServiceContext* TIDorb::core::comm::iiop::ServiceContextReader::read(
 	TIDorb::core::cdr::CDRInputStream& input)
 {
-	//int id = input.read_ulong();
 	CORBA::ULong id;
 	input.read_ulong(id);
 	TIDorb::core::comm::iiop::ServiceContext* serv_ctx = NULL; 
 	switch(id) {
-		// Standart CORBA Service Contexts
-		//case IOP::BI_DIR_IIOP.value:
+		// Standard CORBA Service Contexts
 		case BI_DIR_IIOP:
 			serv_ctx = new TIDorb::core::comm::iiop::BiDirServiceContext();
 			serv_ctx->partial_read(input);
 			return serv_ctx;
                 case IOP::INVOCATION_POLICIES:
                         serv_ctx = new TIDorb::core::comm::iiop::InvocationPoliciesContext();
+                       	serv_ctx->partial_read(input);
+                        return serv_ctx;
+                case IOP::SecurityAttributeService:
+                        serv_ctx = new TIDorb::core::security::sas::SASServiceContext();
                        	serv_ctx->partial_read(input);
                         return serv_ctx;
       		default:

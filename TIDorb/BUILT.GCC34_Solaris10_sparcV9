@@ -1,11 +1,11 @@
 This release of TIDorbC++ was built on a machine with kernel:
-SunOS marimar 5.10 Generic_120011-14 sun4u sparc SUNW,Sun-Fire-V445
+SunOS coco 5.10 Generic_139555-08 sun4u sparc SUNW,Sun-Fire-V445
 
 using the compiler:
-gcc version 3.4.6
+gcc version 3.4.3 
 
 kernel version used:
-SunOS 5.10 Generic_120011-14 
+SunOS 5.10 Generic_139555-08
 
 applied patches:
  125095-15
@@ -442,7 +442,7 @@ applied patches:
  126630-01
 
 using the following libraries:
-gcc-3.4.6-sol10-sparc
+gcc version 3.4.3 (csl-sol210-3_4-branch+sol_rpath)
 make-3.81-sol10-sparc
 binutils-2.17-sol10-sparc
-TIDIdlc_1.3.9
+TIDIdlc_1.3.11

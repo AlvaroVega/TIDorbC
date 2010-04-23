@@ -180,7 +180,6 @@ void TIDorb::core::comm::iiop::GIOPFragmentedMessage::set_body(TIDorb::core::cdr
   message_buffer_in = input;
   message_buffer_in->set_byte_order(_header.getByteOrder());
   
-  //MCPG
   message_buffer_in->set_version(_header.getVersion());
   message_buffer_in->set_message(true);
 
@@ -200,13 +199,11 @@ void TIDorb::core::comm::iiop::GIOPFragmentedMessage::receive_body
    const CORBA::Octet* header_bytes)
 {
   TIDorb::core::comm::iiop::GIOPMessage::receive_body(conn, header_bytes);
-  //MCPG
 
   delete message_buffer_in;
   message_buffer_in = new TIDorb::core::cdr::CDRInputStream(conn->orb(), _message_buffer);
   message_buffer_in->set_byte_order(_header.getByteOrder());
 
-  //MCPG
   message_buffer_in->set_version(_header.getVersion());
   message_buffer_in->set_message(true);
 
@@ -227,7 +224,6 @@ void TIDorb::core::comm::iiop::GIOPFragmentedMessage::write_headers()
 {
 
   if (!_headers_marshaled) {
-//MLG
     TIDorb::core::cdr::CDROutputStream out(NULL, _message_buffer);
     
     out.set_version(_header.getVersion());
@@ -241,7 +237,6 @@ void TIDorb::core::comm::iiop::GIOPFragmentedMessage::write_headers()
     _header.write(out);
 
     _headers_marshaled = true;
-//EMLG
   }
 }
 

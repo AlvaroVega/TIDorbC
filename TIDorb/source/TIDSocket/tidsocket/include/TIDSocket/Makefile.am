@@ -41,7 +41,23 @@ inst_HEADERS = \
         SocketImpl.h \
         SocketOptions.h \
         SocketTimeoutException.h \
-        UnknownHostException.h \
-        UnresolvedAddressException.h \
-        UnsupportedAddressTypeException.h
-
+	SSLContext.h \
+	SSLException.h \
+	SSLHandshakeException.h \
+	SSLInputStream.h \
+	SSLKeyException.h \
+	SSLOutputStream.h \
+	SSLPeerUnverifiedException.h \
+	SSLProtocolException.h \
+	SSLServerSocketFactory.h \
+	SSLServerSocket.h  \
+	SSLSessionContext.h  \
+	SSLSession.h \
+	SSLSocketFactory.h \
+	SSLSocket.h \
+	SSLSocketImpl.h \
+	UnknownHostException.h \
+	UnresolvedAddressException.h \
+	UnsupportedAddressTypeException.h \
+	NoSuchAlgorithmException.h \
+	KeyManagementException.h

@@ -66,10 +66,8 @@ public:
 
   enum OperationStatus { INITIAL = 0, WAITING, COMPLETED};
 	
-//MLG	
   OperationCompletion() throw (TIDThr::SystemException) : m_state(INITIAL) {}
   ~OperationCompletion() throw(TIDThr::SystemException) {}
-//EMLG
 	
   /**
    * @return whether or not the operation is completed
@@ -107,9 +105,9 @@ protected:
   OperationStatus m_state;
   
 };
-//FRAN
+
 typedef TIDThr::HandleT<OperationCompletion> OperationCompletion_ref;
-//EFRAN
+
 
 } // TIDorb
 } // core

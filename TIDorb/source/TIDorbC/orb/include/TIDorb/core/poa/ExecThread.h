@@ -93,9 +93,8 @@ private:
    * @return <code>true</code> wherther the request has been queued in another 
    * POAManager.
    */
-//FRAN
   void processRequest(TIDorb::core::poa::QueuedRequest*& thisRequest);
-//EFRAN
+
   /**
    * Finds the POA which corresponds to @param request. If the request
    * belongs to another POAManager it is bypassed to it, returning null.
@@ -132,7 +131,7 @@ public:
    */
   void execute(TIDorb::core::poa::IIOPRequest* request, TIDorb::core::poa::POAImpl* poa);
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
 
   /**
    * Executes IIOPRequests.

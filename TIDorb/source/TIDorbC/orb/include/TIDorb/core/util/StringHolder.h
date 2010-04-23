@@ -58,7 +58,7 @@ class StringHolder : public TIDorb::portable::Streamable {
     StringHolder()
     {
       m_value = NULL;
-      m_type = CORBA::TypeCode::_nil();
+      m_type = NULL;
     }
     
     void value(char* initial, CORBA::TypeCode_ptr type = NULL)
@@ -67,7 +67,7 @@ class StringHolder : public TIDorb::portable::Streamable {
       
       m_value = initial;
            
-      if(!CORBA::is_nil(type))
+      if(type)
         m_type = CORBA::TypeCode::_duplicate(type);
       else
         //m_type = CORBA::TypeCode::_duplicate(CORBA::_tc_string);
@@ -79,7 +79,7 @@ class StringHolder : public TIDorb::portable::Streamable {
       reset_value();
       m_value = CORBA::string_dup(initial);
         
-      if(!CORBA::is_nil(type))
+      if(type)
         m_type = CORBA::TypeCode::_duplicate(type);
     }
     
@@ -107,7 +107,7 @@ class StringHolder : public TIDorb::portable::Streamable {
 
     CORBA::TypeCode_ptr _type() const
     {
-      if(!CORBA::is_nil(m_type))
+      if(m_type)
         return CORBA::TypeCode::_duplicate(m_type);
       else
         return CORBA::TypeCode::_duplicate(CORBA::_tc_string);
@@ -121,11 +121,11 @@ class StringHolder : public TIDorb::portable::Streamable {
       if(m_value)
         CORBA::string_free(m_value);
         
-      if(!CORBA::is_nil(m_type))
+      if(m_type)
         CORBA::release(m_type);
         
       m_value = NULL;
-      m_type = CORBA::TypeCode::_nil();
+      m_type = NULL;
     }
     
     char* m_value;

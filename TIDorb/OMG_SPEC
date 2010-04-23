@@ -292,6 +292,19 @@ ZlibCompressor                                                  PASSED 3
 CustomCompressor                                                PASSED 3
 
 
+
+* Security (CORBA 2.6 - Chapter 26)
+------------------------------------
+
+·Functional Tests
+=================
+
+Test                                                            Result
+SSLIOP                                                          PASSED 630
+SAS                                                             PASSED 2
+
+
+
 -------------------------------------------------------------------------------
 #################
 # TOTALS        #
@@ -301,9 +314,9 @@ CustomCompressor                                                PASSED 3
                   ----------         ----------        ---------             
 Structured  |         3385                 10             3395
 
-Functional  |         4462                 64             4526
+Functional  |         5092                 64             5156
 
-TOTAL       |         7847                 74             7921
+TOTAL       |         7847                 74             8551
 
 
 -------------------------------------------------------------------------------
@@ -4581,4 +4594,196 @@ test_ref->echo(message) (x 4 sizes)                             [OK]
 
 
 
+* Security SSLIOP
+------------------------
+
+·Functional Tests
+=================
+
+Test SSLIOP                                                     
+[SSLIOP] SSLIOP test: TIDORB
+Struct with basic types: 14 IDL types x 4 operations (in, inout, out, ret) = 56 tests ...OK
+        Struct
+        Float
+        Double
+        Long
+        Unsigned Long
+        Short
+        Unsigned Short
+        Char
+        Wchar
+        Boolean
+        Octet
+        Long Double
+        Long Long
+        Unsigned Long Long
+Struct with complex types: 25 IDL types x 4 operations (in, inout, out, ret) = 100 tests ...OK 
+        Unbounded String
+        Bounded String
+        Unbounded WString
+        Bounded WString
+        Fixed
+        Short Sequence
+        Unsigned Short Sequence
+        Long Sequence
+        Unsigned Long Sequence
+        Long Long Sequence
+        Unsigned Long Long Sequence
+        Float Sequence
+        Double Sequence
+        Long Double Sequence
+        Char sequence
+        WChar sequence
+        Any sequence
+        Array of Long Sequence
+        Bidimensional Array of Long Sequence
+        Array of Float
+        Bidimensional Array of Float
+        Array of Char
+        Bidimensional Array of Char
+        Array of Any
+        Bidimensional Array of Any
+SimpleUnion: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+ComplexUnion: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Enum: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... exception catch: MARSHAL -> ERROR
+Sequence of Booleans: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Sequence of Structs: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Sequence of Enums: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... exception catch: MARSHAL -> ERROR
+Array of Short: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Array of String: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Array of Struct: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Any: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+SimpleValueType: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Exception: 1 IDL type x 1 operation (raise exception) = 1 test...... OK
+ObjectType: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests ...... OK
+typedef Object: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests ...... OK
+Object reference: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+GIOP Fragments Test: 1 IDL type x 1 operation (in) = 1 test...... OK
+
+
+
+[SSLIOP] SSLIOP tests: TAO client + TIDORB server
+Struct with basic types: 14 IDL types x 4 operations (in, inout, out, ret) = 56 tests ...OK
+        Struct
+        Float
+        Double
+        Long
+        Unsigned Long
+        Short
+        Unsigned Short
+        Char
+        Wchar
+        Boolean
+        Octet
+        Long Double
+        Long Long
+        Unsigned Long Long
+Struct with complex types: 25 IDL types x 4 operations (in, inout, out, ret) = 100 tests ...OK 
+        Unbounded String
+        Bounded String
+        Unbounded WString
+        Bounded WString
+        Fixed
+        Short Sequence
+        Unsigned Short Sequence
+        Long Sequence
+        Unsigned Long Sequence
+        Long Long Sequence
+        Unsigned Long Long Sequence
+        Float Sequence
+        Double Sequence
+        Long Double Sequence
+        Char sequence
+        WChar sequence
+        Any sequence
+        Array of Long Sequence
+        Bidimensional Array of Long Sequence
+        Array of Float
+        Bidimensional Array of Float
+        Array of Char
+        Bidimensional Array of Char
+        Array of Any
+        Bidimensional Array of Any
+SimpleUnion: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+ComplexUnion: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Enum: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... exception catch: MARSHAL -> ERROR
+Sequence of Booleans: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Sequence of Structs: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Sequence of Enums: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... exception catch: MARSHAL -> ERROR
+Array of Short: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Array of String: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Array of Struct: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Any: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+SimpleValueType: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Exception: 1 IDL type x 1 operation (raise exception) = 1 test...... OK
+ObjectType: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests ...... OK
+typedef Object: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests ...... OK
+Object reference: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+GIOP Fragments Test: 1 IDL type x 1 operation (in) = 1 test...... OK
+
+
+[SSLIOP] SSLIOP tests: TAO server + TIDORB client
+Struct with basic types: 14 IDL types x 4 operations (in, inout, out, ret) = 56 tests ...OK
+        Struct
+        Float
+        Double
+        Long
+        Unsigned Long
+        Short
+        Unsigned Short
+        Char
+        Wchar
+        Boolean
+        Octet
+        Long Double
+        Long Long
+        Unsigned Long Long
+Struct with complex types: 25 IDL types x 4 operations (in, inout, out, ret) = 100 tests ...OK 
+        Unbounded String
+        Bounded String
+        Unbounded WString
+        Bounded WString
+        Fixed
+        Short Sequence
+        Unsigned Short Sequence
+        Long Sequence
+        Unsigned Long Sequence
+        Long Long Sequence
+        Unsigned Long Long Sequence
+        Float Sequence
+        Double Sequence
+        Long Double Sequence
+        Char sequence
+        WChar sequence
+        Any sequence
+        Array of Long Sequence
+        Bidimensional Array of Long Sequence
+        Array of Float
+        Bidimensional Array of Float
+        Array of Char
+        Bidimensional Array of Char
+        Array of Any
+        Bidimensional Array of Any
+SimpleUnion: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+ComplexUnion: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Enum: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... exception catch: MARSHAL -> ERROR
+Sequence of Booleans: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Sequence of Structs: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Sequence of Enums: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... exception catch: MARSHAL -> ERROR
+Array of Short: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Array of String: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Array of Struct: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Any: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+SimpleValueType: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+Exception: 1 IDL type x 1 operation (raise exception) = 1 test...... OK
+ObjectType: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests ...... OK
+typedef Object: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests ...... OK
+Object reference: 1 IDL type x 4 operations (in, inout, out, ret) = 4 tests...... OK
+GIOP Fragments Test: 1 IDL type x 1 operation (in) = 1 test...... OK
+
+
+
+SAS                                                             
+
+SAS client-server example                                       [OK]                                               
 

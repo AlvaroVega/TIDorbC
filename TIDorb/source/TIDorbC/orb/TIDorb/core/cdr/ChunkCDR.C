@@ -27,22 +27,11 @@
  */
 TIDorb::core::cdr::ChunkCDR::ChunkCDR(CORBA::ULong fixed_size)
 {
-  //MLG
   int size_buffer = fixed_size + CDR::MAX_ALIGNMENT;
-  //m_real_buffer = new CORBA::Octet[size_buffer];
   m_real_buffer = (CORBA::Octet*) malloc(size_buffer);
-
-  //caceres: performance improvements
-  //memset(m_real_buffer,0,size_buffer*sizeof(CORBA::Octet));
-  
-  //EMLG
+ 
   if(!m_real_buffer)
     throw CORBA::NO_MEMORY();
-
-  //PRA  
-  //if(!m_real_buffer) 
-  //  throw CORBA::NO_MEMORY();
-  //EPRA
     
   m_buffer = CDR::align(m_real_buffer);
   m_available_end = m_buffer;
@@ -53,7 +42,6 @@ TIDorb::core::cdr::ChunkCDR::ChunkCDR(CORBA::ULong fixed_size)
 
 TIDorb::core::cdr::ChunkCDR::~ChunkCDR()
 {
-  //delete[] m_real_buffer;
   free(m_real_buffer);
 }
 

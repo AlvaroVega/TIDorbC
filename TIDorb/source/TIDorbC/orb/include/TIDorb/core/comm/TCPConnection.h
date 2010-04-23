@@ -61,7 +61,6 @@ class TCPConnection : public Connection
      */
     TIDSocket::Socket* socket;
 
-    //jagd
     TIDorb::core::poa::POAImpl* _root_POA;
     PortableServer::POAManager_ptr _poamanager;
   public:

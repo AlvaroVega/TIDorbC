@@ -48,20 +48,22 @@ namespace comm {
   typedef TIDThr::HandleT<CommunicationLayer> CommunicationLayer_ref; 
   class IIOPCommLayer;  
   typedef TIDThr::HandleT<IIOPCommLayer> IIOPCommLayer_ref;
+  class SSLIIOPCommLayer;  
+  typedef TIDThr::HandleT<SSLIIOPCommLayer> SSLIIOPCommLayer_ref;
   class LocalCommLayer;
   typedef TIDThr::HandleT<LocalCommLayer> LocalCommLayer_ref;
   class CommunicationManager;
   typedef TIDThr::HandleT<CommunicationManager> CommunicationManager_ref;
   class ServerListener;
   typedef TIDThr::HandleT<ServerListener> ServerListener_ref;
+  class SSLServerListener;
+  typedef TIDThr::HandleT<SSLServerListener> SSLServerListener_ref;
   class FragmentedMessageHolder;
   class ReliableOnewayThread;
   
   class Connection;
-  //PRA
   //typedef TIDThr::HandleT<Connection> Connection_ref;
   class Connection_ref;
-  //EPRA
   class ConnectionThread;
   class ConnectionState;
   class OpeningLock;
@@ -69,7 +71,7 @@ namespace comm {
   class ConnectionManager;
   typedef TIDThr::HandleT<ConnectionManager> ConnectionManager_ref;
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   class TCPConnection;
   typedef TIDThr::HandleT<TCPConnection> TCPConnection_ref;
   class UDPConnection;
@@ -80,7 +82,7 @@ namespace comm {
   typedef TIDThr::HandleT<MIOPCommLayer> MIOPCommLayer_ref;
   // end MIOP extensions
 
-  // pra@tid.es - FT extensions
+  // FT extensions
   class HeartbeatThread;
   // end FT extensions
 
@@ -90,7 +92,7 @@ namespace comm {
 
 #include "TIDorb/core/comm/iiop_fw.h"
 
-// pra@tid.es - MIOP extensions
+// MIOP extensions
 #include "TIDorb/core/comm/miop_fw.h"
 // end MIOP extensions
 
@@ -100,5 +102,6 @@ namespace comm {
 
 
 #include "TIDorb/core/comm/ziop_fw.h"
+#include "TIDorb/core/comm/ssliop_fw.h"
 
 #endif

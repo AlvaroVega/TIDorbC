@@ -6,8 +6,10 @@ AC_DEFUN([TID_CHECK_TIDIDLC],
     dnl Look for TID IDL compiler installation directory
     AC_MSG_CHECKING([for TID IDL compiler path])
     AC_ARG_WITH(
-      tididlc,
-      [  --with-tididlc=DIR  prefix for TID IDL compiler install path],
+      [tididlc],
+      AS_HELP_STRING([--with-tididlc@<:@=DIR@:>@],
+                     [prefix for TID IDL compiler install path]),
+dnl      [  --with-tididlc=DIR  prefix for TID IDL compiler install path],
       [
         if test "$withval" = "yes"; then
           tididlc_prefix=/usr

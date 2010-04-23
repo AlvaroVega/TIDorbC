@@ -96,7 +96,7 @@ class ConnectionManager : public TIDThr::RecursiveMutex
      
    FragmentedMessagesRepository uncompleted_messages;
    	
-  // pra@tid.es - FT extensions
+  // FT extensions
   friend class HeartbeatThread;
   // end FT extensions
 
@@ -140,6 +140,13 @@ class ConnectionManager : public TIDThr::RecursiveMutex
 
 
    ConnectionMapT miop_connections;
+
+
+
+   /*
+    * SSL connnections will be reused depending on context
+    */
+   ConnectionMapT ssl_client_connections;
 
 
    TIDThr::ThreadGroupHandle _group;
@@ -213,14 +220,19 @@ class ConnectionManager : public TIDThr::RecursiveMutex
    * Looks for a client connection with the listen point. If it does not exist, then the creates one.
    * @param listen_point the <code>ListenPoint</code> that determines a remote ORB in a Object reference.
    */
-  void prepareClientConnection(const TIDorb::core::comm::iiop::ListenPoint& listen_point,
-                               TIDorb::core::PolicyContext* policy_context);
+/*   void prepareClientConnection(const TIDorb::core::comm::iiop::ListenPoint& listen_point, */
+/*                                TIDorb::core::PolicyContext* policy_context); */
 
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   Connection* getMIOPClientConnection(const TIDorb::core::comm::miop::ListenPoint& listen_point);
   Connection* getMIOPServerConnection(const TIDorb::core::comm::miop::ListenPoint& listen_point);
   // end MIOP extensions
+
+
+  Connection* getSSLClientConnection(const TIDorb::core::comm::miop::ListenPoint& listen_point,
+                                     TIDorb::core::PolicyContext* policy_context);
+  void createSSLServerConnection(TIDSocket::SSLSocket* socket);
 
 
   protected:
@@ -236,11 +248,14 @@ class ConnectionManager : public TIDThr::RecursiveMutex
   Connection* open_client_connection(const TIDorb::core::comm::iiop::ListenPoint& listen_point,
                                      TIDorb::core::PolicyContext* policy_context);
 
-  // pra@tid.es - MIOP extensions
+  // MIOP extensions
   Connection* open_miop_client_connection(const TIDorb::core::comm::miop::ListenPoint& listen_point);
   Connection* open_miop_server_connection(const TIDorb::core::comm::miop::ListenPoint& listen_point);
   // end MIOP extensions
 
+
+  Connection* open_ssl_client_connection(const TIDorb::core::comm::iiop::ListenPoint& listen_point,
+                                         TIDorb::core::PolicyContext* policy_context);
 
   /**
    * Removes from the client connection table the listen points associted to a connection.

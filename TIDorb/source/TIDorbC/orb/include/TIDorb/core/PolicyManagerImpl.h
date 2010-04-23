@@ -51,7 +51,9 @@ class PolicyManagerImpl : public virtual CORBA::PolicyManager,
                           public virtual CORBA::LocalObject
 {
   protected:
-    TIDorb::core::TIDORB* _orb;
+    TIDorb::core::TIDORB* m_orb;
+    
+    TIDorb::core::ConfORB& m_conf;
 
   public:
     PolicyManagerImpl(TIDorb::core::TIDORB* orb);

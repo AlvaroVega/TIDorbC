@@ -42,7 +42,7 @@ namespace TIDorb {
 namespace core {
 namespace comm {
 namespace iiop {
-//MLG
+
 void* GIOPMessage::_impl()
 {
 	return this;
@@ -53,9 +53,7 @@ const char* GIOPMessage::_typeid()
 	//return CORBA::string_dup("GIOPMessage");
 	return "GIOPMessage";
 }
-//EMLG
 
-//MLG
 GIOPMessage::GIOPMessage()
   : _header(),
     _message_buffer(NULL), 
@@ -83,7 +81,7 @@ GIOPMessage::GIOPMessage(const GIOPHeader& header)
                 	_message_completed = false;
     }
 }
-//EMLG
+
 
 GIOPMessage::~GIOPMessage(){}
 
@@ -96,7 +94,6 @@ void GIOPMessage::write_headers()
 
     if (!_headers_marshaled)
     {
-      //TIDorb::core::cdr::CDROutputStream* out = new CDROutputStream(NULL, _message_buffer);
       TIDorb::core::cdr::CDROutputStream out(NULL, _message_buffer);
 
       out.set_version(_header.getVersion());
@@ -174,7 +171,6 @@ void GIOPMessage::set_body(TIDorb::core::cdr::BufferCDR_ref buf)
 void GIOPMessage::receive_body(TIDorb::core::comm::Connection* conn,
                                const CORBA::Octet* header_bytes)
 {
-    //TIDorb::core::cdr::ChunkCDR* chunk = receive_chunk(conn, _header, header_bytes);
     TIDorb::core::cdr::ChunkCDR* chunk = conn->receive_chunk(_header, header_bytes);
     _message_buffer = new TIDorb::core::cdr::BufferCDR(chunk);
     _message_completed = true;

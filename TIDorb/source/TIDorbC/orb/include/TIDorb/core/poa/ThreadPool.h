@@ -72,7 +72,6 @@ private:
   bool _deactivated;
   TIDThr::RecursiveMutex recursive_mutex;
   TIDThr::ThreadGroupHandle _group; 
-  //jagd 
   unsigned long _maxThreads;  
   unsigned long _minThreads;  
 public:
@@ -89,48 +88,41 @@ public:
    * Test if another thread should be created.
    * @return Returns true if another thread has been started, false otherwise.
    */
-  //synchronized public boolean createNewReader() {
   bool createNewReader();
     
-  void createThread();
       
   /**
    * Counts the number of active threads (increment).
    * @param t Thread that becomes active.
    * @param firstTime It is true if thread t is active for the first time.
    */
-  //synchronized public void setActive(Thread t, boolean firstTime) {
   void setActive(TIDThr::Thread* t, bool firstTime);
     
   /**
    * Counts the number of active threads (decrement).
    * @param t Thread that becomes inactive.
    */
-  //synchronized public void setInactive(Thread t) {
   void setInactive(TIDThr::Thread* t);
     
   /**
    * Clean up when a thread dies.
    * @param t Thread that has died.
    */
-  //synchronized public void threadHasDied(Thread t) {
   void threadHasDied(TIDThr::Thread* t);
     
-  //synchronized public void deactivation()
   void deactivation();
   
-  //synchronized public boolean threadCanDie(Thread t) {
   bool threadCanDie(TIDThr::Thread* t);
     
-  //synchronized public void minThreadsHasChanged() {
   void minThreadsHasChanged();
 
   void maxThreadsHasChanged();
   
-//MLG  
   CORBA::ULong getActives() { return _active; }  
-//EMLG  
-      
+
+ private:
+  void createThread();
+
 };
 } //poa
 } //core

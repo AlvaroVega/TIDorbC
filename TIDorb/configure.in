@@ -41,6 +41,9 @@ dnl TID_CHECK_DEBUG
 dnl Check Compressors
 TID_CHECK_COMPRESSORS
 
+dnl Check SSL
+TID_CHECK_SSL
+
 dnl Makefile generation output
 AC_OUTPUT(
   Makefile \
@@ -84,6 +87,7 @@ AC_OUTPUT(
   source/TIDorbC/orb/IDL/09_PortableGroup/Makefile \
   source/TIDorbC/orb/IDL/10_Messaging/Makefile \
   source/TIDorbC/orb/IDL/11_Compression/Makefile \
+  source/TIDorbC/orb/IDL/12_Security/Makefile \
   source/TIDorbC/orb/TIDorb/Makefile \
   source/TIDorbC/orb/include/Makefile \
   source/TIDorbC/orb/include/TIDorb/Makefile \

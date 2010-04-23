@@ -217,7 +217,7 @@ void ValueTypeInfo::read_type_info(CDRInputStream& input)
 void ValueTypeInfo::write_type_info(CDROutputStream& out)
 {
 
-/* pra@tid.es - Already done in previous write_code_base_url() call
+/* Already done in previous write_code_base_url() call
 
     const char* url = (const char*) m_code_base_url;
     if (url) {

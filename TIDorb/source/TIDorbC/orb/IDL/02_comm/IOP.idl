@@ -29,7 +29,7 @@ module IOP {
   // This would be encapsulated in a TaggedProfile.
 */
   typedef unsigned long ComponentId;
-/*
+
   struct TaggedComponent {
     ComponentId tag;
     sequence <octet> component_data;
@@ -40,7 +40,7 @@ module IOP {
 
   typedef sequence<TaggedComponent> TaggedComponentSeq;
 
-*/
+
     
   // CORBA 2.4  
   const ComponentId TAG_ORB_TYPE = 0;
@@ -67,6 +67,9 @@ module IOP {
   const ComponentId TAG_MESSAGE_ROUTERS = 30;
   const ComponentId TAG_OTS_POLICY = 31;
   const ComponentId TAG_INV_POLICY = 32;
+  const ComponentId TAG_CSI_SEC_MECH_LIST = 33;
+  const ComponentId TAG_NULL_TAG = 34;
+  const ComponentId TAG_TLS_SEC_TRANS = 36;
   const ComponentId TAG_INET_SEC_TRANS = 123;
   const ComponentId TAG_COMPLETE_OBJECT_KEY = 5;
   const ComponentId TAG_ENDPOINT_ID_POSITION = 6;
@@ -98,6 +101,7 @@ module IOP {
   const ServiceId RTCorbaPriority = 10;
   const ServiceId RTCorbaPriorityRange = 11;
   const ServiceId ExceptionDetailMessage = 14;
+  const ServiceId SecurityAttributeService = 15;
 
   local interface Codec {
     

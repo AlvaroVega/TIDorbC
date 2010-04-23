@@ -57,9 +57,7 @@ TIDorb::core::poa::ExecThread::ExecThread(TIDorb::core::poa::POAManagerImpl* poa
 //     param.sched_priority=1;
 //   }
 //   pthread_attr_setschedparam(&tatrb,&param);
-// //FRAN
 //   pthread_attr_destroy(&tatrb);
-// //EFRAN
 // #else
 //   pthread_attr_create(&tatrb);
 //   pthread_attr_setprio(&tatrb,sched_get_priority_max(sched_getscheduler(getpid())));
@@ -137,9 +135,7 @@ CORBA::Boolean TIDorb::core::poa::ExecThread::checkState(TIDorb::core::poa::Queu
 
 
 
-//FRAN
 void TIDorb::core::poa::ExecThread::processRequest(TIDorb::core::poa::QueuedRequest*& thisRequest)
-//EFRAN
 {
   if (_poaManager->orb->trace != NULL) {
     TIDorb::util::StringBuffer  msg;
@@ -166,11 +162,9 @@ void TIDorb::core::poa::ExecThread::processRequest(TIDorb::core::poa::QueuedRequ
       if (poa != NULL) {
         execute(thisRequest,poa);
       }
-//FRAN
       else {
         thisRequest = NULL;
       }
-//EFRAN
 
     }
   } catch (const CORBA::SystemException &e) {
@@ -194,15 +188,10 @@ TIDorb::core::poa::POAImpl* TIDorb::core::poa::ExecThread::findPOA(TIDorb::core:
 
   while (!request->isFinalPOA()) {
     
-    //jagd
-    //PortableServer::POA_ptr aux_poa = current_poa->find_POA((const char*)request->get_current_child_POA_name(), true);
-    //current_poa= dynamic_cast<TIDorb::core::poa::POAImpl*>(aux_poa);
     current_poa= current_poa->find_POA((const char*)request->get_current_child_POA_name(), true);
 
     request->next_child_POA(current_poa);
     PortableServer::POAManager_ptr aux_nextPOAManager = current_poa->the_POAManager();
-    //jagd 
-    //TIDorb::core::poa::POAManagerImpl* nextPOAManager = dynamic_cast<TIDorb::core::poa::POAManagerImpl*>(aux_nextPOAManager);
     TIDorb::core::poa::POAManagerImpl* nextPOAManager = (TIDorb::core::poa::POAManagerImpl*)(aux_nextPOAManager);
 
     if (nextPOAManager != _poaManager) {
@@ -235,7 +224,7 @@ CORBA::Boolean TIDorb::core::poa::ExecThread::checkForeingState
 
   PortableServer::POAManager::State state = current_manager->get_state();
 
-  // chech current_manager state
+  // check current_manager state
   if (state == PortableServer::POAManager::HOLDING) {
     if (_poaManager->orb->trace != NULL) {
       TIDorb::util::StringBuffer msg;
@@ -312,49 +301,15 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::QueuedRequest* re
 
 
   // execute request
-  //jagd 2
-  //CurrentInfo* current = new CurrentInfo(poa, request->getOID());
-  //jagd 3
-  //const TIDorb::core::poa::OID & _oid=request->getOID();
   CurrentInfo  current(poa, oid);
-  //CurrentInfo  current(poa, _oid);
   _currentInfoStack.push(&current);
 
   try
   {
-    //jagd se cambia el poco estilizado bloque if-else-if
-    //por el patron double dispatching 
-    /* 
-    const char* tipobase = request->_typeid();
+    // se cambia el poco estilizado bloque if-else-if
+    // por el patron double dispatching 
 
-    if (tipobase==NULL)
-      throw CORBA::INTERNAL();
-
-    if (tipobase[0]=='I') // IIOP request
-    {
-      if (tipobase[4]=='R')
-        execute((TIDorb::core::poa::IIOPRequest*) request->_impl(), poa);
-      else
-        execute((TIDorb::core::poa::IIOPLocateRequest*) request->_impl(), poa);
-    }
-    else if (tipobase[0]=='L') // Local request
-    {
-      if (tipobase[5]=='R')
-        execute((TIDorb::core::poa::LocalRequest*) request->_impl(), poa);
-      else
-        execute((TIDorb::core::poa::LocalLocateRequest*) request->_impl(), poa);
-    }
-    else if (tipobase[0]=='M') // MIOP request
-    {
-      execute((TIDorb::core::goa::MIOPRequest*) request->_impl(), poa);
-    }
-    else
-    {
-      throw CORBA::INTERNAL();
-    }
-    //EPRA
-   */ 
-    //jagd la funcion dispatch es la encargada de seleccionar el objeto y dentro se hace el segundo 
+    // la funcion dispatch es la encargada de seleccionar el objeto y dentro se hace el segundo 
     // dispatch por polimorfismo
     request->dispatch(this,poa);
    
@@ -367,26 +322,16 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::QueuedRequest* re
   } catch (...) {
   }
 
-  //jagd 2
-  //CurrentInfo* info = _currentInfoStack.top();
   _currentInfoStack.pop();
  
-  //jagd 2 
-  //if(current->is_request_in_POA()) {
   if(current.is_request_in_POA()) {
     try {
       poa->removeUser(oid);
     } catch (const CORBA::Exception &e) {}
-    //PRA
-    //request->destroy();
-    //EPRA
   }
 
-//MLG: This will delete current and info that points to the same
-//     It should be here because current is consulted at is_request_in_POA
-  //jagd 2 
-  //delete info;
-//EMLG  
+  // This will delete current and info that points to the same
+  // It should be here because current is consulted at is_request_in_POA
 }
 
 
@@ -431,9 +376,8 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::IIOPRequest* requ
   }
 
   // get servant
-//MLG  
   PortableServer::ServantLocator::Cookie cookie = NULL;
-//EMLG  
+
   CORBA::Boolean servantLocatorUsed = false;
 
   PortableServer::ServantBase* servant = NULL;
@@ -441,10 +385,7 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::IIOPRequest* requ
   const TIDorb::core::poa::OID& oid = request->getOID();
  
   try {
-//MLG
     servant = poa->find_servant(oid, serverRequest->operation(), &cookie, &servantLocatorUsed);
-//EMLG
-
     poa->addUser(oid);
 
     CurrentInfo* current_info =_currentInfoStack.top();
@@ -473,15 +414,8 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::IIOPRequest* requ
     return;
   }
 
-  // set servant in current object
-  //PRA
-  //CurrentInfo* current = _currentInfoStack.top();
-  //current->setServant(servant);
-  //EPRA
-
   request->setStatus(CORBA::COMPLETED_MAYBE);
 
-  //if (serverRequest->operation()->equals("_is_a")) {
   if (strcmp(serverRequest->operation(), "_is_a")==0) {
     invoke_is_a(poa, servant, serverRequest);
   } else {
@@ -536,9 +470,9 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::goa::MIOPRequest* requ
   }
 
   // get servant
-//MLG  
+
   PortableServer::ServantLocator::Cookie cookie = NULL;
-//EMLG
+
   CORBA::Boolean servantLocatorUsed = false;
 
   PortableServer::ServantBase* servant = NULL;
@@ -546,9 +480,7 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::goa::MIOPRequest* requ
   const TIDorb::core::poa::OID& oid = request->getOID();
 
   try {
-//MLG
     servant = poa->find_servant(oid, serverRequest->operation(), &cookie, &servantLocatorUsed);
-//EMLG
 
     poa->addUser(oid);
 
@@ -577,12 +509,6 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::goa::MIOPRequest* requ
     }
     return;
   }
-
-  // set servant in current object
-  //PRA
-  //CurrentInfo* current = _currentInfoStack.top();
-  //current->setServant(servant);
-  //EPRA
 
   request->setStatus(CORBA::COMPLETED_MAYBE);
 
@@ -690,9 +616,8 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::LocalRequest* loc
 
 
   // get servant
-//MLG
   PortableServer::ServantLocator::Cookie cookie = NULL;
-//EMLG
+
   CORBA::Boolean servantLocatorUsed = false;
 
   PortableServer::ServantBase* servant = NULL;
@@ -730,10 +655,8 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::LocalRequest* loc
   }
 
   // set servant in current object
-  //PRA
   //CurrentInfo* current = _currentInfoStack.top();
   //current->setServant(servant);
-  //EPRA
 
   localRequest->setStatus(CORBA::COMPLETED_MAYBE);
 
@@ -816,32 +739,21 @@ void TIDorb::core::poa::ExecThread::execute(TIDorb::core::poa::LocalLocateReques
 void TIDorb::core::poa::ExecThread::invoke_is_a(TIDorb::core::poa::POAImpl* poa, PortableServer::ServantBase* servant, CORBA::ServerRequest* request)
 {
   try {
-    /* Bug en DSI
-    TIDorb::portable::ServantDelegate* aux_deleg = servant->get_delegate();
-    TIDorb::core::poa::ServantDelegate* deleg = dynamic_cast<TIDorb::core::poa::ServantDelegate*>(aux_deleg);
-    */
 
     TIDorb::core::TIDORB* orb = poa->orb;
 
     CORBA::NVList_var params;
     orb->create_list(1, params);
     
-    //jagd 3 CORBA::NamedValue_var s = params->add_item("s", CORBA::ARG_IN);
     CORBA::NamedValue * s = params->add_item("s", CORBA::ARG_IN);
-//FRAN
-    // Fix bug [#392] Any::type(tc) reset any value
-    //s->value()->type(CORBA::_tc_string);
+
     s->value()->delegate().set_type(CORBA::_tc_string);
-//EFRAN
+
     request->arguments(params);
 
     const char* itf;
     (*(s->value())) >>= itf;
     
-    /* Bug en DSI
-    CORBA::Boolean result = deleg->is_a(servant, itf);
-    */
-
     CORBA::Boolean result = servant->_is_a(itf);
 
     CORBA::Any resultAny;
@@ -901,9 +813,7 @@ void TIDorb::core::poa::ExecThread::run()
         msg << toString() << ": Getting requests..." << ends;
         _poaManager->orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
       }
-//MLG
       thisRequest = _queue->get();
-//EMLG      
 
       _threadStateListener->setActive(this, _firstTime);
 
@@ -926,10 +836,7 @@ void TIDorb::core::poa::ExecThread::run()
     }
     
     if(thisRequest) {
-      //PRA
-      //delete thisRequest;
       thisRequest->destroy();
-      //EPRA
       thisRequest = NULL;
     }
   }
@@ -964,16 +871,11 @@ void TIDorb::core::poa::ExecThread::processLocalRequest(TIDorb::core::poa::Abstr
 
     try {
       while (!thisRequest->isFinalPOA()) {
-        //jagd
-        //PortableServer::POA_ptr aux_poa=current_poa->find_POA((const char*)thisRequest->get_current_child_POA_name(), true);
-        //current_poa = dynamic_cast<TIDorb::core::poa::POAImpl*>(aux_poa);
         current_poa=current_poa->find_POA((const char*)thisRequest->get_current_child_POA_name(), true); 
          
         thisRequest->next_child_POA(current_poa);
 
         PortableServer::POAManager_ptr aux_nextPOAManager = current_poa->the_POAManager();
-        //jagd
-        //TIDorb::core::poa::POAManagerImpl* nextPOAManager = dynamic_cast<TIDorb::core::poa::POAManagerImpl*>(aux_nextPOAManager);
         TIDorb::core::poa::POAManagerImpl* nextPOAManager = (TIDorb::core::poa::POAManagerImpl*)(aux_nextPOAManager);
 
         if (nextPOAManager != _poaManager) {

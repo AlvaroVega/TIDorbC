@@ -72,8 +72,9 @@ class ShortHolder : public TIDorb::portable::Streamable {
     }
 
     CORBA::TypeCode_ptr _type() const {
-        return CORBA::TypeCode::_duplicate(CORBA::_tc_short);
-        //return TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(::CORBA::tk_short);
+      //return CORBA::TypeCode::_duplicate(CORBA::_tc_short);
+        // Temporal workarround of core dump at static initialization due to unions at CSI.idl             
+        return TIDorb::portable::TypeCodeFactory::get_basic_TypeCode(::CORBA::tk_short);
     }
 
 };

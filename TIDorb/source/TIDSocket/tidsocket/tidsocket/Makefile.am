@@ -9,7 +9,8 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libtidsocket.la
 
 libtidsocket_la_LIBADD = \
-  ${top_builddir}/source/TIDThr/tidthr/tidthr/libtidthr.la
+  ${top_builddir}/source/TIDThr/tidthr/tidthr/libtidthr.la \
+  $(SSL_LIB)
 
 libtidsocket_la_SOURCES = \
         DatagramChannel.C \
@@ -31,7 +32,16 @@ libtidsocket_la_SOURCES = \
         ServerSocketChannel.C \
         Socket.C \
         SocketChannel.C \
-        SocketImpl.C
+        SocketImpl.C \
+	SSLContext.C \
+	SSLInputStream.C \
+	SSLOutputStream.C \
+	SSLServerSocket.C \
+	SSLServerSocketFactory.C \
+	SSLSession.C \
+	SSLSessionContext.C \
+	SSLSocket.C \
+	SSLSocketFactory.C
 
 
 libtidsocket_la_LDFLAGS = \

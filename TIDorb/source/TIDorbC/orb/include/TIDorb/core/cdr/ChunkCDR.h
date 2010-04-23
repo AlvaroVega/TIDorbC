@@ -116,7 +116,6 @@ class ChunkCDR {
   	/**
   	 * @return The available bytes. 
   	 */
-        //jagd  
   	inline CDR::Addr get_available_end() const {return m_available_end;}
   	
   	/**
@@ -144,7 +143,6 @@ class ChunkCDR {
   	/**
   	 *	buffer limint: this position is not included
   	 */
-   //jagd
   public:
 
   	CDR::Addr m_buffer_end;

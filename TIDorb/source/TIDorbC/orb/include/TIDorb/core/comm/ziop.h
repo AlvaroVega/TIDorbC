@@ -36,7 +36,6 @@
 #define _TIDORB_CORE_COMM_ZIOP_H_
 
 
-//#include "TIDorb/core/comm/ziop/ProfileZIOP.h"
 #include "TIDorb/core/comm/ziop/ZIOPMessage.h"
 
 

@@ -46,7 +46,7 @@ TIDorb::core::comm::miop::GroupInfo::GroupInfo()
 	: TIDorb::core::iop::TaggedComponent(TIDorb::core::iop::TAG_GROUP) 
 {
 	_str = NULL;
-	_group_domain_id = NULL; //CORBA::string_dup("");
+	_group_domain_id = NULL;
 	_object_group_id = 0;
 	_object_group_ref_version = 0;
 }
@@ -112,7 +112,6 @@ void TIDorb::core::comm::miop::GroupInfo::write(TIDorb::core::cdr::CDROutputStre
   TIDThr::Synchronized synchro(*((GroupInfo*) this));
   
   if (!_component_data) {
-    //TIDorb::core::TIDORB* orb = dynamic_cast<TIDorb::core::TIDORB*>(out.orb());
     TIDorb::core::TIDORB* orb = (TIDorb::core::TIDORB*)(out.orb());
     TIDorb::core::cdr::CDROutputStream encapsulation(orb, new TIDorb::core::cdr::BufferCDR(TIDorb::core::ConfORB::DEFAULT_BLOCK_SIZE));
                        
@@ -124,8 +123,6 @@ void TIDorb::core::comm::miop::GroupInfo::write(TIDorb::core::cdr::CDROutputStre
     encapsulation.write_ulonglong(_object_group_id);
     encapsulation.write_ulong(_object_group_ref_version);
     
-//     ((GroupInfo*) this)->_component_data = dynamic_cast<TIDorb::core::cdr::CDRInputStream*>
-//                                            (encapsulation.create_input_stream());
     ((GroupInfo*) this)->_component_data = (TIDorb::core::cdr::CDRInputStream*)
                                            (encapsulation.create_input_stream());
   }
@@ -155,12 +152,7 @@ void TIDorb::core::comm::miop::GroupInfo::partial_read(TIDorb::core::cdr::CDRInp
   minor = aux;
   _version = Version(major, minor);
 
-//PRA
-//TODO: posible memory leak
-//if (_group_domain_id) {
-//  CORBA::string_free(_group_domain_id);
-//}
-//EPRA
+
   _component_data->read_string(_group_domain_id);
   _component_data->read_ulonglong(_object_group_id);
   _component_data->read_ulong(_object_group_ref_version);

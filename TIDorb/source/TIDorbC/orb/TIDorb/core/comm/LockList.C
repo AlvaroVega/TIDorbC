@@ -69,7 +69,7 @@ Lock& LockList::activate_lock(RequestId id)
     }
     
     lock->request_id(id);
-    
+
 	active_locks[id] = lock;
     
     return *lock;
@@ -102,13 +102,13 @@ void LockList::deactivate_lock(RequestId id)
     }
         
     Lock* lock = (*it).second;
-        
+
 	active_locks.erase(it);
-            
+
     lock_pool.put_lock(lock);
     
     if(destroyed && (active_locks.size() == 0)){
-        notifyAll();
+      notifyAll();
     }
 }
 	
@@ -120,7 +120,7 @@ size_t LockList::size()
 void LockList::destroy() 
 {
   TIDThr::Synchronized synchro(*this);
-  
+
   if(!destroyed) {
       destroyed = true; 
       
@@ -129,10 +129,10 @@ void LockList::destroy()
       Lock* lock = NULL;
       while(it != end) {
         lock = (*it).second;
-        
+
         TIDThr::Synchronized sync(*lock);
         lock->notify();
-        
+
         ++it;  
       }
   }

@@ -48,8 +48,7 @@ TIDorb::core::poa::RequestQueue::RequestQueue(
   _poaManager = poaManager;
   _poaManager->_add_ref();
   _deactivation = false;
-  
-  //jagd
+  _thread_pool = _poaManager->getThreadPool();
   _maxAvailableRequests = (_poaManager->conf->getMaxQueuedRequests() +
                            _poaManager->conf->getMaxThreads());
   _starving_time = _poaManager->conf->getStarvingTime();
@@ -97,10 +96,10 @@ void TIDorb::core::poa::RequestQueue::add(TIDorb::core::poa::QueuedRequest* requ
   TIDThr::Synchronized synchro(*this);
 
   if ( (_deactivation) ||
-       // jagd (this->size() >= (_poaManager->conf->getMaxQueuedRequests()
+       // (this->size() >= (_poaManager->conf->getMaxQueuedRequests()
        (this->size() >= (_maxAvailableRequests
-                         //jagd + _poaManager->conf->getMaxThreads()
-                         - _poaManager->getThreadPool()->getActives())) ) {
+                         //+ _poaManager->conf->getMaxThreads()
+                         - _thread_pool->getActives())) ) {
     
     request->returnError(CORBA::TRANSIENT(NULL, 1, CORBA::COMPLETED_NO),
                          _poaManager->orb->trace);
@@ -141,7 +140,6 @@ TIDorb::core::poa::QueuedRequest* TIDorb::core::poa::RequestQueue::get()
       return NULL;
     }
     try {
-      //jagd wait(_poaManager->conf->getStarvingTime());
       wait(_starving_time);
     } catch(TIDThr::InterruptedException &ie) {}
 

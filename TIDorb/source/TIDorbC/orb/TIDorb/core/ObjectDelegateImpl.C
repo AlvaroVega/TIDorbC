@@ -42,7 +42,8 @@ TIDorb::core::ObjectDelegateImpl::ObjectDelegateImpl
    TIDorb::core::iop::IOR* ref,
    TIDorb::core::comm::CommunicationLayer* layer)
  throw (TIDThr::SystemException)
-    : m_orb(orb), m_reference(ref), m_comm_layer(layer), policyContext(NULL)
+    : m_orb(orb), m_reference(ref), m_comm_layer(layer), policyContext(NULL), 
+      m_domain_manager_list(NULL)
 {
 }  
 
@@ -53,7 +54,8 @@ TIDorb::core::ObjectDelegateImpl::ObjectDelegateImpl
    TIDorb::core::comm::CommunicationLayer* layer,
    TIDorb::core::PolicyContext* policies)
  throw (TIDThr::SystemException)
-    : m_orb(orb), m_reference(ref), m_comm_layer(layer), policyContext(policies)
+    : m_orb(orb), m_reference(ref), m_comm_layer(layer), policyContext(policies),
+      m_domain_manager_list(NULL)
 {
 }  
 
@@ -91,27 +93,23 @@ TIDorb::core::iop::IOR* TIDorb::core::ObjectDelegateImpl::getReference()
   if(!m_orb)
     throw CORBA::BAD_OPERATION("ORB Singleton", 0, CORBA::COMPLETED_NO);
 
-  TIDorb::core::PolicyContext* request_policy_context = createRequestPolicyContext();
-
   if(m_forwarded_delegate.in())  
     return m_forwarded_delegate->non_existent();
-  else
-    return ! m_comm_layer->object_exists(m_reference, *request_policy_context);
+  else {
+    TIDorb::core::PolicyContext* request_policy_context = createRequestPolicyContext();
+    CORBA::Boolean non_existent = 
+      ! m_comm_layer->object_exists(m_reference, *request_policy_context);
+    delete request_policy_context;
+  }
 }
 
  //TIDORB 
 
 void TIDorb::core::ObjectDelegateImpl::oneway_request(TIDorb::core::RequestImpl* request) throw(CORBA::SystemException)
 {
-//   if(m_forwarded_reference.is_null())
-//     m_orb->getCommunicationLayer()->oneway_request(request, m_reference);
-//   else
-//     m_orb->getCommunicationLayer()->oneway_request(request, m_forwarded_reference);  
   if (! m_forwarded_delegate.in())  
     m_comm_layer->oneway_request(request,m_reference);
   else
-    //    m_comm_layer->oneway_request(request,m_reference);
-    // m_forwarded_delegate->invoke(request);
     m_forwarded_delegate->oneway_request(request);
 
 
@@ -215,5 +213,20 @@ TIDorb::core::ObjectDelegateImpl* TIDorb::core::ObjectDelegateImpl::copy()
     new ObjectDelegateImpl(m_orb, m_reference, m_comm_layer, context_aux);
 
   return copy_delegate;
+
+}
+
+
+
+CORBA::DomainManagerList* 
+TIDorb::core::ObjectDelegateImpl::getDomainManagerList()
+{
+
+  if (m_domain_manager_list == NULL) {
+    m_domain_manager_list = new CORBA::DomainManagerList();
+    m_domain_manager_list->length(1);
+    (*m_domain_manager_list)[0] = m_orb->getDefaultDomainManager();
+  }
+  return m_domain_manager_list;
 
 }
