@@ -89,7 +89,7 @@ TIDorb::core::init()
   TIDorb::core::TIDORB::st_init_mutex =
     TIDorb::core::TIDORB::create_init_mutex();
   
-  TIDorb::core::TIDORB::st_version = "6.4.2";
+  TIDorb::core::TIDORB::st_version = "6.4.3";
   
   TIDorb::core::TIDORB::st_orb_instances = TIDorb::core::TIDORB::ORBTable();
 
