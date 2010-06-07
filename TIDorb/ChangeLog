@@ -1,4 +1,12 @@
-2010-04-16 Alvaro Vega Garcia  <avega@tid.es>
+2010-06-07 Alvaro Vega Garcia  <avega at tid dot es>
+	
+	* TIDorbC version 6.4.3 released.
+
+	Fix bug [#1197] INV_REF exception using ZIOP over MIOP
+	Fix bug [#1194] Core dump: checking policies
+	Fix bug [#1193] memory leak in Object::_set_policy_overrides
+
+2010-04-16 Alvaro Vega Garcia  <avega at tid dot es>
         
 	* TIDorbC version 6.4.2 released.
 
@@ -8,7 +16,7 @@
 	Fix bug [#1150] orb->destroy does not destroy properly SSLIOP layer
 	Fix bug [#1135] TIDorb must ensure initialization of static variables
 
-2010-03-03 Alvaro Vega Garcia  <avega@tid.es>
+2010-03-03 Alvaro Vega Garcia  <avega at tid dot es>
         
 	* TIDorbC version 6.4.1 released.
         * TIDorbC version 6.3.3 released.
@@ -17,7 +25,7 @@
         Fix bug [#1119] NULL reference to Thread in PolicyManagerContext
 	Fix bug [#1113] INTERNAL exception catched procesing a reply
 	
-2010-02-12 Alvaro Vega Garcia  <avega@tid.es>
+2010-02-12 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.4.0 released.
 
@@ -33,7 +41,7 @@
 	Task [#779] Security Checker
 	Task [#781] Secure corbalocs
 
-2009-08-05 Alvaro Vega Garcia  <avega@tid.es>
+2009-08-05 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.3.2 released.
        
@@ -41,7 +49,7 @@
 	Fix bug [#1034] Object::_set_policy_overrides doesn't leave current 
 	object reference without changes
         
-2009-07-02 Alvaro Vega Garcia  <avega@tid.es>
+2009-07-02 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.3.1 released.
         
@@ -56,7 +64,7 @@
 	(ej. -123.234)
 	Fix bug [#782] CORE: infinite loop in BigInt management
 
-2009-04-08 Alvaro Vega Garcia  <avega@tid.es>
+2009-04-08 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.3.0 released.
 	
@@ -72,7 +80,7 @@
 	created from an alias TypeCode
 	Feature [#841] Set TAG_ORB_TYPE requested to OMG
 
-2008-10-03 Alvaro Vega Garcia  <avega@tid.es>
+2008-10-03 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.21 released.
 	
@@ -80,7 +88,7 @@
 	a Typecode.
 	Fix bug [#775] MARSHAL dispatching a LocateRequest
 	
-2008-09-15 Alvaro Vega Garcia  <avega@tid.es>
+2008-09-15 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.20 released.
 	
@@ -113,7 +121,7 @@
 	Implemented feature [#676] LongDouble type
 
 
-2008-09-11 Alvaro Vega Garcia  <avega@tid.es>
+2008-09-11 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.19 released.
 
@@ -129,7 +137,7 @@
 	Fix bug [#748] Memory leak with Unions
 	
 	
-2008-06-20 Alvaro Vega Garcia  <avega@tid.es>
+2008-06-20 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.17 released.
 
@@ -137,20 +145,20 @@
 	Fix bug [#527] After a COMM_FAILURE client doesn't retry connection with a 
 	restarted server
 	
-2008-06-10 Alvaro Vega Garcia  <avega@tid.es>
+2008-06-10 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.16 released.
 			
 	Fix bug [#442] Core dump inserting a Any into a structure created from a DynAny
 	
-2008-06-03 Alvaro Vega Garcia  <avega@tid.es>
+2008-06-03 Alvaro Vega Garcia  <avega at tid dot es>
 	
 	* TIDorbC version 6.2.15 released.
 	
 	Fix bug [#440] TIDorb close socket connection after obtain MARSHAL processing 
 	a completed MIOP packet
 
-2008-05-16 Alvaro Vega Garcia  <avega@tid.es>
+2008-05-16 Alvaro Vega Garcia  <avega at tid dot es>
 	
 	* TIDorbC version 6.2.14 released.
 	
@@ -158,26 +166,26 @@
 	Fix bug [#433] Incorrect timeout returned by QoS::CheckRequestTime
 
 
-2008-05-08 Alvaro Vega Garcia  <avega@tid.es>
+2008-05-08 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.13 released.
 	
 	Fix bug [#431] CDR alignment problem with some valuetypes: FormatMisMatch raised
 	
-2008-04-24 Alvaro Vega Garcia  <avega@tid.es>
+2008-04-24 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.12 released.
 	
 	Fix bug [#423] TIDorb close socket connection after receive a bad MIOP header
 	Fix bug [#324] Incorrect internal representation of TimeT in QoS module
 	
-2008-03-14 Alvaro Vega Garcia  <avega@tid.es>
+2008-03-14 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.11 released.
 
 	Fix bug [#408] MIOP Interoperability issues between TAO and TIDorb
 
-2008-02-18 Alvaro Vega Garcia  <avega@tid.es>
+2008-02-18 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.10 released.
 
@@ -185,19 +193,19 @@
 	out/return of an invocation
 	Fix bug [#403] tk_longdouble is ignored in Any management
 	
-2008-02-18 Alvaro Vega Garcia  <avega@tid.es>
+2008-02-18 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.9 released.
 
 	Fix bug [#392] Any::type(tc) reset any value
 	
-2008-02-15 Alvaro Vega Garcia  <avega@tid.es>
+2008-02-15 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.8 released.
 
 	Fix bug [#393] Error processing a return of DII invocation
 	
-2008-01-29 Alvaro Vega Garcia  <avega@tid.es>
+2008-01-29 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.7 released.
 	
@@ -205,11 +213,11 @@
 	from a string
 	Fix bug [#388] Corbaname::to_string doesn't include kind field of Name
 
-2008-01-24 Alvaro Vega Garcia  <avega@tid.es>
+2008-01-24 Alvaro Vega Garcia  <avega at tid dot es>
 	
 	Fix bug [#385] Memory leak about requests that are not queued
 	
-2007-11-30 Alvaro Vega Garcia  <avega@tid.es>
+2007-11-30 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.6 released.
 
@@ -219,14 +227,14 @@
 	Fix bug [#353] OBJECT_NOT_EXISTS dispaching request with corbaloc 
 	instead of POAkey
 	
-2007-11-19 Alvaro Vega Garcia  <avega@tid.es>
+2007-11-19 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.5 released.
 	
 	* source/TIDorbC/core/messagin/QoS.C:
 	  Fix bug [#352] Core dump with RequestEndTimePolicy
 
-2007-10-30 Alvaro Vega Garcia  <avega@tid.es>
+2007-10-30 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.4 released.
 
@@ -234,27 +242,27 @@
 	Fix bug [#343] Server listeners sockets doesn't set SO_REUSEADDR socket 
 	option at initializing
 	
-2007-10-11 Alvaro Vega Garcia  <avega@tid.es>
+2007-10-11 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.3 released.
 
 	More fiexed related with bug [#323] Some errors with corbaloc:iiop and 
 	corbanames
 	
-2007-10-10 Alvaro Vega Garcia  <avega@tid.es>
+2007-10-10 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.2 released.
 	
 	More fiexed related with bug [#323] Some errors with corbaloc:iiop and 
 	corbanames
 
-2007-10-08 Alvaro Vega Garcia  <avega@tid.es>
+2007-10-08 Alvaro Vega Garcia  <avega at tid dot es>
 
 	* TIDorbC version 6.2.1 released.
 
 	Fix bug [#323] Some errors with corbaloc:iiop and corbanames
 	
-2007-08-23 Alvaro Vega Garcia  <avega@tid.es>
+2007-08-23 Alvaro Vega Garcia  <avega at tid dot es>
 	
 	* TIDorbC version 6.2.0 released.
 

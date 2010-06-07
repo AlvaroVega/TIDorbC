@@ -176,7 +176,8 @@ TIDorb::core::ObjectImpl::_set_policy_overrides(const CORBA::PolicyList& policie
     TIDorb::core::PolicyContext* policy_context = NULL;
     policy_context = delegate_copy->getPolicyContext();
 
-    ///delegate_copy->_remove_ref(); /// ?????
+    // Fix memory leak: _set_delegate increases internal count
+    delegate_copy->_remove_ref(); 
 
     if (policy_context != NULL){
 

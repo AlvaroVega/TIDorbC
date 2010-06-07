@@ -89,6 +89,7 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP
         _object_key = object_key;
         _components = tagged_components;
         _profile_data = NULL;
+        _policies = NULL;
         _components_extracted = true;
         _ssl = NULL;
         _compound_sec_mechs = NULL;
@@ -134,6 +135,7 @@ TIDorb::core::comm::iiop::ProfileIIOP::ProfileIIOP
         _object_key = other._object_key;
         _components = other._components;
         _profile_data = NULL;
+        _policies = NULL;
         _components_extracted = true;
         _ssl = NULL;
         _compound_sec_mechs = NULL;
@@ -186,6 +188,9 @@ TIDorb::core::comm::iiop::ProfileIIOP::operator= (const TIDorb::core::comm::iiop
         _components = other._components;
         _profile_data = NULL;
         _components_extracted = true;
+        _policies = NULL;
+        _ssl = NULL;
+        _compound_sec_mechs = NULL;
 	return *this;
 }
 

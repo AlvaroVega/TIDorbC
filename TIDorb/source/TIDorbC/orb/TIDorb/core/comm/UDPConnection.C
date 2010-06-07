@@ -312,7 +312,8 @@ void TIDorb::core::comm::UDPConnection::send_oneway_request_async
     if (/*ior->is_ZIOP() || */assume_ziop_server) {
 
       TIDorb::core::PolicyContext* policies_context_ior = NULL;
-      policies_context_ior = ior->policies();
+      
+      policies_context_ior = NULL; // NOT IOR policies ior->policies();
 
       compressor = TIDorb::core::ziop::Ziop::getClientCompressor(
                                                               *policy_context,
@@ -693,9 +694,8 @@ void TIDorb::core::comm::UDPConnection::receive_message(){
       // Attend for compressed messages
       if (header.getCompressed()){
         TIDorb::core::comm::ziop::ZIOPMessage ziop_message(header);
-        
-        ziop_message.receive_body(this, (unsigned char*) 
-                                  (receive_header_buffer->get_chunk(0)->get_buffer()));
+
+        ziop_message.set_body(this, buffer, input);
 
         ziop_message.connect_GIOPMessage(this);
         continue;

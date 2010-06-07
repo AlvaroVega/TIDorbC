@@ -70,9 +70,7 @@ class ExceptionListImpl : public CORBA::ExceptionList,
     
   protected:
   
-//FRAN
     typedef vector<CORBA::TypeCode_ptr> ItemList;
-//EFRAN    
     ItemList m_list;
 };
 

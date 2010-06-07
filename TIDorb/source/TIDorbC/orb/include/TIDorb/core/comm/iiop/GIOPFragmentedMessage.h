@@ -58,17 +58,13 @@ protected:
         // TODO: GIOPFragmentedMessage: ?tiene que ser virtual?
         void create_message_buffer_output(TIDorb::core::TIDORB* orb);
 
-        void create_body_buffer_output(TIDorb::core::TIDORB* orb);
+        //void create_body_buffer_output(TIDorb::core::TIDORB* orb);
 
         RequestId _request_id;
 
         TIDorb::core::cdr::CDRInputStream* message_buffer_in;
 
         TIDorb::core::cdr::CDROutputStream* message_buffer_out;
-
-        TIDorb::core::cdr::CDROutputStream* body_buffer_in;
-
-        TIDorb::core::cdr::CDROutputStream* body_buffer_out;
 
   	// MIOP extensions
         size_t _fragment_size;

@@ -170,16 +170,25 @@ void TIDorb::core::comm::ziop::ZIOPMessage::receive_body
   (TIDorb::core::comm::Connection* conn,
    const CORBA::Octet* header_bytes)
 {
+  TIDorb::core::TIDORB* _orb = conn->orb();
   TIDorb::core::comm::iiop::GIOPMessage::receive_body(conn, header_bytes);
 
   delete message_buffer_in;
-  message_buffer_in = new TIDorb::core::cdr::CDRInputStream(conn->orb(), _message_buffer);
+  message_buffer_in = new TIDorb::core::cdr::CDRInputStream(_orb, _message_buffer);
   message_buffer_in->set_byte_order(_header.getByteOrder());
 
   message_buffer_in->set_version(_header.getVersion());
   message_buffer_in->set_message(true);
 
   _message_completed = !(_header.hasMoreFragments());
+
+  this->perform_uncompression(_orb);
+
+}
+
+
+void TIDorb::core::comm::ziop::ZIOPMessage::perform_uncompression(TIDorb::core::TIDORB* orb)
+{
 
   CORBA::OctetSeq compressed;
   CORBA::ULong compressed_length;
@@ -194,19 +203,19 @@ void TIDorb::core::comm::ziop::ZIOPMessage::receive_body
                                       compressed_length);
     
   Compression::Compressor_var compressor_ptr = 
-    conn->_orb->getCompressionManager()->get_compressor(_compressor.compressor_id, 0);
+    orb->getCompressionManager()->get_compressor(_compressor.compressor_id, 0);
   
   CORBA::OctetSeq uncompressed;
   compressor_ptr->decompress(compressed, uncompressed);
  
 
-  if (conn->_orb->trace != NULL) {
+  if (orb->trace != NULL) {
     TIDorb::util::StringBuffer msg;
     msg << "Uncompressing ZIOP message ";
     msg << " from " << compressed.length() << " bytes "; 
     msg << " to " << uncompressed.length() << " bytes ";
     msg << "using compressor " << _compressor.compressor_id;
-    conn->_orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
+    orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
   }
 
 
@@ -221,6 +230,30 @@ void TIDorb::core::comm::ziop::ZIOPMessage::receive_body
 
 }
 
+
+void TIDorb::core::comm::ziop::ZIOPMessage::set_body
+  (TIDorb::core::comm::Connection* conn,
+   TIDorb::core::cdr::BufferCDR_ref buf,
+   TIDorb::core::cdr::CDRInputStream* input)
+{
+  TIDorb::core::TIDORB* _orb = conn->orb();
+  TIDorb::core::comm::iiop::GIOPMessage::set_body(buf);
+
+  delete message_buffer_in;
+
+  // TODO: Try to improve this without a new CDRInputStream, using input
+  //message_buffer_in = input;
+  message_buffer_in = new TIDorb::core::cdr::CDRInputStream(_orb, _message_buffer);
+  message_buffer_in->set_byte_order(_header.getByteOrder());
+
+  message_buffer_in->set_version(_header.getVersion());
+  message_buffer_in->set_message(true);
+
+  _message_completed = !(_header.hasMoreFragments());
+
+  this->perform_uncompression(_orb);
+}
+ 
 
 void TIDorb::core::comm::ziop::ZIOPMessage::connect_GIOPMessage(
                                         TIDorb::core::comm::Connection* conn)

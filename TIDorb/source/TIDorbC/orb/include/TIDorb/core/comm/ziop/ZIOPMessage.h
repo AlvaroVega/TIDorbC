@@ -69,12 +69,18 @@ public:
   void receive_body(TIDorb::core::comm::Connection* conn,
                     const CORBA::Octet* header_bytes);
 
+  void set_body(TIDorb::core::comm::Connection* conn,
+                TIDorb::core::cdr::BufferCDR_ref buf,
+                TIDorb::core::cdr::CDRInputStream* input);
+
   size_t get_fragment_size(TIDorb::core::TIDORB* orb);
 
   bool perform_compression(TIDorb::core::TIDORB* orb, 
                            Compression::CompressorIdLevel compressor,
                            CORBA::ULong low_value,
                            ZIOP::CompressionMinRatioPolicyValue min_ratio);
+
+  void perform_uncompression(TIDorb::core::TIDORB* orb);
 
   void connect_GIOPMessage(TIDorb::core::comm::Connection* conn);
 

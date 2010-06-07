@@ -45,8 +45,6 @@ TIDorb::core::comm::iiop::GIOPFragmentedMessage::GIOPFragmentedMessage()
     _request_id(0),
     message_buffer_in(NULL),
     message_buffer_out(NULL),
-    body_buffer_in(NULL),
-    body_buffer_out(NULL),
     _fragment_size(0)
 {
 }
@@ -58,8 +56,6 @@ TIDorb::core::comm::iiop::GIOPFragmentedMessage::GIOPFragmentedMessage
     _request_id(0),
     message_buffer_in(NULL),
     message_buffer_out(NULL),
-    body_buffer_in(NULL),
-    body_buffer_out(NULL),
     _fragment_size(0)
 {
 }
@@ -71,8 +67,6 @@ TIDorb::core::comm::iiop::GIOPFragmentedMessage::GIOPFragmentedMessage
       _request_id(request_id),
       message_buffer_in(NULL),
       message_buffer_out(NULL),
-      body_buffer_in(NULL),
-      body_buffer_out(NULL),
       _fragment_size(fragment_size)
 {
 }
@@ -85,8 +79,6 @@ TIDorb::core::comm::iiop::GIOPFragmentedMessage::GIOPFragmentedMessage
       _request_id(request_id),
       message_buffer_in(NULL),
       message_buffer_out(NULL),
-      body_buffer_in(NULL),
-      body_buffer_out(NULL),
       _fragment_size(fragment_size)
 {
 }
@@ -114,10 +106,6 @@ TIDorb::core::comm::iiop::GIOPFragmentedMessage::~GIOPFragmentedMessage()
   	delete message_buffer_in;
  if (message_buffer_out)
         delete message_buffer_out; 
- if (body_buffer_in)
-        delete body_buffer_in; 
- if (body_buffer_out)
-        delete body_buffer_out; 
 
 }
 
@@ -147,20 +135,6 @@ void TIDorb::core::comm::iiop::GIOPFragmentedMessage::create_message_buffer_outp
   if(_header.getVersion() >= Version::VERSION_1_2) {
     message_buffer_out->write_ulong(_request_id);
   }
-}
-
-
-void TIDorb::core::comm::iiop::GIOPFragmentedMessage::create_body_buffer_output
-  (TIDorb::core::TIDORB* orb)
-{
-  if (_body_buffer.is_null())
-    _body_buffer = new TIDorb::core::cdr::BufferCDR(get_fragment_size(orb));
-  else
-    _body_buffer->recycle();
-
-  delete body_buffer_out;
-  body_buffer_out = new TIDorb::core::cdr::CDROutputStream(orb, _body_buffer);
-
 }
 
 
