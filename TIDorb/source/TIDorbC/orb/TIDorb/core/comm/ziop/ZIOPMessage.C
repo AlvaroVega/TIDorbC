@@ -38,6 +38,7 @@
 
 #include "TIDorb/core/comm/ziop/ZIOPMessage.h"
 
+#include <iomanip>
 
 namespace TIDorb {
 namespace core {
@@ -141,8 +142,8 @@ bool TIDorb::core::comm::ziop::ZIOPMessage::perform_compression(
   message_buffer_out->write_ulong(source_length);
 
   // Check min ratio
-  //if ((100 - (((float)compressed.length() / (float)source.length())*100)) < min_ratio) 
-  if ( ((float)compressed.length() / (float)source.length()) < min_ratio) 
+  float ratio = 1 - ((float)compressed.length() / (float)source.length());
+  if ( ratio < min_ratio) 
     return false;
 
   message_buffer_out->write_octet_array(compressed.get_buffer(), 0 , compressed.length());
@@ -155,6 +156,7 @@ bool TIDorb::core::comm::ziop::ZIOPMessage::perform_compression(
     msg << " from " << source.length() << " bytes "; 
     msg << " to " << compressed.length() << " bytes ";
     msg << "using compressor " << compressor.compressor_id;
+    msg << " achieving ratio " << setprecision(4) << ratio*100 << " %";
     orb->print_trace(TIDorb::util::TR_USER, msg.str().data());
   }
 
