@@ -14,15 +14,15 @@ noinst_LTLIBRARIES = libTIDorbIdl_sending_context.la
 idl_source = SendingContext.idl
 
 idl_cpp_headers = \
-   SendingContext.h \
-   POA_SendingContext.h
+   SendingContext.h
+#   POA_SendingContext.h
 
 idl_cpp_sources = \
-   SendingContext.C \
-   POA_SendingContext.C
+   SendingContext.C
+#   POA_SendingContext.C
 
 $(idl_cpp_sources): $(srcdir)/SendingContext.idl
-	${IDLC} -CORBA_IDL -I./ $(srcdir)/SendingContext.idl
+	${IDLC} -CORBA_IDL -no_skel -I./ $(srcdir)/SendingContext.idl
 
 libTIDorbIdl_sending_context_la_SOURCES = $(idl_cpp_headers) $(idl_cpp_sources)
 

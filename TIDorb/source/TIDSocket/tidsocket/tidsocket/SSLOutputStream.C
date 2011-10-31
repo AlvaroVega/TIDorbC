@@ -36,7 +36,17 @@
 
 #include "TIDSocket.h"
 #include <sys/types.h>
-#include <stropts.h>
+#if (defined __darwin || defined __CYGWIN__)
+   #include <sys/ioctl.h>
+
+   // I_FLUSH was declared in CoreServices framework in OSX < 10.4
+   // This framework cannot be used in 10.5 and later, so this
+   // value is included directly
+   #define I_FLUSH ((65 << 8) | 5)
+   #define FLUSHW  0x02
+#else
+   #include <stropts.h>
+#endif
 #include <unistd.h>
 #include <errno.h>
 #include <openssl/err.h>

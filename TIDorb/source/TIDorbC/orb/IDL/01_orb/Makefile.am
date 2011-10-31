@@ -1,4 +1,5 @@
-SUBDIRS = . CORBA POA_CORBA PortableServer
+#SUBDIRS = . CORBA POA_CORBA PortableServer
+SUBDIRS = . CORBA PortableServer
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/source/TIDorbC/orb/include \
@@ -14,9 +15,10 @@ idl_cpp_headers = \
 	CORBA_ext.h \
 	CORBA.h \
 	_global_includes_for_CORBA_idl.h \
-	POA_CORBA.h \
 	PortableServer_ext.h \
 	PortableServer.h 
+#	POA_CORBA.h
+
 
 idl_cpp_sources = 
 
@@ -26,7 +28,7 @@ invalid_srcs = \
 
 $(idl_cpp_headers): $(srcdir)/CORBA.idl
 	if [ ! -f "CORBA.h" ]; then\
-	  ${IDLC} -expanded -CORBA_IDL -I./ $(srcdir)/CORBA.idl;\
+	  ${IDLC} -expanded -CORBA_IDL -no_skel -I./ $(srcdir)/CORBA.idl;\
 		cp -R $(srcdir)/extra/*.h                $(builddir)/;\
 		cp -R $(srcdir)/extra/CORBA/*.h          $(builddir)/CORBA/;\
 		cp -R $(srcdir)/extra/CORBA/ORB/*.h      $(builddir)/CORBA/ORB/;\

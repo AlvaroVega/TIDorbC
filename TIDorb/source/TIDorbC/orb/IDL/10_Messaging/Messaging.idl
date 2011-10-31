@@ -45,7 +45,7 @@ module Messaging {
 	// Synchronization Policy (default = SYNC_WITH_TRANSPORT)
 
 	const CORBA::PolicyType SYNC_SCOPE_POLICY_TYPE = 24;
-		local interface SyncScopePolicy : CORBA::Policy {
+	local interface SyncScopePolicy : CORBA::Policy {
 		readonly attribute SyncScope synchronization;
 	};
 
@@ -64,7 +64,7 @@ module Messaging {
 
 	const CORBA::PolicyType REPLY_PRIORITY_POLICY_TYPE = 26;
 
-	interface ReplyPriorityPolicy : CORBA::Policy {
+	local interface ReplyPriorityPolicy : CORBA::Policy {
 		readonly attribute PriorityRange priority_range;
 	};
 

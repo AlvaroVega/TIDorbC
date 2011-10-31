@@ -36,14 +36,14 @@
 /////////////////////////////////////////////////////////////////////////
 
 #include "CORBA.h"
-#include "POA_CORBA.h"
+//#include "POA_CORBA.h"
 #include "PortableServer.h"
 #include "DynamicAny.h"
 #include "IOP.h"
 #include "BiDirPolicy.h"
 #include "SendingContext.h"
-#include "POA_SendingContext.h"
+//#include "POA_SendingContext.h"
 #include "CosNaming.h"
-#include "POA_CosNaming.h"
+//#include "POA_CosNaming.h"
 #include "TIDorb/core.h"
 

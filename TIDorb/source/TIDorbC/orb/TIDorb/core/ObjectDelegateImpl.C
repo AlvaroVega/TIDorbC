@@ -100,6 +100,7 @@ TIDorb::core::iop::IOR* TIDorb::core::ObjectDelegateImpl::getReference()
     CORBA::Boolean non_existent = 
       ! m_comm_layer->object_exists(m_reference, *request_policy_context);
     delete request_policy_context;
+    return non_existent;
   }
 }
 

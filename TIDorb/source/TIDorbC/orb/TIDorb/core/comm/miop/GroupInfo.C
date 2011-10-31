@@ -166,14 +166,26 @@ void TIDorb::core::comm::miop::GroupInfo::partial_read(TIDorb::core::cdr::CDRInp
 const char* TIDorb::core::comm::miop::GroupInfo::toString() const
 {
   if (!_str) {
-    TIDorb::util::StringBuffer buffer;
-
-    buffer << "GroupInfo {" << _version.toString() << ", "
-           << _group_domain_id << ", "
-           << _object_group_id << ", "
-           << _object_group_ref_version << " }";                       
-    ((GroupInfo*) this)->_str = CORBA::string_dup(buffer.str().data());
+//     // Performance improvement: GCC uses ostrstream as StrinbBuffer, 
+//     // and basic_streambuf::xsputn uses memcpy in each "<<" call
+//     TIDorb::util::StringBuffer buffer;
+//     buffer << "GroupInfo {" << _version.toString() << ", " // 11 bytes + 12 bytes + 2
+//            << _group_domain_id << ", "
+//            << _object_group_id << ", " // 4 bytes: ULongLong
+//            << _object_group_ref_version << " }";     // 4bytes: ULong                   
+//     ((GroupInfo*) this)->_str = CORBA::string_dup(buffer.str().data());
+    // TODO: see sync_with_stdio
+    // Another way: use in buffer a more big internal_buffer
+    unsigned int _length = 11 + 12 + 2 + // Adition of constant terms is optimized by compiler
+      strlen(_group_domain_id) + 2 +
+      16 + 2 +
+      16 + 2;
+    char* _str_aux = (char*) malloc (_length);
+    sprintf(_str_aux, "%s%s%s%s%s%0*d%s%0*d%s", "GroupInfo {", _version.toString(), ", ",
+            _group_domain_id, ", ",
+            16, _object_group_id, ", ",
+            16, _object_group_ref_version, " }");
+    ((GroupInfo*) this)->_str = _str_aux;
   }
-	
   return _str;
 }

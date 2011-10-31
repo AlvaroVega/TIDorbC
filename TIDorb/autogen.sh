@@ -11,7 +11,7 @@ print_exec_result() {
   fi
 }
 
-autoreconf --install 2>&1 >> autogen.log
+#autoreconf --install 2>&1 >> autogen.log
 
 printf "Expanding M4 files... "
 aclocal-1.11 -I m4 2>&1 > autogen.log

@@ -168,7 +168,7 @@ void TIDorb::core::security::SecurityChecker::checkEstablishTrust(
                                              CSIIOP::CompoundSecMechList* mechs)
 
 {
-  cerr << "SecurityChecker::checkEstablishTrust " << endl;
+  //cerr << "SecurityChecker::checkEstablishTrust " << endl;
   CORBA::Policy_ptr policy = 
     context.getPolicy(Security::SecEstablishTrustPolicy);
 

@@ -1,5 +1,5 @@
 This release of TIDorbC++ was built on a machine with kernel:
-SunOS coco 5.8 Generic_117350-28 sun4u sparc SUNW,Sun-Fire-V440
+SunOS pacopico 5.8 Generic_108528-20 sun4u sparc SUNW,Ultra-5_10
 
 using the compiler:
 gcc version 3.4.4 

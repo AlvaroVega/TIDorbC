@@ -458,7 +458,7 @@ CORBA::Any* DynComposite::to_any()
       throw CORBA::OBJECT_NOT_EXIST("DynAny destroyed", 0, CORBA::COMPLETED_NO);
    }
 
-   CORBA::Any* new_any = new CORBA::Any();
+   CORBA::Any* new_any = _orb->create_any();
 
    // Fix bug [#392] Any::type(tc) reset any value
    //new_any->type(_dyn_type);

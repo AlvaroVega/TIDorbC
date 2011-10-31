@@ -444,7 +444,7 @@ void TIDorb::core::comm::UDPConnection::dispatch_request(TIDorb::core::comm::iio
   service_context_received(message->get_service_context_list());
 
   // Get the group object id
-  string group_object_id;// = TIDorb::core::comm::miop::MIOPCorbaloc::get_group_object_id(profile);
+  const char* group_object_id = NULL;
   try {
     group_object_id = TIDorb::core::comm::miop::MIOPCorbaloc::get_group_object_id(profile);
   } catch (...) {
@@ -698,6 +698,18 @@ void TIDorb::core::comm::UDPConnection::receive_message(){
         ziop_message.set_body(this, buffer, input);
 
         ziop_message.connect_GIOPMessage(this);
+
+        delete[] collection->chunks;
+        delete collection;
+        collections.remove(unique_id);
+
+        if (_orb->trace != NULL) {
+          TIDorb::util::StringBuffer msg;
+          msg << "MIOP packet collection zipped id=" << unique_id;
+          msg << " processed ";
+          _orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, msg.str().data());
+        }
+
         continue;
       }
 

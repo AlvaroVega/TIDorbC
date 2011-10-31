@@ -30,10 +30,10 @@ idl_cpp_headers = \
 	Security.h \
 	SecurityLevel1.h \
 	SecurityLevel2.h \
-	POA_SecurityLevel2.h \
 	SecurityLevel3.h \
 	OBV_SecurityLevel3.h \
 	SSLIOP.h
+#	POA_SecurityLevel2.h
 
 idl_cpp_sources = \
 	CSI.C \
@@ -42,10 +42,11 @@ idl_cpp_sources = \
 	Security.C \
 	SecurityLevel1.C \
 	SecurityLevel2.C \
-	POA_SecurityLevel2.C \
 	SecurityLevel3.C \
 	OBV_SecurityLevel3.C \
 	SSLIOP.C
+#	POA_SecurityLevel2.C
+
 
 $(idl_cpp_sources): $(srcdir)/CSI.idl $(srcdir)/CSIIOP.idl $(srcdir)/GSSUP.idl $(srcdir)/Security.idl $(srcdir)/SecurityLevel1.idl $(srcdir)/SecurityLevel2.idl $(srcdir)/SecurityLevel3.idl $(srcdir)/SSLIOP.idl
 	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
@@ -58,7 +59,7 @@ $(idl_cpp_sources): $(srcdir)/CSI.idl $(srcdir)/CSIIOP.idl $(srcdir)/GSSUP.idl $
 	  -I$(srcdir)/../02_comm $(srcdir)/Security.idl
 	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/SecurityLevel1.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} -CORBA_IDL -no_skel -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/SecurityLevel2.idl
 	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/SecurityLevel3.idl

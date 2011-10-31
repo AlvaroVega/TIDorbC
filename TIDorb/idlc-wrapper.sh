@@ -56,4 +56,8 @@ eval "$java -version 2>/dev/null >/dev/null" || usage "Java VM cannot be execute
 [ -f "$tididlc_jar" ] || tididlc_jar="/usr/lib/idl2cpp.jar"
 [ -f "$tididlc_jar" ] || usage "cannot find idl2cpp.jar"
 
-[ "$args" ] && $java -jar $tididlc_jar $args
+if [ -x "/bin/cygpath" ]; then 
+    [ "$args" ] && $java -jar `cygpath -m $tididlc_jar` $args
+else
+    [ "$args" ] && $java -jar $tididlc_jar $args
+fi

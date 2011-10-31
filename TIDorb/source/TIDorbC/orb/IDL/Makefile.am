@@ -32,7 +32,6 @@ libTIDorbIdl_la_SOURCES =
 
 libTIDorbIdl_la_LIBADD = \
    $(top_builddir)/source/TIDorbC/orb/IDL/01_orb/CORBA/libTIDorbIdl_orb_CORBA.la \
-   $(top_builddir)/source/TIDorbC/orb/IDL/01_orb/POA_CORBA/libTIDorbIdl_orb_POA_CORBA.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/01_orb/PortableServer/libTIDorbIdl_orb_PortableServer.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/02_comm/libTIDorbIdl_comm.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/03_sending_context/libTIDorbIdl_sending_context.la \
@@ -45,6 +44,7 @@ libTIDorbIdl_la_LIBADD = \
    $(top_builddir)/source/TIDorbC/orb/IDL/10_Messaging/libTIDorbIdl_Messaging.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/libTIDorbIdl_Compression.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/12_Security/libTIDorbIdl_Security.la
+#   $(top_builddir)/source/TIDorbC/orb/IDL/01_orb/POA_CORBA/libTIDorbIdl_orb_POA_CORBA.la
 
 libTIDorbIdl_la_LDFLAGS = \
 	-avoid-version

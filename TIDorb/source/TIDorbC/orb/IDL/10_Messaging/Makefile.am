@@ -16,15 +16,15 @@ noinst_LTLIBRARIES = libTIDorbIdl_Messaging.la
 idl_source = Messaging.idl
 
 idl_cpp_headers = \
-        Messaging.h \
-        POA_Messaging.h
+        Messaging.h
+#        POA_Messaging.h
 
 idl_cpp_sources = \
-        Messaging.C \
-        POA_Messaging.C 
+        Messaging.C
+#        POA_Messaging.C 
 
 $(idl_cpp_sources): $(srcdir)/Messaging.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} -CORBA_IDL -no_skel -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/Messaging.idl
 
 libTIDorbIdl_Messaging_la_SOURCES = $(idl_cpp_headers) $(idl_cpp_sources) 

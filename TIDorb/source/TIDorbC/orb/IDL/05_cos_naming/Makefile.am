@@ -14,15 +14,15 @@ noinst_LTLIBRARIES = libTIDorbIdl_cos_naming.la
 idl_source = CosNaming.idl
 
 idl_cpp_headers = \
-   CosNaming.h \
-   POA_CosNaming.h
+   CosNaming.h 
+#   POA_CosNaming.h
 
 idl_cpp_sources = \
-   CosNaming.C \
-   POA_CosNaming.C
+   CosNaming.C 
+#   POA_CosNaming.C
 
 $(idl_cpp_sources): $(srcdir)/CosNaming.idl
-	${IDLC} -CORBA_IDL -I./ $(srcdir)/CosNaming.idl
+	${IDLC} -CORBA_IDL -no_skel -I./ $(srcdir)/CosNaming.idl
 
 libTIDorbIdl_cos_naming_la_SOURCES = $(idl_cpp_headers) $(idl_cpp_sources)
 

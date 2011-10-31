@@ -38,7 +38,16 @@
 #include "TIDSocket.h"
 #include <sys/time.h>
 #include <sys/types.h>
-#include <stropts.h>
+#if (defined __darwin || defined __CYGWIN__)
+   #include <sys/ioctl.h>
+   
+   // I_NREAD was declared in CoreServices framework in OSX < 10.4
+   // This framework cannot be used in 10.5 and later, so this
+   // value is included directly
+   #define I_NREAD ((65 << 8) | 1)
+#else
+   #include <stropts.h>
+#endif
 #include <unistd.h>
 #include <errno.h>
 #include <openssl/err.h>
