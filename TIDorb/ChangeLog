@@ -1,3 +1,8 @@
+	Feature: minimun CORBA added
+	Fix bug extract value from dynany valuetype
+	Fix bug ziop over miop not remove collection
+
+
 2010-06-07 Alvaro Vega Garcia  <avega at tid dot es>
 	
 	* TIDorbC version 6.4.3 released.
