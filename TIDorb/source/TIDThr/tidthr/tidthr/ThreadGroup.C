@@ -300,17 +300,21 @@ ThreadGroup::attrCopy(const pthread_attr_t* from, pthread_attr_t* to)
     pthread_attr_getstacksize(from, &size);
     pthread_attr_setstacksize(to, size);
 
+#if !defined(__ANDROID__)
     int scope;
     pthread_attr_getscope(from, &scope);
     pthread_attr_setscope(to, scope);
+#endif
 
+#if !defined(__ANDROID__)
     int policy;
     pthread_attr_getschedpolicy(from, &policy);
     pthread_attr_setschedpolicy(to, policy);
 
     pthread_attr_getinheritsched(from, &policy);
     pthread_attr_setinheritsched(to, policy);
-  
+#endif
+
     sched_param param;
   
     pthread_attr_getschedparam(from, &param);
