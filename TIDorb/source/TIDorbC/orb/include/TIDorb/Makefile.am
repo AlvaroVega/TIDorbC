@@ -1,5 +1,7 @@
-SUBDIRS = dynAny portable templates types util .
-
+SUBDIRS = portable templates types util .
+if !MINIMUN
+SUBDIRS += dynAny 
+endif
 dist_noinst_HEADERS = \
    core.h \
    core_fw.h \
@@ -327,7 +329,11 @@ inst_HEADERS = \
    templates_fw.h \
    templates.h \
    types.h \
-   dynAny.h \
    util.h
+
+if !MINIMUN
+inst_HEADERS += \
+   dynAny.h
+endif
 
 instdir=$(includedir)/TIDorb

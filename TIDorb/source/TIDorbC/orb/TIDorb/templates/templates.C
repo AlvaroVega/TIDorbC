@@ -38,7 +38,9 @@
 #include "CORBA.h"
 //#include "POA_CORBA.h"
 #include "PortableServer.h"
+#ifndef MINIMUN
 #include "DynamicAny.h"
+#endif
 #include "IOP.h"
 #include "BiDirPolicy.h"
 #include "SendingContext.h"

@@ -38,7 +38,9 @@
 
 #include "CORBA.h"
 #include "PortableServer.h"
+#ifndef MINIMUN
 #include "DynamicAny.h"
+#endif
 
 #include "TIDorb/core.h"
 #include "TIDorb/core/typecode/TypeCodeCache.h"
@@ -112,9 +114,9 @@ class TIDORB : public TIDorb::portable::ORB,
     ::CORBA::Object_ptr string_to_object(const char* str);
 
     void create_list(::CORBA::Long size, ::CORBA::NVList_out);
-
+#ifndef MINIMUN
     void create_operation_list(::CORBA::OperationDef_ptr def, ::CORBA::NVList_out list);
-
+#endif
     void create_named_value(::CORBA::NamedValue_out nv);
 
     void create_exception_list(::CORBA::ExceptionList_out list);
@@ -332,9 +334,9 @@ class TIDORB : public TIDorb::portable::ORB,
     TIDorb::core::poa::POAImpl* rootPOA;
 
     TIDorb::core::poa::CurrentImpl* current;
-
+#ifndef MINIMUN
     DynamicAny::DynAnyFactory_ptr dyn_factory;
-
+#endif
     IOP::CodecFactory_ptr codec_factory;
 
     TIDorb::core::PolicyManagerImpl* policy_manager;

@@ -51,7 +51,11 @@
 #endif
 
 
+#ifndef __ANDROID__
 extern int errno;
+#else
+extern volatile int errno;
+#endif
 
 TIDorb::core::PolicyContext* TIDorb::core::ConfORB::st_default_policy_context = 
   TIDorb::core::ConfORB::createDefaultPolicies();

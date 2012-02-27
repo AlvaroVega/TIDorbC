@@ -43,6 +43,7 @@
     (defined(__linux)) || \
     (defined(__darwin)) || \
     (defined(__CYGWIN__)) || \
+    (defined(__ANDROID__)) || \
     (defined(__hpux)) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_NAMESPACE_STD
@@ -57,6 +58,7 @@
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__darwin)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__CYGWIN__)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__ANDROID__)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__hpux)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_IOSTREAM
@@ -71,6 +73,7 @@
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__darwin)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__CYGWIN__)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__ANDROID__)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__hpux)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_FSTREAM
@@ -85,6 +88,7 @@
     (defined(__linux)     && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__darwin)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__CYGWIN__)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
+    (defined(__ANDROID__)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__hpux)    && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95))) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_SSTREAM
@@ -99,6 +103,7 @@
     defined(__linux) || \
     defined(__darwin) || \
     defined(__CYGWIN__) || \
+    defined(__ANDROID__) || \
     defined(__hpux) || \
     (defined(__sun)       && ((__GNUC__ > 2) || (__GNUC__ == 2 &&  __GNUC_MINOR__ >= 95)))
 #ifndef TIDORB_HAVE_STRSTREAM

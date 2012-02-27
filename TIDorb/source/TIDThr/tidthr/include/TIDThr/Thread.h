@@ -171,6 +171,7 @@ public:
     throw (IllegalArgumentException,
            SystemException);
   //#if !defined(__linux__)
+#if !defined(__ANDROID__)
   static void setConcurrency(int new_level) 
     throw (IllegalArgumentException)
   {
@@ -185,6 +186,7 @@ public:
     return pthread_getconcurrency();
   }
   //#endif
+#endif
   static void waitThreadTermination()
     throw (InterruptedException,
            SystemException)

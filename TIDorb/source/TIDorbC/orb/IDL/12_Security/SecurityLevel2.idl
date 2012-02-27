@@ -14,6 +14,7 @@ module SecurityLevel2 {
 
 // Interface PrincipalAuthenticator
 	local interface PrincipalAuthenticator {
+#ifndef MINIMUN
           //#		pragma version PrincipalAuthenticator 1.8
 		Security::AuthenticationMethodList
 		get_supported_authen_methods(
@@ -35,10 +36,12 @@ module SecurityLevel2 {
 			out	 	any				continuation_data,
 			out	 	any				auth_specific_data
 		);
+#endif
 	};
 
 	// Interface Credentials
 	local interface Credentials {				
+#ifndef MINIMUN
           //#		pragma version Credentials 1.8
 		Credentials copy ();
 		void destroy();
@@ -66,26 +69,32 @@ module SecurityLevel2 {
 		boolean refresh(
 			in		any				refresh_data
 		);
+#endif
 	};
 
 	typedef sequence <Credentials> 		CredentialsList;
 
 	local interface ReceivedCredentials : Credentials {
+#ifndef MINIMUN
           //#		pragma version ReceivedCredentials 1.8
 		readonly attribute Credentials			accepting_credentials;
 		readonly attribute Security::AssociationOptions	association_options_used;
 		readonly attribute Security::DelegationState	delegation_state;
 		readonly attribute Security::DelegationMode	delegation_mode;
+#endif
 	};
 
 	local interface TargetCredentials : Credentials {
+#ifndef MINIMUN
           //#		pragma version TargetCredentials 1.8
 		readonly attribute Credentials			initiating_credentials;
 		readonly attribute Security::AssociationOptions	association_options_used;
+#endif
 	};
 
 	// RequiredRights Interface
 	interface RequiredRights{
+#ifndef MINIMUN
 		void get_required_rights(
 			in 		Object				obj,
 			in 		CORBA::Identifier		operation_name,
@@ -99,8 +108,10 @@ module SecurityLevel2 {
 			in 		Security::RightsList		rights,
 			in 		Security::RightsCombinator 	rights_combinator
 		);
+#endif
 	};
 
+#ifndef MINIMUN
 	// interface audit channel
 	local interface AuditChannel {
           //#		pragma version AuditChannel 1.8
@@ -113,18 +124,22 @@ module SecurityLevel2 {
 		);
 		readonly attribute Security::AuditChannelId 		audit_channel_id;
 	};
+#endif
 
 	// interface for Audit Decision 
 	local interface AuditDecision {
+#ifndef MINIMUN
           //		#pragma version AuditDecision 1.8
 		boolean audit_needed (
 			in 		Security::AuditEventType	event_type,
 			in 		Security::SelectorValueList	value_list
 		);
 		readonly attribute AuditChannel audit_channel;
+#endif
 	};
 
 	local interface AccessDecision {
+#ifndef MINIMUN
           //		#pragma version AccessDecision 1.8
 		boolean access_allowed (
 			in		SecurityLevel2::CredentialsList	cred_list,
@@ -132,6 +147,7 @@ module SecurityLevel2 {
 			in		CORBA::Identifier           	operation_name,
 			in		CORBA::Identifier		target_interface_name
 		);
+#endif
 	};
 
 	// Policy interfaces to control bindings
@@ -139,27 +155,28 @@ module SecurityLevel2 {
           //		#pragma version QOPPolicy 1.8
 		readonly attribute Security::QOP		qop;
 	};
-
+#ifndef MINIMUN
 	local interface MechanismPolicy : CORBA::Policy {
           //		#pragma version MechanismPolicy 1.8
 		readonly attribute Security::MechanismTypeList	mechanisms;
 	};
-
+#endif
+#ifndef MINIMUN
 	local interface InvocationCredentialsPolicy : CORBA::Policy {
           //		#pragma version InvocationCredentialsPolicy 1.8
 		readonly attribute CredentialsList		creds;
 	};
-
+#endif
 	local interface EstablishTrustPolicy : CORBA::Policy {
           //		#pragma version EstablishTrustPolicy 1.8
 		readonly attribute Security::EstablishTrust	trust;
 	};
-
+#ifndef MINIMUN
 	local interface DelegationDirectivePolicy : CORBA::Policy { 
           //		#pragma version DelegationDirectivePolicy 1.8
 		readonly attribute Security::DelegationDirective delegation_directive;
 	};
-
+#endif
 	local interface SecurityManager {
           //		#pragma version SecurityManager 1.8
 		// Process/Capsule/ORB Instance specific operations

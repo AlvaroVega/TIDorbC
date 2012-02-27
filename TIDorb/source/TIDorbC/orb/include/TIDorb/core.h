@@ -55,7 +55,9 @@
 #include "TIDorb/core/PolicyManagerImpl.h"
 #include "TIDorb/core/PolicyCurrentImpl.h"
 #include "TIDorb/core/PolicyContextManagerImpl.h"
+#ifndef MINIMUN
 #include "TIDorb/core/ConstructionPolicyImpl.h"
+#endif
 #include "TIDorb/core/DomainManagerImpl.h"
 
 #include "TIDorb/core/ConfORB.h"

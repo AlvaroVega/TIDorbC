@@ -5,12 +5,15 @@
 module CORBA {
  
   local interface TypeCode;
+#ifndef MINIMUN
   interface Contained;
   interface Repository;
   interface Container;
   interface ModuleDef;
   interface ConstantDef;
+#endif
   interface IDLType;
+#ifndef MINIMUN
   interface StructDef;
   interface UnionDef;
   interface EnumDef;
@@ -23,7 +26,7 @@ module CORBA {
   typedef sequence <ValueDef> ValueDefSeq;
   interface ValueBoxDef;
   typedef sequence <Contained> ContainedSeq;
-
+#endif
   typedef sequence<any> AnySeq;
   typedef sequence<boolean> BooleanSeq;
   typedef sequence<char> CharSeq;
@@ -138,13 +141,13 @@ module CORBA {
   };  
 
   const PolicyType SecConstruction = 11;
-
+#ifndef MINIMUN
   interface ConstructionPolicy: Policy{
     void make_domain_manager(in InterfaceDef object_type,
                              in boolean constr_policy);
 
   };
-  
+#endif  
 
   typedef sequence <DomainManager> DomainManagerList;  
   
@@ -182,7 +185,7 @@ module CORBA {
   };
   
   typedef string VersionSpec;
-   
+#ifndef MINIMUN   
   interface Contained : IRObject {
     // read/write interface
     attribute RepositoryId id;
@@ -208,7 +211,7 @@ module CORBA {
       in VersionSpec new_version
     );
   };
-  
+#endif
  
   struct StructMember {
     Identifier name;
@@ -217,14 +220,14 @@ module CORBA {
   };
   
   typedef sequence <StructMember> StructMemberSeq;
-  
+#ifndef MINIMUN
   struct Initializer {
     StructMemberSeq members;
     Identifier name;
   };
   
   typedef sequence <Initializer> InitializerSeq;
-  
+#endif  
   struct UnionMember {
     Identifier name;
     any label;
@@ -234,7 +237,7 @@ module CORBA {
   
   typedef sequence <UnionMember> UnionMemberSeq;
   typedef sequence <Identifier> EnumMemberSeq;
-  
+#ifndef MINIMUN  
   interface Container : IRObject {
     // read interface
     Contained lookup (in ScopedName search_name);
@@ -350,11 +353,11 @@ module CORBA {
       in VersionSpec version
     );
   };
-  
+#endif    
   interface IDLType : IRObject {
     readonly attribute TypeCode type;
   };
-  
+#ifndef MINIMUN  
   interface PrimitiveDef;
   interface StringDef;
   interface SequenceDef;
@@ -552,8 +555,9 @@ module CORBA {
     ParDescriptionSeq parameters;
     ExcDescriptionSeq exceptions;
   };
-  
+#endif  
   typedef sequence <RepositoryId> RepositoryIdSeq;
+#ifndef MINIMUN
   typedef sequence <OperationDescription> OpDescriptionSeq;
   typedef sequence <AttributeDescription> AttrDescriptionSeq;
   
@@ -608,7 +612,7 @@ module CORBA {
     RepositoryIdSeq base_interfaces;
     boolean is_abstract;
   };
-  
+#endif  
   typedef short Visibility;
   
   const Visibility PRIVATE_MEMBER = 0;
@@ -625,7 +629,7 @@ module CORBA {
   };
   
   typedef sequence <ValueMember> ValueMemberSeq;
-  
+#ifndef MINIMUN  
   interface ValueMemberDef : Contained {
     readonly attribute TypeCode type;
     attribute IDLType type_def;
@@ -709,7 +713,7 @@ module CORBA {
   interface ValueBoxDef : TypedefDef {
     attribute IDLType original_type_def;
   };
-  
+#endif  
   enum TCKind { //JAVA MAPPING PIDL
     tk_null, tk_void,
     tk_short, tk_long, tk_ushort, tk_ulong,
@@ -780,8 +784,10 @@ module CORBA {
     short fixed_scale() raises (BadKind);
     
     // for tk_value
+#ifndef MINIMUN
     Visibility member_visibility(in unsigned long index)
     raises(BadKind, Bounds);
+#endif
     ValueModifier type_modifier() raises(BadKind);
     TypeCode concrete_base_type() raises(BadKind);
   };

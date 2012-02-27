@@ -11,15 +11,16 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/03_sending_context/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/04_bidir_policy/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/05_cos_naming/ \
-	-I$(top_builddir)/source/TIDorbC/orb/IDL/06_dynamic_any/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/07_TimeBase/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/08_FT/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/09_PortableGroup/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/10_Messaging/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/ \
 	-I$(top_builddir)/source/TIDorbC/orb/IDL/12_Security/
-
-
+if !MINIMUN
+AM_CPPFLAGS += \
+	-I$(top_builddir)/source/TIDorbC/orb/IDL/06_dynamic_any/
+endif
 lib_LTLIBRARIES = libTIDorb.la
 
 libTIDorb_la_SOURCES = \
@@ -253,6 +254,15 @@ libTIDorb_la_SOURCES = \
 	$(srcdir)/core/ziop/CompressionMinRatioPolicyImpl.C \
 	$(srcdir)/core/ziop/CompressorIdLevelListPolicyImpl.C \
 	$(srcdir)/core/ziop/Ziop.C \
+	$(srcdir)/util/Base64Codec.C \
+	$(srcdir)/util/Base16Codec.C \
+	$(srcdir)/util/Trace.C \
+	$(srcdir)/util/TranslateURLEscapes.C \
+	$(srcdir)/util/ObjectGroupFactory.C
+
+if !MINIMUN
+libTIDorb_la_SOURCES += \
+	$(srcdir)/core/ConstructionPolicyImpl.C \
 	$(srcdir)/dynAny/DynAnyBase.C \
 	$(srcdir)/dynAny/DynStructImpl.C \
 	$(srcdir)/dynAny/DynExceptImpl.C \
@@ -265,12 +275,9 @@ libTIDorb_la_SOURCES = \
 	$(srcdir)/dynAny/DynValueImpl.C \
 	$(srcdir)/dynAny/DynEnumImpl.C \
 	$(srcdir)/dynAny/DynFixedImpl.C \
-	$(srcdir)/dynAny/DynSequenceImpl.C \
-	$(srcdir)/util/Base64Codec.C \
-	$(srcdir)/util/Base16Codec.C \
-	$(srcdir)/util/Trace.C \
-	$(srcdir)/util/TranslateURLEscapes.C \
-	$(srcdir)/util/ObjectGroupFactory.C
+	$(srcdir)/dynAny/DynSequenceImpl.C
+endif
+
 
 
 libTIDorb_la_LIBADD = \

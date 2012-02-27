@@ -81,7 +81,9 @@ namespace core {
   class PolicyManagerImpl;
   class PolicyCurrentImpl;
   class PolicyContextManagerImpl;
+#ifndef MINIMUN
   class ConstructionPolicyImpl;
+#endif
   class DomainManagerImpl;
 
   // FT extensions

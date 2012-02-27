@@ -15,14 +15,19 @@ idl_source = SendingContext.idl
 
 idl_cpp_headers = \
    SendingContext.h
-#   POA_SendingContext.h
 
 idl_cpp_sources = \
    SendingContext.C
-#   POA_SendingContext.C
 
-$(idl_cpp_sources): $(srcdir)/SendingContext.idl
-	${IDLC} -CORBA_IDL -no_skel -I./ $(srcdir)/SendingContext.idl
+IDLC_OPTIONS = -CORBA_IDL -no_skel 
+
+if MINIMUN
+IDLC_OPTIONS += -DMINIMUN
+endif
+
+
+$(idl_cpp_sources): $(srcdir)/$(idl_source)
+	${IDLC} $(IDLC_OPTIONS) -I./ $(srcdir)/$(idl_source)
 
 libTIDorbIdl_sending_context_la_SOURCES = $(idl_cpp_headers) $(idl_cpp_sources)
 

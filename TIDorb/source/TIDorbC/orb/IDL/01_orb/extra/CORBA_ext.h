@@ -9,9 +9,11 @@
 #include "CORBA/Any_ext.h"
 #include "CORBA/ValueBase_ext.h"
 #include "CORBA/Fixed_ext.h"
+#ifndef MINIMUN
 #include "CORBA/InterfaceDefSeq_ext.h"
 #include "CORBA/ValueDefSeq_ext.h"
 #include "CORBA/ContainedSeq_ext.h"
+#endif
 #include "CORBA/AnySeq_ext.h"
 #include "CORBA/BooleanSeq_ext.h"
 #include "CORBA/CharSeq_ext.h"
@@ -49,7 +51,9 @@
 #include "CORBA/PolicyErrorCode_ext.h"
 #include "CORBA/PolicyError_ext.h"
 #include "CORBA/DomainManager_ext.h"
+#ifndef MINIMUN
 #include "CORBA/ConstructionPolicy_ext.h"
+#endif
 #include "CORBA/DomainManagerList_ext.h"
 #include "CORBA/Current_ext.h"
 //#include "CORBA/StringValue_ext.h"
@@ -57,6 +61,7 @@
 #include "CORBA/DefinitionKind_ext.h"
 #include "CORBA/IRObject_ext.h"
 #include "CORBA/VersionSpec_ext.h"
+#ifndef MINIMUN
 #include "CORBA/Contained_ext.h"
 #include "CORBA/StructMember_ext.h"
 #include "CORBA/StructMemberSeq_ext.h"
@@ -66,7 +71,9 @@
 #include "CORBA/UnionMemberSeq_ext.h"
 #include "CORBA/EnumMemberSeq_ext.h"
 #include "CORBA/Container_ext.h"
+#endif
 #include "CORBA/IDLType_ext.h"
+#ifndef MINIMUN
 #include "CORBA/PrimitiveKind_ext.h"
 #include "CORBA/Repository_ext.h"
 #include "CORBA/ModuleDef_ext.h"
@@ -101,18 +108,23 @@
 #include "CORBA/ExcDescriptionSeq_ext.h"
 #include "CORBA/OperationDef_ext.h"
 #include "CORBA/OperationDescription_ext.h"
+#endif
 #include "CORBA/RepositoryIdSeq_ext.h"
+#ifndef MINIMUN
 #include "CORBA/OpDescriptionSeq_ext.h"
 #include "CORBA/AttrDescriptionSeq_ext.h"
 #include "CORBA/InterfaceDef_ext.h"
 #include "CORBA/InterfaceDescription_ext.h"
+#endif
 #include "CORBA/Visibility_ext.h"
 #include "CORBA/ValueMember_ext.h"
 #include "CORBA/ValueMemberSeq_ext.h"
+#ifndef MINIMUN
 #include "CORBA/ValueMemberDef_ext.h"
 #include "CORBA/ValueDef_ext.h"
 #include "CORBA/ValueDescription_ext.h"
 #include "CORBA/ValueBoxDef_ext.h"
+#endif
 #include "CORBA/TCKind_ext.h"
 #include "CORBA/ValueModifier_ext.h"
 //#include "CORBA/TypeCode_ext.h"

@@ -18,9 +18,9 @@ class ORB
     virtual Object_ptr string_to_object(const char* str) = 0;
 
     virtual void create_list(Long size, NVList_out) = 0;
-
+#ifndef MINIMUN
     virtual void create_operation_list(OperationDef_ptr def, NVList_out list) = 0;
-
+#endif
     virtual void create_named_value(NamedValue_out nv) = 0;
 
     virtual void create_exception_list(ExceptionList_out list) = 0;

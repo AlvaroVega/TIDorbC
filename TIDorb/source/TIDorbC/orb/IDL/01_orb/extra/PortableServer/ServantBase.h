@@ -10,7 +10,9 @@ class ServantBase : public virtual TIDorb::portable::RefCounter
   public:
     virtual ~ServantBase();
     virtual POA_ptr _default_POA();
+#ifndef MINIMUN
     virtual CORBA::InterfaceDef_ptr _get_interface();
+#endif
     virtual CORBA::Boolean _is_a(const char* logical_type_id);
     virtual CORBA::Boolean _non_existent();
     

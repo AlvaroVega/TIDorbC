@@ -1,4 +1,3 @@
-#SUBDIRS = . CORBA POA_CORBA PortableServer
 SUBDIRS = . CORBA PortableServer
 
 AM_CPPFLAGS = \
@@ -19,20 +18,27 @@ idl_cpp_headers = \
 	PortableServer.h 
 #	POA_CORBA.h
 
-
 idl_cpp_sources = 
 
 invalid_srcs = \
 	$(top_srcdir)/src/idl/01_orb/CORBA/TypeCode.C \
 	$(top_srcdir)/src/idl/01_orb/CORBA/ORB.C
 
-$(idl_cpp_headers): $(srcdir)/CORBA.idl
+IDLC_OPTIONS = -expanded -CORBA_IDL -no_skel
+CORBAIDL=CORBA.idl
+EXTRA=extra
+
+if MINIMUN
+IDLC_OPTIONS += -minimun -DMINIMUN
+endif
+
+$(idl_cpp_headers): $(srcdir)/$(CORBAIDL)
 	if [ ! -f "CORBA.h" ]; then\
-	  ${IDLC} -expanded -CORBA_IDL -no_skel -I./ $(srcdir)/CORBA.idl;\
-		cp -R $(srcdir)/extra/*.h                $(builddir)/;\
-		cp -R $(srcdir)/extra/CORBA/*.h          $(builddir)/CORBA/;\
-		cp -R $(srcdir)/extra/CORBA/ORB/*.h      $(builddir)/CORBA/ORB/;\
-		cp -R $(srcdir)/extra/PortableServer/*.h $(builddir)/PortableServer/;\
+	  ${IDLC} $(IDLC_OPTIONS) -I./ $(srcdir)/$(CORBAIDL);\
+		cp -R $(srcdir)/$(EXTRA)/*.h                $(builddir)/;\
+		cp -R $(srcdir)/$(EXTRA)/CORBA/*.h          $(builddir)/CORBA/;\
+		cp -R $(srcdir)/$(EXTRA)/CORBA/ORB/*.h      $(builddir)/CORBA/ORB/;\
+		cp -R $(srcdir)/$(EXTRA)/PortableServer/*.h $(builddir)/PortableServer/;\
 	fi;
 
 
@@ -47,7 +53,7 @@ instdir=$(includedir)
 
 EXTRA_DIST = \
    $(idl_source) \
-   extra/*.h \
-   extra/CORBA/*.h \
-   extra/CORBA/ORB/*.h \
-   extra/PortableServer/*.h
+   $(EXTRA)/*.h \
+   $(EXTRA)/CORBA/*.h \
+   $(EXTRA)/CORBA/ORB/*.h \
+   $(EXTRA)/PortableServer/*.h

@@ -49,7 +49,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#if (defined __darwin || defined __CYGWIN__)
+#if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips)
    #include <sys/ioctl.h>
 #else
    #include <stropts.h>

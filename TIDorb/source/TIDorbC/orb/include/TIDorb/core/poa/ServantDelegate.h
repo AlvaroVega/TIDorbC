@@ -123,9 +123,9 @@ public:
     * @param oid The Object Id.
     */
     void setObjectId(const PortableServer::ObjectId& oid);
-    
+#ifndef MINIMUN    
     CORBA::InterfaceDef_ptr get_interface(PortableServer::ServantBase* self);
-  
+#endif  
     CORBA::Boolean non_existent(PortableServer::ServantBase* self);
     
     static CORBA::RepositoryIdSeq_ptr init_ids();

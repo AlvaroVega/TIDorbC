@@ -23,7 +23,7 @@
 
 #include "TIDSocket.h"
 #include <sys/types.h>
-#if (defined __darwin || defined __CYGWIN__)
+#if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips)
    #include <sys/ioctl.h>
 
    // I_FLUSH was declared in CoreServices framework in OSX < 10.4

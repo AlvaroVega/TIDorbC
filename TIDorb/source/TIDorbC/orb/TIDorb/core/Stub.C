@@ -58,13 +58,14 @@ TIDorb::portable::Stub::~Stub()
   }
 }
 
-
+#ifndef MINIMUN
 ::CORBA::InterfaceDef_ptr TIDorb::portable::Stub::_get_interface()
 {
   throw CORBA::NO_IMPLEMENT(0,CORBA::COMPLETED_NO);
   // never reached !!
   return NULL;
 }
+#endif
 
 
 ::CORBA::Boolean TIDorb::portable::Stub::_is_a(const char* logical_type_id)

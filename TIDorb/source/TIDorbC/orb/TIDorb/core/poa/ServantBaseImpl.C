@@ -73,7 +73,7 @@ PortableServer::ServantBase::~ServantBase()
 {
   delete _delegate;
 }
-
+#ifndef MINIMUN
 CORBA::InterfaceDef_ptr PortableServer::ServantBase::_get_interface()
 {
   if(_delegate == NULL)
@@ -81,7 +81,7 @@ CORBA::InterfaceDef_ptr PortableServer::ServantBase::_get_interface()
 	
 	return _delegate->get_interface(this);
 }
-  	
+#endif  	
 CORBA::Boolean PortableServer::ServantBase::_is_a(const char* logical_type_id)
 {
   if(_delegate == NULL)

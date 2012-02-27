@@ -10,9 +10,9 @@ class Object
 public:
   
   virtual ~Object() {}    
-
+#ifndef MINIMUN
   virtual InterfaceDef_ptr _get_interface() = 0;
-
+#endif
   virtual Boolean _is_a(const char* logical_type_id) = 0;
     
   virtual Boolean _non_existent() = 0;

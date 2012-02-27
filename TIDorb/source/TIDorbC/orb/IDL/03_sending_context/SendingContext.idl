@@ -10,11 +10,12 @@ module SendingContext {
 
     typedef string URL; // blank-separated list of one or more URLs
     typedef sequence<URL> URLSeq;
+#ifndef MINIMUN
     typedef sequence < CORBA::ValueDef::FullValueDescription > ValueDescSeq;
 
     // Operation to obtain the IR from the sending context
     CORBA::Repository get_ir();
-
+#endif
     // Operations to obtain a location of the implementation code
     URL implementation(in CORBA::RepositoryId x);
 
@@ -23,14 +24,18 @@ module SendingContext {
     // Operations to obtain complete meta information about a Value
     // This is just a performance optimization the IR can provide
     // the same information
+#ifndef MINIMUN
     CORBA::ValueDef::FullValueDescription meta(in CORBA::RepositoryId x);
 
-    ValueDescSeq metas(in CORBA::RepositoryIdSeq x);
 
+    ValueDescSeq metas(in CORBA::RepositoryIdSeq x);
+#endif
     // To obtain a type graph for a value type
     // same comment as before the IR can provide similar
     // information
+#ifndef MINIMUN
     CORBA::RepositoryIdSeq bases(in CORBA::RepositoryId x);
+#endif
   };
 };
 

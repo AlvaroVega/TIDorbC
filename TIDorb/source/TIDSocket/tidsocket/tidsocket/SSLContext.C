@@ -86,14 +86,14 @@ SSLContext::SSLContext( /* SSLContextSpi contextSpi, Provider provider, */
   /* Set up a SIGPIPE handler */
   signal(SIGPIPE,sigpipe_handle);
 
-  SSL_METHOD *meth; 
+  const SSL_METHOD *meth; 
 
   _protocol = protocol;
   
   switch (protocol) {
-  case SSLv2: 
-    meth = SSLv2_method();
-    break;
+  // case SSLv2: 
+  //   meth = SSLv2_method();
+  //   break;
   case SSLv3: 
     meth = SSLv3_method();
     break;

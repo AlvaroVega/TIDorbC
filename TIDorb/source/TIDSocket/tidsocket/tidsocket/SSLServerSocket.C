@@ -292,7 +292,7 @@ char* SSLServerSocket::getEnabledCipherSuites()
 
   if (_s != NULL) {
     char cipdesc[128];
-    SSL_CIPHER *sslciph = SSL_get_current_cipher(_s->_ssl);
+    const SSL_CIPHER *sslciph = SSL_get_current_cipher(_s->_ssl);
     
     SSL_CIPHER_description(sslciph, cipdesc, sizeof(cipdesc));
     

@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////
 //
 // File:        TIDSocket_SSLOutputStream.C
-// Description: This file contains the SSLOutputStream class methods
+// Description: This file contains the ServerSocket class methods
 // Rel:         01.00
 // Created:     May, 2009
 // Author:      Alvaro Vega Garcia      ( avega@tid.es   )
+//
 // Revised:
 //
 // (C) Copyright 2009 Telefonica Investigacion y Desarrollo
@@ -36,7 +37,7 @@
 
 #include "TIDSocket.h"
 #include <sys/types.h>
-#if (defined __darwin || defined __CYGWIN__)
+#if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips )
    #include <sys/ioctl.h>
 
    // I_FLUSH was declared in CoreServices framework in OSX < 10.4

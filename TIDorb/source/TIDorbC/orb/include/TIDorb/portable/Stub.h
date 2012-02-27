@@ -51,9 +51,9 @@ class Stub : public virtual CORBA::Object,
   public:
 
     virtual ~Stub();
-
+#ifndef MINIMUN
     CORBA::InterfaceDef_ptr _get_interface();
-
+#endif
     CORBA::Boolean _is_a(const char* logical_type_id);
 
     CORBA::Boolean _non_existent();

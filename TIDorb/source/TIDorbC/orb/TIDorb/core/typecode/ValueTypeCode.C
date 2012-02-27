@@ -219,7 +219,7 @@ CORBA::TypeCode_ptr ValueTypeCode::member_type(CORBA::ULong index) const
 
 
 
-
+#ifndef MINIMUN
 CORBA::Visibility ValueTypeCode::member_visibility(CORBA::ULong index) const
 {
   if (index < m_members->length())
@@ -227,7 +227,7 @@ CORBA::Visibility ValueTypeCode::member_visibility(CORBA::ULong index) const
   else
     throw CORBA::TypeCode::Bounds();
 }
-
+#endif
 
 
 
@@ -286,7 +286,9 @@ void ValueTypeCode::read_params
 
     CORBA::_IdentifierHelper::read(input, member.name);
     CORBA::_TypeCodeHelper::read(input, member.type);
+#ifndef MINIMUN
     CORBA::_VisibilityHelper::read(input, member.access);
+#endif
   }
 }
 

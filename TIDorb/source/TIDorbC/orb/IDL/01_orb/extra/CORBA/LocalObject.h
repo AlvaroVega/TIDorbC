@@ -12,9 +12,9 @@ class LocalObject : public virtual Object
 
     virtual void _add_ref();
     virtual void _remove_ref();
-
+#ifndef MINIMUN
     InterfaceDef_ptr _get_interface();
-
+#endif
     Boolean _is_a(const char* logical_type_id);
 
     Boolean _non_existent();

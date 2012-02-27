@@ -78,7 +78,7 @@ module Security {
 		unsigned short		family;
 	};
 	typedef sequence<octet>		OID;
-	typedef sequence<OID>		OIDList;
+  //	typedef sequence<OID>		OIDList;
 	// security attributes
 	typedef unsigned long		SecurityAttributeType;
 	// other attributes; family = 0
@@ -94,6 +94,7 @@ module Security {
 	const SecurityAttributeType	AttributeSet = 6;
 	const SecurityAttributeType	Clearance = 7; 
 	const SecurityAttributeType	Capability = 8;
+
 	struct AttributeType {
 		ExtensibleFamily	attribute_family;
 		SecurityAttributeType	attribute_type;
@@ -107,6 +108,7 @@ module Security {
 		// decoded only with knowledge of defining_authority
 	};
 	typedef sequence <SecAttribute> AttributeList;
+#ifndef MINIMUN
 	// Authentication return status
 	enum AuthenticationStatus {
 		SecAuthSuccess,
@@ -148,11 +150,13 @@ module Security {
 		Delegate,
 		NoDelegate
 	};
+#endif
 	// pick up from TimeBase
-	typedef TimeBase::UtcT		UtcT;
-	typedef TimeBase::IntervalT	IntervalT;
-	typedef TimeBase::TimeT		TimeT;
+// 	typedef TimeBase::UtcT		UtcT;
+// 	typedef TimeBase::IntervalT	IntervalT;
+// 	typedef TimeBase::TimeT		TimeT;
 	// Security features available on credentials.
+#ifndef MINIMUN
 	enum SecurityFeature {
 		SecNoDelegation,
 		SecSimpleDelegation,
@@ -166,6 +170,7 @@ module Security {
 		SecEstablishTrustInTarget,
 		SecEstablishTrustInClient
 	};
+#endif
 	// Quality of protection which can be specified
 	// for an object reference and used to protect messages
 	enum QOP {
@@ -175,6 +180,7 @@ module Security {
 		SecQOPIntegrityAndConfidentiality
 	};
 	// Type of SecurityContext
+#ifndef MINIMUN
 	enum SecurityContextType {
 		SecClientSecurityContext,
 		SecServerSecurityContext
@@ -196,7 +202,10 @@ module Security {
 		sequence<octet>		acceptor_address;
 		sequence<octet>		application_data;
 	};
+#endif
+
 	// For use with SecurityReplaceable
+#ifndef MINIMUN
 	struct OpaqueBuffer {
 		Opaque 			buffer;
 		unsigned long 		startpos; 
@@ -204,7 +213,7 @@ module Security {
 		// startpos <= endpos
 		// OpaqueBuffer is said to be empty if startpos == endpos
 	};
-
+#endif
 	// Association options which can be administered
 	// on secure invocation policy and used to
 	// initialize security context
@@ -219,7 +228,7 @@ module Security {
 	const AssociationOptions NoDelegation = 128;
 	const AssociationOptions SimpleDelegation = 256; 
 	const AssociationOptions CompositeDelegation = 512;
-
+#ifndef MINIMUN
 	// Flag to indicate whether association options being
 	// administered are the "required" or "supported" set
 	enum RequiresSupports {	
@@ -234,7 +243,9 @@ module Security {
 		SecDirectionReply
 	};
 	// security association mechanism type
+#endif
 	typedef string				MechanismType;
+#ifndef MINIMUN
 	typedef sequence<MechanismType> 	MechanismTypeList;
 	// AssociationOptions-Direction pair
 	struct OptionsDirectionPair {
@@ -249,6 +260,7 @@ module Security {
 		SecDelModeCompositeDelegation	// delegate both; 
 	};
 	// Association options supported by a given mech type
+#endif
 	struct MechandOptions {
 		MechanismType			mechanism_type;
 		AssociationOptions		options_supported;
@@ -259,6 +271,7 @@ module Security {
 		boolean trust_in_client;
 		boolean trust_in_target;
 	};
+#ifndef MINIMUN
 	// Audit 
 	typedef unsigned long	AuditChannelId;
 	typedef unsigned short	EventType;
@@ -301,12 +314,13 @@ module Security {
 	// Time: utc time on audit_write; time picked up from
 	// environment in audit_needed if required
 	// DayOfWeek: DayOfTheWeek
+
 	struct SelectorValue {
 		SelectorType	selector;
 		any		value;
 	};
 	typedef	 sequence <SelectorValue> SelectorValueList;
-
+#endif
 	// Constant declaration for valid Security Policy Types
 	// General administrative policies
 	const CORBA::PolicyType SecClientInvocationAccess = 1;

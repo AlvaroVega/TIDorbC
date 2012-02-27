@@ -37,7 +37,9 @@
 
 #include "TIDorb/core.h"
 #include "TIDorb/core/typecode.h"
+#ifndef MINIMUN
 #include "TIDorb/dynAny.h"
+#endif
 #include "TIDorb/util.h"
 
 #ifdef TIDORB_HAVE_IOSTREAM
@@ -119,7 +121,10 @@ TIDorb::core::TIDORB::TIDORB()
   throw (TIDThr::SystemException)
   : trace(NULL), m_typecode_cache(NULL), m_services(this), m_state(this), 
     m_destroyed(false), commManager(NULL), rootPOA(NULL), current(NULL), 
-    dyn_factory(NULL), codec_factory(NULL), policy_manager(NULL), 
+#ifndef MINIMUN
+    dyn_factory(NULL), 
+#endif
+    codec_factory(NULL), policy_manager(NULL), 
     policy_current(NULL), policy_context_manager(NULL), 
     compression_manager(NULL), default_domain_manager(NULL), 
     requestCounter(NULL)
@@ -586,7 +591,7 @@ void TIDorb::core::TIDORB::create_list(::CORBA::Long size, ::CORBA::NVList_out l
 
   list = new NVListImpl(this);
 }
-
+#ifndef MINIMUN
 void TIDorb::core::TIDORB::create_operation_list(::CORBA::OperationDef_ptr def, ::CORBA::NVList_out list)
 {
   if (m_destroyed)
@@ -594,7 +599,7 @@ void TIDorb::core::TIDORB::create_operation_list(::CORBA::OperationDef_ptr def, 
 
   throw CORBA::NO_IMPLEMENT(0,CORBA::COMPLETED_NO);
 }
-
+#endif
 void TIDorb::core::TIDORB::create_named_value(::CORBA::NamedValue_out nv)
 {
   if (m_destroyed)
@@ -864,7 +869,7 @@ void TIDorb::core::TIDORB::destroy()
       CORBA::release(current);
       current = NULL;
     }
-    
+#ifndef MINIMUN
     if(dyn_factory) {
       TIDorb::dynAny::DynAnyFactoryImpl* dyn_impl =
         ( TIDorb::dynAny::DynAnyFactoryImpl* ) (dyn_factory);
@@ -872,7 +877,7 @@ void TIDorb::core::TIDORB::destroy()
       CORBA::release(dyn_factory);
       dyn_factory = NULL;
     }
-
+#endif
     if(codec_factory) {
       CORBA::release(codec_factory);
       codec_factory = NULL;
@@ -1207,7 +1212,7 @@ CORBA::Object_ptr TIDorb::core::TIDORB::init_POACurrent()
   }
   return PortableServer::Current::_duplicate(current);
 }
-
+#ifndef MINIMUN
 CORBA::Object_ptr TIDorb::core::TIDORB::init_DynAnyFactory()
 {
   TIDThr::Synchronized synchro (*this);
@@ -1221,7 +1226,7 @@ CORBA::Object_ptr TIDorb::core::TIDORB::init_DynAnyFactory()
 
   return DynamicAny::DynAnyFactory::_duplicate(dyn_factory);
 }
-
+#endif
 CORBA::Object_ptr TIDorb::core::TIDORB::init_CodecFactory()
 {
   TIDThr::Synchronized synchro (*this);

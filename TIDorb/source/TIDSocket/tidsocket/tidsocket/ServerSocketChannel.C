@@ -51,9 +51,11 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#if (defined __darwin || defined __CYGWIN__)
+#if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips)
    #include <sys/ioctl.h>
+#if (defined __darwin)
    #include <CoreServices/CoreServices.h>
+#endif
 #else
    #include <stropts.h>
 #endif

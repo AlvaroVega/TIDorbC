@@ -82,7 +82,9 @@ class ValueTypeCode : public ComplexTypeCode
     CORBA::ULong member_count() const;
     const char* member_name(CORBA::ULong index) const;
     CORBA::TypeCode_ptr member_type(CORBA::ULong index) const;
+#ifndef MINIMUN
     CORBA::Visibility member_visibility(CORBA::ULong index) const;
+#endif
     CORBA::ValueModifier type_modifier() const;
     CORBA::TypeCode_ptr concrete_base_type() const;
 

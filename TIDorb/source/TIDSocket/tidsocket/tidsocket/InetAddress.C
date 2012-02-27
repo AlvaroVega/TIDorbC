@@ -223,7 +223,7 @@ char* InetAddress::getCanonicalHostName()
 #ifdef __sun
     ht_ptr = gethostbyaddr_r((const char*) ip_ptr, len, AF_INET,
                              &ht, ht_buffer, HOSTENT_BUFFER_SIZE, &ht_error);
-#elif defined __CYGWIN__
+#elif (defined __CYGWIN__ || defined __ANDROID__)
     ht_ptr = gethostbyaddr((const char*) ip_ptr, len, AF_INET);
     ht_error = h_errno;
 #else

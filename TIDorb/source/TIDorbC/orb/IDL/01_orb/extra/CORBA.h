@@ -123,12 +123,12 @@ namespace CORBA
 	typedef DomainManager* DomainManager_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<DomainManager> DomainManager_var;
 	typedef ::TIDorb::templates::InterfaceT_out<DomainManager> DomainManager_out;
-
+#ifndef MINIMUN
 	class ConstructionPolicy;
 	typedef ConstructionPolicy* ConstructionPolicy_ptr;
     typedef ::TIDorb::templates::InterfaceT_var<ConstructionPolicy> ConstructionPolicy_var;
 	typedef ::TIDorb::templates::InterfaceT_out<ConstructionPolicy> ConstructionPolicy_out;
-
+#endif
 	class Current;
 	typedef Current* Current_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<Current> Current_var;
@@ -154,12 +154,12 @@ namespace CORBA
 	typedef IRObject* IRObject_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<IRObject> IRObject_var;
 	typedef ::TIDorb::templates::InterfaceT_out<IRObject> IRObject_out;
-
+#ifndef MINIMUN
 	class Contained;
 	typedef Contained* Contained_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<Contained> Contained_var;
 	typedef ::TIDorb::templates::InterfaceT_out<Contained> Contained_out;
-
+#endif
 	class StructMember;
 	typedef StructMember* StructMember_ptr;    
 	typedef ::TIDorb::templates::VariableSizeT_var<StructMember> StructMember_var;
@@ -174,17 +174,17 @@ namespace CORBA
 	typedef UnionMember* UnionMember_ptr;    
 	typedef ::TIDorb::templates::VariableSizeT_var<UnionMember> UnionMember_var;
 	typedef ::TIDorb::templates::VariableSizeT_out<UnionMember> UnionMember_out;
-
+#ifndef MINIMUN
 	class Container;
 	typedef Container* Container_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<Container> Container_var;
 	typedef ::TIDorb::templates::InterfaceT_out<Container> Container_out;
-
+#endif
 	class IDLType;
 	typedef IDLType* IDLType_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<IDLType> IDLType_var;
 	typedef ::TIDorb::templates::InterfaceT_out<IDLType> IDLType_out;
-
+#ifndef MINIMUN
 	class Repository;
 	typedef Repository* Repository_ptr;    
 	typedef ::TIDorb::templates::InterfaceT_var<Repository> Repository_var;
@@ -319,12 +319,12 @@ namespace CORBA
 	typedef InterfaceDescription* InterfaceDescription_ptr;
     typedef ::TIDorb::templates::VariableSizeT_var<InterfaceDescription> InterfaceDescription_var;
 	typedef ::TIDorb::templates::VariableSizeT_out<InterfaceDescription> InterfaceDescription_out;
-
+#endif
 	class ValueMember;
 	typedef ValueMember* ValueMember_ptr;
     typedef ::TIDorb::templates::VariableSizeT_var<ValueMember> ValueMember_var;
 	typedef ::TIDorb::templates::VariableSizeT_out<ValueMember> ValueMember_out;
-
+#ifndef MINIMUN
 	class ValueMemberDef;
 	typedef ValueMemberDef* ValueMemberDef_ptr;
 	typedef ::TIDorb::templates::InterfaceT_var<ValueMemberDef> ValueMemberDef_var;
@@ -344,7 +344,7 @@ namespace CORBA
 	typedef ValueBoxDef* ValueBoxDef_ptr;
 	typedef ::TIDorb::templates::InterfaceT_var<ValueBoxDef> ValueBoxDef_var;
 	typedef ::TIDorb::templates::InterfaceT_out<ValueBoxDef> ValueBoxDef_out;
-	 
+#endif	 
 	typedef ::TIDorb::templates::InterfaceT_var<TypeCode> TypeCode_var;
 	typedef ::TIDorb::templates::InterfaceT_out<TypeCode> TypeCode_out;
 
@@ -464,9 +464,11 @@ namespace CORBA
 
 namespace CORBA
 {
+#ifndef MINIMUN
 	#include "CORBA/InterfaceDefSeq.h"
 	#include "CORBA/ValueDefSeq.h"
 	#include "CORBA/ContainedSeq.h"
+#endif
 	#include "CORBA/BooleanSeq.h"
 	#include "CORBA/CharSeq.h"
 	#include "CORBA/WCharSeq.h"
@@ -547,14 +549,16 @@ namespace CORBA
 	#include "CORBA/PolicyError.h"
 
 	#include "CORBA/DomainManager.h"
+#ifndef MINIMUN
 	#include "CORBA/SecConstruction.h"
+#endif
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_DomainManagerStub.h"
-
+#ifndef MINIMUN
 	#include "CORBA/ConstructionPolicy.h"
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_ConstructionPolicyStub.h"
-
+#endif
 	#include "CORBA/Current.h"
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_CurrentStub.h"
@@ -577,24 +581,29 @@ namespace CORBA
 	#include "CORBA/_IRObjectStub.h"
 
 	#include "CORBA/VersionSpec.h"
+#ifndef MINIMUN
 	#include "CORBA/Contained.h"
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_ContainedStub.h"
+#endif
 
 	#include "CORBA/StructMember.h"
 	#include "CORBA/StructMemberSeq.h"
+#ifndef MINIMUN
 	#include "CORBA/Initializer.h"
 	#include "CORBA/InitializerSeq.h"
+#endif
 	#include "CORBA/UnionMember.h"
 	#include "CORBA/UnionMemberSeq.h"
 	#include "CORBA/EnumMemberSeq.h"
+#ifndef MINIMUN
 	#include "CORBA/Container.h"
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_ContainerStub.h"
-
+#endif
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_IDLTypeStub.h"
-
+#ifndef MINIMUN
 	#include "CORBA/PrimitiveKind.h"
 	#include "CORBA/Repository.h"
 	// Interface Stub Inclusion (Client Side).
@@ -689,9 +698,10 @@ namespace CORBA
 	#include "CORBA/_InterfaceDefStub.h"
 
 	#include "CORBA/InterfaceDescription.h"
-
+#endif
 	#include "CORBA/ValueMember.h"
 	#include "CORBA/ValueMemberSeq.h"
+#ifndef MINIMUN
 	#include "CORBA/ValueMemberDef.h"
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_ValueMemberDefStub.h"
@@ -704,6 +714,7 @@ namespace CORBA
 	#include "CORBA/ValueBoxDef.h"
 	// Interface Stub Inclusion (Client Side).
 	#include "CORBA/_ValueBoxDefStub.h"
+#endif
 
 	#include "CORBA/BadFixedValue.h"
 

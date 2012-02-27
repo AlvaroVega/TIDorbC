@@ -20,8 +20,9 @@ idl_source = \
 	Security.idl \
 	SecurityLevel1.idl \
 	SecurityLevel2.idl \
-	SecurityLevel3.idl \
 	SSLIOP.idl
+#	SecurityLevel3.idl
+
 
 idl_cpp_headers = \
 	CSI.h \
@@ -30,10 +31,7 @@ idl_cpp_headers = \
 	Security.h \
 	SecurityLevel1.h \
 	SecurityLevel2.h \
-	SecurityLevel3.h \
-	OBV_SecurityLevel3.h \
 	SSLIOP.h
-#	POA_SecurityLevel2.h
 
 idl_cpp_sources = \
 	CSI.C \
@@ -42,28 +40,27 @@ idl_cpp_sources = \
 	Security.C \
 	SecurityLevel1.C \
 	SecurityLevel2.C \
-	SecurityLevel3.C \
-	OBV_SecurityLevel3.C \
 	SSLIOP.C
-#	POA_SecurityLevel2.C
 
+IDLC_OPTIONS = -CORBA_IDL
+if MINIMUN
+IDLC_OPTIONS += -minimun -DMINIMUN -no_tie
+endif
 
-$(idl_cpp_sources): $(srcdir)/CSI.idl $(srcdir)/CSIIOP.idl $(srcdir)/GSSUP.idl $(srcdir)/Security.idl $(srcdir)/SecurityLevel1.idl $(srcdir)/SecurityLevel2.idl $(srcdir)/SecurityLevel3.idl $(srcdir)/SSLIOP.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+$(idl_cpp_sources): $(srcdir)/CSI.idl $(srcdir)/CSIIOP.idl $(srcdir)/GSSUP.idl $(srcdir)/Security.idl $(srcdir)/SecurityLevel1.idl $(srcdir)/SecurityLevel2.idl $(srcdir)/SSLIOP.idl
+	${IDLC} $(IDLC_OPTIONS) -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/CSI.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} $(IDLC_OPTIONS) -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/CSIIOP.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} $(IDLC_OPTIONS) -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/GSSUP.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} $(IDLC_OPTIONS) -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/Security.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} $(IDLC_OPTIONS) -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/SecurityLevel1.idl
-	${IDLC} -CORBA_IDL -no_skel -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} $(IDLC_OPTIONS) -no_skel -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/SecurityLevel2.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
-	  -I$(srcdir)/../02_comm $(srcdir)/SecurityLevel3.idl
-	${IDLC} -CORBA_IDL -I./ -I$(srcdir)/../07_TimeBase \
+	${IDLC} $(IDLC_OPTIONS) -I./ -I$(srcdir)/../07_TimeBase \
 	  -I$(srcdir)/../02_comm $(srcdir)/SSLIOP.idl
 
 

@@ -86,12 +86,12 @@ void CORBA::LocalObject::_remove_ref()
   }
 }
 
-
+#ifndef MINIMUN
 ::CORBA::InterfaceDef_ptr CORBA::LocalObject::_get_interface()
 {
   throw CORBA::NO_IMPLEMENT(3, CORBA::COMPLETED_NO);
 }
-
+#endif
 
 ::CORBA::Boolean CORBA::LocalObject::_is_a(const char* logical_type_id)
 {

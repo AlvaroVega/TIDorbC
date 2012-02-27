@@ -173,12 +173,12 @@ CORBA::Boolean TIDorb::core::poa::ServantDelegate::non_existent(PortableServer::
 {
   return false;
 };
-
+#ifndef MINIMUN
 CORBA::InterfaceDef_ptr TIDorb::core::poa::ServantDelegate::get_interface(PortableServer::ServantBase* self)
 {
   throw CORBA::NO_IMPLEMENT();
 };
-
+#endif
 /**
 * Sets object Id (useful for default servants).
 * @param oid The Object Id.

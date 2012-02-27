@@ -53,7 +53,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#if (defined __darwin || defined __CYGWIN__)
+#if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips)
    #include <sys/ioctl.h>
 
    // I_NREAD was declared in CoreServices framework in OSX < 10.4

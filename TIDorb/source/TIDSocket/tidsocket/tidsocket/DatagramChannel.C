@@ -50,7 +50,11 @@
 #include <sys/socket.h>
 #ifndef __darwin
 #ifndef __CYGWIN__
+#ifndef __ANDROID__
+#ifndef __mips
    #include <stropts.h>
+#endif
+#endif
 #endif
 #endif
 #include <unistd.h>

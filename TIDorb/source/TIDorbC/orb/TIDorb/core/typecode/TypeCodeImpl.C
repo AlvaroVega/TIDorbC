@@ -153,11 +153,12 @@ CORBA::Short TIDorb::core::typecode::TypeCodeImpl::fixed_scale() const
 {
   throw CORBA::TypeCode::BadKind();
 }
-
+#ifndef MINIMUN
 CORBA::Visibility TIDorb::core::typecode::TypeCodeImpl::member_visibility(CORBA::ULong index) const
 {
   throw CORBA::TypeCode::BadKind();
 }
+#endif
 
 CORBA::ValueModifier TIDorb::core::typecode::TypeCodeImpl::type_modifier() const
 {

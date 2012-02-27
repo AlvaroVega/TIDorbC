@@ -51,7 +51,9 @@ class ServantDelegate : public virtual TIDThr::Monitor {
   public:
    virtual ~ServantDelegate() throw (TIDThr::SystemException) {}
    virtual PortableServer::POA_ptr default_POA(PortableServer::ServantBase* self) = 0;
+#ifndef MINIMUN
    virtual CORBA::InterfaceDef_ptr get_interface(PortableServer::ServantBase* self) = 0;
+#endif
    virtual CORBA::Boolean          is_a(PortableServer::ServantBase* self, 
                                         const char* logical_type_id) = 0;
    virtual CORBA::Boolean          non_existent(PortableServer::ServantBase* self) = 0;

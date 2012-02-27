@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// File:        TIDSocket_InetStream.C
-// Description: This file contains the InetStream class methods
+// File:        TIDSocket_SSLInputStream.C
+// Description: This file contains the ServerSocket class methods
 // Rel:         01.00
 // Created:     May, 2009
 // Author:      Alvaro Vega Garcia      ( avega@tid.es   )
@@ -38,7 +38,7 @@
 #include "TIDSocket.h"
 #include <sys/time.h>
 #include <sys/types.h>
-#if (defined __darwin || defined __CYGWIN__)
+#if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips)
    #include <sys/ioctl.h>
    
    // I_NREAD was declared in CoreServices framework in OSX < 10.4

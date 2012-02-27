@@ -1,5 +1,9 @@
-SUBDIRS = Contained Container InterfaceDef ORB ServiceDetail \
-	ServiceInformation TypeCode ValueDef .
+SUBDIRS = ORB ServiceDetail \
+	ServiceInformation TypeCode .
+
+if !MINIMUN
+SUBDIRS += Contained Container InterfaceDef ValueDef
+endif
 
 # Default includes should be removed since header file String.h
 # is clashing with /usr/include/string.h, producing compile erros.
@@ -14,275 +18,276 @@ AM_CPPFLAGS = \
 CLEANFILES = *.C *.h
 
 idl_cpp_headers = \
-	AttributeDescription_ext.h \
 	ScopedName_ext.h \
 	DomainManager_ext.h \
-	AttributeMode.h \
-	ValueBoxDef.h \
 	PolicyCurrent_ext.h \
-	AttrDescriptionSeq_ext.h \
 	DomainManagerList_ext.h \
-	_FixedDefStub.h \
-	TypeDescription.h \
 	DoubleSeq_ext.h \
-	ConstantDef_ext.h \
 	ServiceDetail_ext.h \
-	ParameterDescription.h \
 	CharSeq_ext.h \
-	ContainedSeq_ext.h \
 	ARG_IN.h \
-	OperationDef_ext.h \
-	Repository.h \
-	_ValueDefStub.h \
 	PRIVATE_MEMBER.h \
 	Identifier.h \
 	Flags.h \
 	ServiceOption.h \
-	DefinitionKind.h \
-	_PrimitiveDefStub.h \
 	ServiceDetailType_ext.h \
 	Identifier_ext.h \
 	DataInputStream_ext.h \
 	PolicyError.h \
-	ParDescriptionSeq.h \
 	WCharSeq.h \
-	OperationDescription_ext.h \
-	_StructDefStub.h \
 	RepositoryIdSeq_ext.h \
 	BadFixedValue.h \
-	StructDef.h \
-	ExceptionDefSeq.h \
-	_InterfaceDefStub.h \
 	_PolicyStub.h \
-	UnionDef_ext.h \
-	Container.h \
 	DomainManager.h \
 	PolicyTypeSeq_ext.h \
 	CustomMarshal_ext.h \
-	ValueBoxDef_ext.h \
-	ValueMemberSeq.h \
-	Initializer.h \
-	StructMemberSeq.h \
 	PolicyManager_ext.h \
-	OperationDescription.h \
 	VM_ABSTRACT.h \
-	WstringDef.h \
-	_AttributeDefStub.h \
+	ValueMemberSeq.h \
 	ValueMember.h \
-	_NativeDefStub.h \
 	ULongLongSeq_ext.h \
-	UnionMemberSeq_ext.h \
-	OpDescriptionSeq.h \
-	PrimitiveKind_ext.h \
 	PUBLIC_MEMBER.h \
 	ServiceType.h \
-	PrimitiveKind.h \
-	UnionMemberSeq.h \
 	AnySeq_ext.h \
 	FloatSeq_ext.h \
 	FloatSeq.h \
 	ARG_OUT.h \
-	ExceptionDef.h \
-	StructDef_ext.h \
-	_AliasDefStub.h \
-	Initializer_ext.h \
-	_ConstantDefStub.h \
 	Current_ext.h \
 	BadFixedValue_ext.h \
 	ShortSeq.h \
 	WStringSeq.h \
-	ConstructionPolicy_ext.h \
-	ConstantDef.h \
-	OperationDef.h \
 	PolicyType_ext.h \
-	SequenceDef.h \
-	ValueDefSeq_ext.h \
 	_CurrentStub.h \
-	_OperationDefStub.h \
-	ValueDef.h \
-	ModuleDef.h \
-	ConstantDescription.h \
-	InitializerSeq_ext.h \
 	WCharSeq_ext.h \
-	ValueMemberDef_ext.h \
 	AnySeq.h \
 	Visibility_ext.h \
-	ValueDescription_ext.h \
 	LongLongSeq.h \
-	_ValueMemberDefStub.h \
 	PolicyList_ext.h \
 	PolicyError_ext.h \
 	BooleanSeq_ext.h \
 	BAD_POLICY_TYPE.h \
-	ContainedSeq.h \
-	_ModuleDefStub.h \
 	Flags_ext.h \
-	ConstantDescription_ext.h \
 	ValueModifier_ext.h \
 	Policy.h \
-	InterfaceDescription.h \
 	ValueMemberSeq_ext.h \
-	ArrayDef.h \
 	LongLongSeq_ext.h \
 	ServiceOption_ext.h \
 	StringSeq.h \
-	_TypedefDefStub.h \
 	ULongSeq_ext.h \
 	CharSeq.h \
 	LongSeq_ext.h \
-	_RepositoryStub.h \
-	ValueDef_ext.h \
-	ExcDescriptionSeq_ext.h \
-	ValueDescription.h \
-	ContextIdentifier_ext.h \
 	TypeCode.h \
 	DataOutputStream.h \
-	_ArrayDefStub.h \
 	PolicyCurrent.h \
-	ContextIdSeq_ext.h \
-	ExceptionDefSeq_ext.h \
 	_DomainManagerStub.h \
-	ExceptionDef_ext.h \
 	ServiceType_ext.h \
 	OctetSeq_ext.h \
 	ULongLongSeq.h \
-	IDLType.h \
-	_IRObjectStub.h \
-	FixedDef_ext.h \
-	_WstringDefStub.h \
-	NativeDef_ext.h \
-	ModuleDef_ext.h \
-	PrimitiveDef.h \
-	_IDLTypeStub.h \
 	UNSUPPORTED_POLICY_VALUE.h \
 	CTX_RESTRICT_SCOPE.h \
 	InvalidPolicies.h \
 	ServiceInformation.h \
 	Visibility.h \
-	InterfaceDefSeq_ext.h \
-	_ValueBoxDefStub.h \
-	StructMemberSeq_ext.h \
-	InitializerSeq.h \
-	ConstructionPolicy.h \
-	ExceptionDescription.h \
 	ORB.h \
 	DoubleSeq.h \
 	RepositoryId.h \
-	_ContainerStub.h \
-	ExceptionDescription_ext.h \
-	InterfaceDescription_ext.h \
-	SequenceDef_ext.h \
-	ParameterMode_ext.h \
-	ContextIdSeq.h \
 	ServiceInformation_ext.h \
-	_StringDefStub.h \
-	OpDescriptionSeq_ext.h \
 	SetOverrideType.h \
 	BAD_POLICY.h \
 	RepositoryIdSeq.h \
-	FixedDef.h \
-	AliasDef_ext.h \
-	StructMember.h \
-	NativeDef.h \
-	AttributeDef.h \
 	VersionSpec.h \
-	DefinitionKind_ext.h \
-	InterfaceDef.h \
 	BooleanSeq.h \
-	IDLType_ext.h \
-	Repository_ext.h \
 	ScopedName.h \
-	PrimitiveDef_ext.h \
 	TCKind.h \
-	ValueMemberDef.h \
 	UShortSeq.h \
 	BAD_POLICY_VALUE.h \
 	RepositoryId_ext.h \
 	WStringSeq_ext.h \
-	EnumDef_ext.h \
 	Security.h \
 	PolicyErrorCode_ext.h \
 	ValueMember_ext.h \
-	Container_ext.h \
 	Current.h \
-	UnionDef.h \
-	_EnumDefStub.h \
 	ShortSeq_ext.h \
 	PolicyList.h \
-	OperationMode_ext.h \
-	ValueDefSeq.h \
-	_ExceptionDefStub.h \
-	StringDef_ext.h \
 	InvalidPolicies_ext.h \
 	CompletionStatus_ext.h \
 	DataInputStream.h \
-	_ConstructionPolicyStub.h \
-	AttributeDef_ext.h \
 	PolicyType.h \
-	TypedefDef_ext.h \
-	_UnionDefStub.h \
-	StructMember_ext.h \
-	TypeDescription_ext.h \
-	_ContainedStub.h \
-	UnionMember_ext.h \
 	DataOutputStream_ext.h \
 	StringSeq_ext.h \
 	DomainManagerList.h \
 	OctetSeq.h \
-	ParameterDescription_ext.h \
 	ServiceDetail.h \
-	AttributeDescription.h \
 	ValueModifier.h \
 	LongSeq.h \
-	SecConstruction.h \
-	ExcDescriptionSeq.h \
-	InterfaceDefSeq.h \
-	_SequenceDefStub.h \
-	AttributeMode_ext.h \
-	InterfaceDef_ext.h \
-	IRObject_ext.h \
 	ULongSeq.h \
 	VM_NONE.h \
-	TypedefDef.h \
-	EnumMemberSeq.h \
 	ServiceDetailType.h \
-	OperationMode.h \
 	ARG_INOUT.h \
 	PolicyErrorCode.h \
-	ContextIdentifier.h \
-	UnionMember.h \
-	IRObject.h \
-	WstringDef_ext.h \
 	ORB_ext.h \
-	Contained.h \
-	AliasDef.h \
-	StringDef.h \
 	PolicyTypeSeq.h \
-	ParDescriptionSeq_ext.h \
 	CustomMarshal.h \
-	AttrDescriptionSeq.h \
 	PolicyManager.h \
 	SetOverrideType_ext.h \
 	UNSUPPORTED_POLICY.h \
 	Policy_ext.h \
-	ParameterMode.h \
-	ModuleDescription.h \
 	VM_CUSTOM.h \
 	TypeCode_ext.h \
-	ModuleDescription_ext.h \
-	ArrayDef_ext.h \
 	TCKind_ext.h \
 	VersionSpec_ext.h \
 	VM_TRUNCATABLE.h \
-	Contained_ext.h \
 	OMGVMCID.h \
 	UShortSeq_ext.h \
-	EnumMemberSeq_ext.h \
 	CompletionStatus.h \
-	EnumDef.h \
 	LongDoubleSeq.h \
-	LongDoubleSeq_ext.h
+	LongDoubleSeq_ext.h \
+	StructMemberSeq_ext.h \
+	StructMemberSeq.h \
+	StructMember.h \
+	StructMember_ext.h \
+	UnionMember_ext.h \
+	UnionMemberSeq_ext.h \
+	UnionMember.h \
+	UnionMemberSeq.h \
+	_IRObjectStub.h \
+	IRObject_ext.h \
+	IRObject.h \
+	IDLType.h \
+	_IDLTypeStub.h \
+	IDLType_ext.h \
+	DefinitionKind.h \
+	DefinitionKind_ext.h
 
+if !MINIMUN
+idl_cpp_headers += \
+	ParameterMode.h \
+	ParameterMode_ext.h \
+	ContextIdentifier.h \
+	ContextIdentifier_ext.h \
+	OperationMode.h \
+	OperationMode_ext.h \
+	ContextIdSeq.h \
+	ContextIdSeq_ext.h \
+	PrimitiveKind.h \
+	PrimitiveKind_ext.h \
+	AttributeMode.h \
+	AttributeMode_ext.h \
+	SecConstruction.h \
+	ConstructionPolicy_ext.h \
+	ConstructionPolicy.h \
+	_ConstructionPolicyStub.h \
+	Contained.h \
+	ContainedSeq_ext.h \
+	ContainedSeq.h \
+	_ContainedStub.h \
+	Contained_ext.h \
+	Container.h \
+	_ContainerStub.h \
+	Container_ext.h \
+	_PrimitiveDefStub.h \
+	PrimitiveDef.h \
+	PrimitiveDef_ext.h \
+	WstringDef.h \
+	WstringDef_ext.h \
+	SequenceDef.h \
+	SequenceDef_ext.h \
+	ArrayDef.h \
+	ArrayDef_ext.h \
+	FixedDef.h \
+	FixedDef_ext.h \
+	StringDef.h \
+	_StringDefStub.h \
+	StringDef_ext.h \
+	Repository.h \
+	_RepositoryStub.h \
+	Repository_ext.h \
+	ModuleDef.h \
+	_ModuleDefStub.h \
+	ModuleDef_ext.h \
+	EnumMemberSeq.h \
+	EnumMemberSeq_ext.h \
+	ConstantDef_ext.h \
+	_ConstantDefStub.h \
+	ConstantDef.h \
+	_TypedefDefStub.h \
+	TypedefDef_ext.h \
+	TypedefDef.h \
+	ValueBoxDef.h \
+	_FixedDefStub.h \
+	OperationDef_ext.h \
+	_ValueDefStub.h \
+	_StructDefStub.h \
+	StructDef.h \
+	ExceptionDefSeq.h \
+	_InterfaceDefStub.h \
+	UnionDef_ext.h \
+	ValueBoxDef_ext.h \
+	_AttributeDefStub.h \
+	_NativeDefStub.h \
+	ExceptionDef.h \
+	StructDef_ext.h \
+	_AliasDefStub.h \
+	OperationDef.h \
+	ValueDefSeq_ext.h \
+	_OperationDefStub.h \
+	ValueDef.h \
+	ValueMemberDef_ext.h \
+	_ValueMemberDefStub.h \
+	ValueDef_ext.h \
+	_ArrayDefStub.h \
+	ExceptionDefSeq_ext.h \
+	ExceptionDef_ext.h \
+	InterfaceDefSeq_ext.h \
+	_ValueBoxDefStub.h \
+	AliasDef_ext.h \
+	NativeDef.h \
+	AttributeDef.h \
+	InterfaceDef.h \
+	ValueMemberDef.h \
+	EnumDef_ext.h \
+	UnionDef.h \
+	_EnumDefStub.h \
+	ValueDefSeq.h \
+	_ExceptionDefStub.h \
+	AttributeDef_ext.h \
+	_UnionDefStub.h \
+	InterfaceDefSeq.h \
+	_SequenceDefStub.h \
+	InterfaceDef_ext.h \
+	AliasDef.h \
+	EnumDef.h \
+	AttributeDescription_ext.h \
+	AttrDescriptionSeq_ext.h \
+	TypeDescription.h \
+	ParameterDescription.h \
+	ParDescriptionSeq.h \
+	OperationDescription_ext.h \
+	OperationDescription.h \
+	OpDescriptionSeq.h \
+	ValueDescription_ext.h \
+	InterfaceDescription.h \
+	ExcDescriptionSeq_ext.h \
+	ValueDescription.h \
+	ExceptionDescription.h \
+	ExceptionDescription_ext.h \
+	InterfaceDescription_ext.h \
+	OpDescriptionSeq_ext.h \
+	TypeDescription_ext.h \
+	ParameterDescription_ext.h \
+	AttributeDescription.h \
+	ExcDescriptionSeq.h \
+	ParDescriptionSeq_ext.h \
+	AttrDescriptionSeq.h \
+	ModuleDescription.h \
+	ModuleDescription_ext.h \
+	ConstantDescription.h \
+	ConstantDescription_ext.h \
+	Initializer_ext.h \
+	Initializer.h \
+	InitializerSeq_ext.h \
+	InitializerSeq.h
+endif
 
 idl_cpp_extra_headers = \
 	UserException.h \
@@ -315,147 +320,150 @@ idl_cpp_extra_headers = \
 	WString.h \
 	Object.h
 
-
 idl_cpp_sources = \
 	CompletionStatus.C \
-	EnumDef.C \
-	AttributeMode.C \
-	ValueBoxDef.C \
-	_FixedDefStub.C \
-	TypeDescription.C \
-	ParameterDescription.C \
-	Repository.C \
-	_ValueDefStub.C \
 	Identifier.C \
 	Flags.C \
-	DefinitionKind.C \
 	ServiceOption.C \
-	_PrimitiveDefStub.C \
 	PolicyError.C \
-	ParDescriptionSeq.C \
 	WCharSeq.C \
-	_StructDefStub.C \
 	BadFixedValue.C \
-	StructDef.C \
-	ExceptionDefSeq.C \
-	_InterfaceDefStub.C \
 	_PolicyStub.C \
-	Container.C \
 	DomainManager.C \
 	ValueMemberSeq.C \
-	Initializer.C \
 	StructMemberSeq.C \
-	OperationDescription.C \
-	WstringDef.C \
-	_AttributeDefStub.C \
 	ValueMember.C \
-	_NativeDefStub.C \
-	OpDescriptionSeq.C \
 	ServiceType.C \
-	PrimitiveKind.C \
-	UnionMemberSeq.C \
 	FloatSeq.C \
-	ExceptionDef.C \
-	_AliasDefStub.C \
-	_ConstantDefStub.C \
 	ShortSeq.C \
-	WStringSeq.C \
-	ConstantDef.C \
-	OperationDef.C \
-	SequenceDef.C \
 	_CurrentStub.C \
-	_OperationDefStub.C \
-	ValueDef.C \
-	ModuleDef.C \
-	ConstantDescription.C \
 	AnySeq.C \
 	LongLongSeq.C \
-	_ValueMemberDefStub.C \
-	ContainedSeq.C \
-	_ModuleDefStub.C \
-	InterfaceDescription.C \
-	ArrayDef.C \
 	StringSeq.C \
-	_TypedefDefStub.C \
 	CharSeq.C \
-	_RepositoryStub.C \
-	ValueDescription.C \
 	DataOutputStream.C \
-	_ArrayDefStub.C \
 	PolicyCurrent.C \
 	_DomainManagerStub.C \
 	ULongLongSeq.C \
 	Policy.C \
-	IDLType.C \
-	_IRObjectStub.C \
-	_WstringDefStub.C \
-	PrimitiveDef.C \
-	_IDLTypeStub.C \
 	InvalidPolicies.C \
 	ServiceInformation.C \
 	Visibility.C \
-	_ValueBoxDefStub.C \
-	InitializerSeq.C \
-	ConstructionPolicy.C \
-	ExceptionDescription.C \
 	DoubleSeq.C \
 	RepositoryId.C \
-	_ContainerStub.C \
-	ContextIdSeq.C \
-	_StringDefStub.C \
 	SetOverrideType.C \
 	RepositoryIdSeq.C \
-	FixedDef.C \
 	StructMember.C \
-	NativeDef.C \
-	AttributeDef.C \
 	VersionSpec.C \
-	InterfaceDef.C \
 	BooleanSeq.C \
 	ScopedName.C \
 	TCKind.C \
-	ValueMemberDef.C \
 	UShortSeq.C \
 	Current.C \
-	UnionDef.C \
-	_EnumDefStub.C \
 	PolicyList.C \
-	ValueDefSeq.C \
-	_ExceptionDefStub.C \
 	DataInputStream.C \
-	_ConstructionPolicyStub.C \
 	PolicyType.C \
-	_UnionDefStub.C \
-	_ContainedStub.C \
 	DomainManagerList.C \
 	OctetSeq.C \
 	ServiceDetail.C \
-	AttributeDescription.C \
 	ValueModifier.C \
 	LongSeq.C \
-	ExcDescriptionSeq.C \
-	InterfaceDefSeq.C \
-	_SequenceDefStub.C \
 	ULongSeq.C \
-	TypedefDef.C \
-	EnumMemberSeq.C \
 	ServiceDetailType.C \
-	OperationMode.C \
 	PolicyErrorCode.C \
-	ContextIdentifier.C \
-	UnionMember.C \
-	IRObject.C \
-	Contained.C \
-	AliasDef.C \
-	StringDef.C \
 	PolicyTypeSeq.C \
 	CustomMarshal.C \
-	AttrDescriptionSeq.C \
 	PolicyManager.C \
-	ParameterMode.C \
-	ModuleDescription.C \
-	LongDoubleSeq.C
+	LongDoubleSeq.C \
+	_IRObjectStub.C \
+	IRObject.C \
+	IDLType.C \
+	_IDLTypeStub.C \
+	DefinitionKind.C
 
+
+if !MINIMUN
+idl_cpp_sources += \
+	ParameterMode.C \
+	ContextIdentifier.C \
+	OperationMode.C \
+	_ConstructionPolicyStub.C \
+	ContextIdSeq.C \
+	PrimitiveKind.C \
+	AttributeMode.C \
+	ConstructionPolicy.C \
+	ContainedSeq.C \
+	_ContainedStub.C \
+	Contained.C \
+	Container.C \
+	_ContainerStub.C \
+	_StringDefStub.C \
+	StringDef.C \
+	SequenceDef.C \
+	_SequenceDefStub.C \
+	ArrayDef.C \
+	_ArrayDefStub.C \
+	WStringSeq.C \
+	_FixedDefStub.C \
+	FixedDef.C \
+	Repository.C \
+	_RepositoryStub.C \
+	ModuleDef.C \
+	_ModuleDefStub.C \
+	UnionMemberSeq.C \
+	UnionMember.C \
+	EnumMemberSeq.C \
+	ModuleDescription.C \
+	_ConstantDefStub.C \
+	ConstantDef.C \
+	ConstantDescription.C \
+	_TypedefDefStub.C \
+	TypedefDef.C \
+	EnumDef.C \
+	ValueBoxDef.C \
+	_ValueDefStub.C \
+	_PrimitiveDefStub.C \
+	_StructDefStub.C \
+	StructDef.C \
+	ExceptionDefSeq.C \
+	_InterfaceDefStub.C \
+	WstringDef.C \
+	_AttributeDefStub.C \
+	_NativeDefStub.C \
+	ExceptionDef.C \
+	_AliasDefStub.C \
+	OperationDef.C \
+	_OperationDefStub.C \
+	ValueDef.C \
+	_ValueMemberDefStub.C \
+	_WstringDefStub.C \
+	PrimitiveDef.C \
+	_ValueBoxDefStub.C \
+	NativeDef.C \
+	AttributeDef.C \
+	InterfaceDef.C \
+	ValueMemberDef.C \
+	UnionDef.C \
+	_EnumDefStub.C \
+	ValueDefSeq.C \
+	_ExceptionDefStub.C \
+	_UnionDefStub.C \
+	InterfaceDefSeq.C \
+	AliasDef.C \
+	TypeDescription.C \
+	ParameterDescription.C \
+	ParDescriptionSeq.C \
+	OperationDescription.C \
+	OpDescriptionSeq.C \
+	InterfaceDescription.C \
+	ValueDescription.C \
+	ExceptionDescription.C \
+	AttributeDescription.C \
+	ExcDescriptionSeq.C \
+	AttrDescriptionSeq.C \
+	Initializer.C \
+	InitializerSeq.C
+endif
 
 instdir=$(includedir)/CORBA
 
@@ -467,11 +475,16 @@ noinst_LTLIBRARIES = libTIDorbIdl_orb_CORBA.la
 libTIDorbIdl_orb_CORBA_la_SOURCES = $(idl_cpp_headers) $(idl_cpp_sources)
 
 libTIDorbIdl_orb_CORBA_la_LIBADD = \
-	Contained/libTIDorbIdl_orb_CORBA_Contained.la \
-	Container/libTIDorbIdl_orb_CORBA_Container.la \
-	InterfaceDef/libTIDorbIdl_orb_CORBA_InterfaceDef.la \
 	ORB/libTIDorbIdl_orb_CORBA_ORB.la \
 	ServiceDetail/libTIDorbIdl_orb_CORBA_ServiceDetail.la \
 	ServiceInformation/libTIDorbIdl_orb_CORBA_ServiceInformation.la \
-	TypeCode/libTIDorbIdl_orb_CORBA_TypeCode.la \
+	TypeCode/libTIDorbIdl_orb_CORBA_TypeCode.la
+
+if !MINIMUN
+libTIDorbIdl_orb_CORBA_la_LIBADD += \
+	Contained/libTIDorbIdl_orb_CORBA_Contained.la \
+	Container/libTIDorbIdl_orb_CORBA_Container.la \
+	InterfaceDef/libTIDorbIdl_orb_CORBA_InterfaceDef.la \
 	ValueDef/libTIDorbIdl_orb_CORBA_ValueDef.la 
+
+endif

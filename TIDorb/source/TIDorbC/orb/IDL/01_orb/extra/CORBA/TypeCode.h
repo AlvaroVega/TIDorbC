@@ -41,7 +41,9 @@ class TypeCode
     virtual TypeCode_ptr content_type() const = 0;
     virtual UShort fixed_digits() const = 0;
     virtual Short fixed_scale() const = 0;
+#ifndef MINIMUN
     virtual Visibility member_visibility(ULong index) const = 0;
+#endif
     virtual ValueModifier type_modifier() const = 0;
     virtual TypeCode_ptr concrete_base_type() const = 0;
     
