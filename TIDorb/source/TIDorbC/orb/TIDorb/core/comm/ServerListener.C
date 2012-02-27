@@ -58,30 +58,45 @@ TIDorb::core::comm::ServerListener::ServerListener(ConnectionManager* the_manage
 
   TIDSocket::InetAddress* inet = NULL;
   char* localhost = NULL;
-
+  char* interface = NULL;
+  char* ip_iface  = NULL;
+  
   try {
     if (conf.ip_address == NULL){
       // Bug #343 Allow to reuse port
-      server_socket = new TIDSocket::ServerSocket();
+      server_socket = new TIDSocket::ServerSocket(conf.prefer_ipv6);
       server_socket->setReuseAddress(true);
       try{
-        TIDSocket::InetSocketAddress inet(conf.orb_port);
-        server_socket->bind((TIDSocket::SocketAddress*) &inet, conf.server_socket_backlog);
+      	TIDSocket::InetSocketAddress inet(conf.orb_port, conf.prefer_ipv6);
+        server_socket->bind((TIDSocket::SocketAddress*) &inet, 
+                            conf.server_socket_backlog, interface);
       }
       catch(TIDSocket::IllegalArgumentException& e) {
           throw TIDSocket::IOException(e.what());
       }
     }
     else {
-      inet = TIDSocket::InetAddress::getByName(conf.ip_address);
+      if (conf.prefer_ipv6) {
+      	string aux = conf.ip_address;
+      	if (strcmp(aux.c_str(),"::1") != 0) {
+          aux += "%";
+          aux += conf.iface;
+        }
+        ip_iface = CORBA::string_dup(aux.c_str());
+        inet = TIDSocket::InetAddress::getByName(ip_iface);
+        interface = CORBA::string_dup(conf.iface);
+      }
+      else
+        inet = TIDSocket::InetAddress::getByName(conf.ip_address);
       // Bug #343 Allow to reuse port
-      server_socket = new TIDSocket::ServerSocket();
+      server_socket = new TIDSocket::ServerSocket(conf.prefer_ipv6);
       server_socket->setReuseAddress(true);
       try {
-        TIDSocket::InetSocketAddress addr(conf.orb_port);
+        TIDSocket::InetSocketAddress addr(conf.orb_port, conf.prefer_ipv6);
         if (inet) 
           addr = TIDSocket::InetSocketAddress(inet, conf.orb_port);
-        server_socket->bind((TIDSocket::SocketAddress*) &addr, conf.server_socket_backlog);
+        server_socket->bind((TIDSocket::SocketAddress*) &addr, 
+                            conf.server_socket_backlog, interface);
       } catch(TIDSocket::IllegalArgumentException& e) {
         throw TIDSocket::IOException(e.what());
       }
@@ -92,12 +107,45 @@ TIDorb::core::comm::ServerListener::ServerListener(ConnectionManager* the_manage
     server_socket->setReceiveBufferSize(conf.tcp_buffer_size);
 
     if(conf.host != NULL)
-      listen_point = TIDorb::core::comm::iiop::ListenPoint(conf.host, server_socket->getLocalPort());
+      listen_points.insert(TIDorb::core::comm::iiop::ListenPoint(
+                                              conf.host, server_socket->getLocalPort()));
     else{
+      if (conf.prefer_ipv6) {
+        if (conf.ip_address == NULL)
+          inet = TIDSocket::InetAddress::getByName("::1"); //ip6-localhost");
+        else
+          inet = TIDSocket::InetAddress::getByName(ip_iface);
+
+        if (ip_iface != NULL)
+          localhost = CORBA::string_dup(ip_iface);
+        else
+          localhost = inet->getHostAddress();
+          
+        listen_points.insert(TIDorb::core::comm::iiop::ListenPoint(
+                                               localhost, server_socket->getLocalPort()));
+        delete inet;
+        delete[] localhost;
+      }
+
       inet = TIDSocket::InetAddress::getLocalHost();
       localhost = inet->getHostAddress();
-      listen_point = TIDorb::core::comm::iiop::ListenPoint(localhost, server_socket->getLocalPort());
+      // TODO: if there is more than 1 interface by address...
+//       TIDSocket::InetAddressList* inet_list = 
+//         TIDSocket::InetAddress::getAllByName(inet->getCanonicalHostName());
+//       TIDSocket::InetAddressList::iterator it  = inet_list->begin();
+//       TIDSocket::InetAddressList::iterator end = inet_list->end();
+//       while (it != end) {     
+      listen_points.insert(TIDorb::core::comm::iiop::ListenPoint(
+                                               localhost, server_socket->getLocalPort()));
+//       listen_points.insert(TIDorb::core::comm::iiop::ListenPoint(//(*it).getHostAddress(), 
+//                                                                  inet->getCanonicalHostName(),
+//                                                                  server_socket->getLocalPort()));
+
+//         it++;
+//       }
       delete[] localhost;
+      CORBA::string_free(interface);
+      CORBA::string_free(ip_iface);
       delete inet;
       inet = NULL;
     }
@@ -124,10 +172,10 @@ TIDorb::core::comm::ServerListener::~ServerListener()
 
 
 
-const TIDorb::core::comm::iiop::ListenPoint&
-  TIDorb::core::comm::ServerListener::get_listen_point()
+const TIDorb::core::comm::iiop::ListenPointSet&
+  TIDorb::core::comm::ServerListener::get_listen_points()
 {
-  return listen_point;
+  return listen_points;
 }
 
 
@@ -145,13 +193,27 @@ void TIDorb::core::comm::ServerListener::shutdown()
     }
     if (_orb->trace != NULL){
       TIDorb::util::StringBuffer msg;
-      msg << "ServerListener at " << listen_point.toString() << " shutdown!";
+      msg << "ServerListener at ";
+      TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+      TIDorb::core::comm::iiop::ListenPointSet::iterator end = listen_points.end();
+      while  (it != end) {
+        msg << (*it).toString() << " ";
+        it++;
+      }
+      msg << " shutdown!";
       _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data());
     }
   } catch(...) {
     if (_orb->trace != NULL){
       TIDorb::util::StringBuffer msg;
-      msg << "ServerListener at " << listen_point.toString() << " shutdown!";
+      msg << "ServerListener at ";
+      TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+      TIDorb::core::comm::iiop::ListenPointSet::iterator end = listen_points.end();
+      while  (it != end) {
+        msg << (*it).toString() << " ";
+        it++;
+      }
+      msg << " shutdown!";
       _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data(),CORBA::UNKNOWN());
     }
   }
@@ -173,16 +235,20 @@ void TIDorb::core::comm::ServerListener::reset_server_socket()
   }
 
   TIDSocket::InetAddress* inet = NULL;
-
+  const char* interface = NULL;
   try {
     if(conf.ip_address == NULL) {
       server_socket = // Bug #343 Allow to reuse port
         // new TIDSocket::ServerSocket(listen_point._port, _orb->conf().server_socket_backlog);
-        new TIDSocket::ServerSocket();
+        new TIDSocket::ServerSocket(conf.prefer_ipv6);
       server_socket->setReuseAddress(true);
       try{
-        TIDSocket::InetSocketAddress inet(listen_point._port);
-        server_socket->bind((TIDSocket::SocketAddress*) &inet, conf.server_socket_backlog);
+        //TIDSocket::InetSocketAddress inet(listen_point._port);
+        // All listen points have the same port, so we can take the first.
+        TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+        TIDSocket::InetSocketAddress inet((*it)._port, conf.prefer_ipv6);
+        server_socket->bind((TIDSocket::SocketAddress*) &inet, 
+                            conf.server_socket_backlog, interface);
       }
       catch(TIDSocket::IllegalArgumentException& e) {
         throw TIDSocket::IOException(e.what());
@@ -192,13 +258,20 @@ void TIDorb::core::comm::ServerListener::reset_server_socket()
       inet = TIDSocket::InetAddress::getByName(conf.ip_address);
       server_socket = // Bug #343 Allow to reuse port
         // new TIDSocket::ServerSocket(listen_point._port, _orb->conf().server_socket_backlog, inet);
-        new TIDSocket::ServerSocket();
+        new TIDSocket::ServerSocket(conf.prefer_ipv6);
       server_socket->setReuseAddress(true);
       try {
-        TIDSocket::InetSocketAddress addr(conf.orb_port);
+        TIDSocket::InetSocketAddress addr(conf.orb_port, conf.prefer_ipv6);
         if (inet) 
           addr = TIDSocket::InetSocketAddress(inet, conf.orb_port);
-        server_socket->bind((TIDSocket::SocketAddress*) &addr, conf.server_socket_backlog);
+        if (conf.prefer_ipv6) {
+          string point = conf.ip_address;
+          string::size_type colon_position = point.find('%');
+          if (colon_position != string::npos)
+            interface = point.substr(colon_position + 1).c_str();
+        }
+        server_socket->bind((TIDSocket::SocketAddress*) &addr, 
+                            conf.server_socket_backlog, interface);
       } catch(TIDSocket::IllegalArgumentException& e) {
         throw TIDSocket::IOException(e.what());
       }
@@ -223,7 +296,14 @@ void TIDorb::core::comm::ServerListener::run()
 
       if (_orb->trace != NULL) {
         TIDorb::util::StringBuffer buffer;
-        buffer << "Accepting connections at " << listen_point.toString() << "..." << ends;
+        buffer << "Accepting connections at ";
+        TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+        TIDorb::core::comm::iiop::ListenPointSet::iterator end = listen_points.end();
+        while  (it != end) {
+          buffer << (*it).toString() << " ";
+          it++;
+        }
+        buffer << "..." << ends;
         _orb->print_trace(TIDorb::util::TR_DEBUG, buffer.str().data());
       }
 

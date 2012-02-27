@@ -45,10 +45,10 @@ class IIOPCorbaloc
 {
 	
 public:
-  static char* get_object_id(const char* corbaloc_URL) 
+  static char* get_object_id(const char* corbaloc_URL,const char* iface) 
     throw(CORBA::ORB::InvalidName);
   	  
-  static TIDorb::core::iop::IOR* get_IOR(const char* corbaloc_URL) 
+  static TIDorb::core::iop::IOR* get_IOR(const char* corbaloc_URL, const char* iface) 
     throw(CORBA::ORB::InvalidName);
 	  
 private:

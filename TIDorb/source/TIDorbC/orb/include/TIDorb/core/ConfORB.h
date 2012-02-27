@@ -648,6 +648,27 @@ namespace core {
     static const char* assume_ziop_server_name;
     static const bool DEFAULT_ASSUME_ZIOP_SERVER;
 
+
+    /**
+     * Prefer IPv6 interfaces.
+     * Values must be "true" or "false".
+     * Default "false".
+     */
+
+    bool prefer_ipv6;
+    static const char* prefer_ipv6_name;
+    static const bool DEFAULT_PREFER_IPV6;
+    
+    /**
+     * Interface relation with ip_address.
+     * Multiple options are allowed.
+     * Default "eth0".
+     */
+
+    char* iface;
+    static const char* iface_name;
+    static const char* DEFAULT_IFACE;
+
     /**
      * Private key file (RSA or DSA) in PEM format
      * Values must be a file name
@@ -679,6 +700,7 @@ namespace core {
     char* ssl_ca;
     static const char* ssl_ca_name;
     static const char* DEFAULT_SSL_CA;
+
 
     /**
      * CSIv2 mode. Enables the usage of SAS context between client and server 

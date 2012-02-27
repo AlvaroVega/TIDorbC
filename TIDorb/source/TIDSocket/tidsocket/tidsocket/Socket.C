@@ -67,16 +67,17 @@ SocketImplFactory* Socket::_factory = NULL;
 //
 // Constructor
 //
-Socket::Socket()
+Socket::Socket(bool ipv6)
     throw(IOException, SystemException)
 {
     // New socket implementation object
     _impl    = new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_STREAM socket
-    _impl->create(true);
+    _impl->create(true, _ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 }
 
@@ -86,20 +87,22 @@ Socket::Socket()
 //
 // Constructor
 //
-Socket::Socket(const InetAddress& address, in_port_t port)
+Socket::Socket(const InetAddress& address, in_port_t port,const char* interface,
+               bool ipv6)
     throw(IOException, SystemException)
 {
     // New implementation object from factory, if defined
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_STREAM socket
-    _impl->create(true);
+    _impl->create(true, _ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Connect socket
-    _impl->connect(address, port);
+    _impl->connect(address, port,interface);
     setConnected();
 }
 
@@ -110,24 +113,26 @@ Socket::Socket(const InetAddress& address, in_port_t port)
 // Constructor
 //
 Socket::Socket(const InetAddress& address,   in_port_t port,
-               const InetAddress& localAddr, in_port_t localPort)
+               const InetAddress& localAddr, in_port_t localPort,
+               const char* interface,        bool ipv6)
     throw(IOException, SystemException)
 {
     // New implementation object from factory, if defined
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_STREAM socket
-    _impl->create(true);
+    _impl->create(true, _ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Bind socket to pair (localAddr,localPort)
-    _impl->bind(localAddr, localPort);
+    _impl->bind(localAddr, localPort, interface);
     _status |= TID_SOCKET_STATUS_BOUND;
 
     // Connect socket to remote host
-    _impl->connect(address, port);
+    _impl->connect(address, port, interface);
     setConnected();
 }
 
@@ -137,20 +142,22 @@ Socket::Socket(const InetAddress& address,   in_port_t port,
 //
 // Constructor
 //
-Socket::Socket(const char* host, in_port_t port)
+Socket::Socket(const char* host, in_port_t port, const char* interface, bool ipv6)
     throw(UnknownHostException, IOException, SystemException)
 {
     // New implementation object from factory, if defined
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_STREAM socket
-    _impl->create(true);
+    _impl->create(true, _ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Connect socket
-    _impl->connect(host, port);
+    _impl->connect(host, port, interface);
+    
     setConnected();
 }
 
@@ -161,24 +168,26 @@ Socket::Socket(const char* host, in_port_t port)
 // Constructor
 //
 Socket::Socket(const char* host,             in_port_t port,
-               const InetAddress& localAddr, in_port_t localPort)
+               const InetAddress& localAddr, in_port_t localPort,
+               const char* interface,        bool ipv6)
     throw(IOException, SystemException)
 {
     // New implementation object from factory, if defined
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_STREAM socket
-    _impl->create(true);
+    _impl->create(true, _ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Bind socket to pair (localAddr,localPort)
-    _impl->bind(localAddr, localPort);
+    _impl->bind(localAddr, localPort, interface);
     _status |= TID_SOCKET_STATUS_BOUND;
 
     // Connect socket
-    _impl->connect(host, port);
+    _impl->connect(host, port,interface);
     setConnected();
 }
 
@@ -244,11 +253,11 @@ void Socket::setSocketImplFactory(const SocketImplFactory& fac)
 //
 // bind()
 //
-void Socket::bind(const SocketAddress* bindpoint)
+void Socket::bind(const SocketAddress* bindpoint, const char* interface)
     throw(IOException, IllegalArgumentException)
 {
     // InetSocketAddress a la que nos asociamos (cualquier IP, cualquier puerto)
-    InetSocketAddress addr(PlainSocketImpl::ANY_PORT);
+    InetSocketAddress addr(PlainSocketImpl::ANY_PORT, _ipv6);
     InetSocketAddress* addrptr = &addr;
 
     // Comprueba si bindpoint es referencia a un objeto InetSocketAddress; en
@@ -268,7 +277,7 @@ void Socket::bind(const SocketAddress* bindpoint)
         Synchronized synchronized(_sync);
         {
             // Asocia el socket a la direccion InetSocketAddress
-            _impl->bind(addrptr->getAddress(), addrptr->getPort());
+            _impl->bind(addrptr->getAddress(), addrptr->getPort(),interface);
             _status |= TID_SOCKET_STATUS_BOUND;
         }
     }
@@ -308,7 +317,7 @@ void Socket::close()
 //
 // connect()
 //
-void Socket::connect(const SocketAddress& endpoint)
+void Socket::connect(const SocketAddress& endpoint,const char* interface)
     throw(IllegalBlockingModeException, IllegalArgumentException, IOException)
 {
     // Comprueba si endpoint es referencia a un objeto InetSocketAddress
@@ -332,7 +341,7 @@ void Socket::connect(const SocketAddress& endpoint)
             }
 
             // Invoca a la operacion connect de SocketImpl
-            _impl->connect(addrptr->getAddress(), addrptr->getPort());
+            _impl->connect(addrptr->getAddress(), addrptr->getPort(),interface);
             setConnected();
         }
     }
@@ -348,7 +357,7 @@ void Socket::connect(const SocketAddress& endpoint)
 //
 // connect()
 //
-void Socket::connect(const SocketAddress& endpoint, time_t timeout)
+void Socket::connect(const SocketAddress& endpoint, time_t timeout,const char* interface)
     throw(IllegalBlockingModeException, IllegalArgumentException, IOException)
 {
     // Comprueba si endpoint es referencia a un objeto InetSocketAddress
@@ -372,7 +381,7 @@ void Socket::connect(const SocketAddress& endpoint, time_t timeout)
             }
 
             // Invoca a la operacion connect de SocketImpl
-            _impl->connect(endpoint, timeout);
+            _impl->connect(endpoint, timeout,interface);
             setConnected();
         }
     }
@@ -703,7 +712,7 @@ SocketAddress* Socket::getRemoteSocketAddress()
             Synchronized synchronized(_sync);
             {
                 const InetAddress& addr = _impl->getInetAddress();
-                sock = new InetSocketAddress(&addr, _impl->getPort());
+                sock = new InetSocketAddress(&addr, _impl->getPort(), _ipv6);
             }
         }
         catch(...)

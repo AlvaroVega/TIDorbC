@@ -68,7 +68,7 @@ class DatagramSocketImpl : public virtual SocketOptions
 
     protected:
         // Bind a datagram socket to a local port and address
-        virtual void bind(in_port_t lport, const InetAddress& laddr)
+        virtual void bind(in_port_t lport, const InetAddress& laddr, const char* interface)
             throw(SocketException) = 0;
 
         // Close this socket
@@ -76,11 +76,11 @@ class DatagramSocketImpl : public virtual SocketOptions
             throw(IOException) = 0;
 
         // Connect a datagram socket to a remote destination
-        virtual void connect(const InetAddress& address, in_port_t port)
+        virtual void connect(const InetAddress& address, in_port_t port, const char* interface)
             throw(SocketException);
 
         // Create a datagram socket
-        virtual void create()
+        virtual void create(bool ipv6=false)
             throw(SocketException) = 0;
 
         // Disconnect a datagram socket from its remote destination
@@ -130,7 +130,7 @@ class DatagramSocketImpl : public virtual SocketOptions
             throw(IOException, PortUnreachableException) = 0;
 
         // Send the datagram packet
-        virtual void send(DatagramPacket& i)
+        virtual void send(DatagramPacket& i,const char* interface)
             throw(IOException, PortUnreachableException) = 0;
 
         // Set the TTL (time-to-live) option

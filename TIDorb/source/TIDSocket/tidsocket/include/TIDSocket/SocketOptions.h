@@ -124,6 +124,11 @@ struct SocketOptions
     // Disable Nagle's algorithm for this connection
     // (data type: bool)
     static const int _TCP_NODELAY       = 13;
+    
+    
+    static const int _IPV6_MULTICAST_IF = 14;
+    static const int _IPV6_MULTICAST_IF2 = 15;
+    static const int _IPV6_MULTICAST_LOOP = 16;
 
 
     // Fetch the value of an option

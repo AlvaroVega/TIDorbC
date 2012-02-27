@@ -252,7 +252,7 @@ void TIDorb::core::goa::GOAImpl::deactivate_object(const PortableServer::ObjectI
   TIDThr::Synchronized synchro(recursive_mutex);
  
   if (orb->trace != NULL){
-    orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, "GOAImpl::desactivate_object ...");
+    orb->print_trace(TIDorb::util::TR_DEEP_DEBUG, "GOAImpl::deactivate_object ...");
   } 
   TIDorb::core::poa::POAImpl::deactivate_object(oid);
 
@@ -265,7 +265,7 @@ void TIDorb::core::goa::GOAImpl::deactivate_object(const PortableServer::ObjectI
     } catch (const PortableGroup::NotAGroupObject& ex) { /*unreachable*/
       if (orb->trace != NULL){
         orb->print_trace(TIDorb::util::TR_ERROR, 
-                         "GOAImpl::desactivate_object catched a NotGroupObject exc");
+                         "GOAImpl::deactivate_object catched a NotGroupObject exc");
       } 
     }
   }

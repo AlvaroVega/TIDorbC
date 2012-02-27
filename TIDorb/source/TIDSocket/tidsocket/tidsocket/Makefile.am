@@ -19,6 +19,8 @@ libtidsocket_la_SOURCES = \
         DatagramSocketImpl.C \
         Exception.C \
         InetAddress.C \
+        Inet4Address.C \
+        Inet6Address.C \
         InetSocketAddress.C \
         InputStream.C \
         MulticastSocket.C \

@@ -81,7 +81,7 @@ class SocketImpl : public virtual SocketOptions
             throw(IOException) = 0;
 
         // Binds this socket to the specified port number on the specified host
-        virtual void bind(const InetAddress& host, in_port_t port)
+        virtual void bind(const InetAddress& host, in_port_t port, const char* interface)
             throw(IOException) = 0;
 
         // Closes this socket
@@ -90,21 +90,21 @@ class SocketImpl : public virtual SocketOptions
 
         // Connects this socket to the specified port number on the
         // specified host
-        virtual void connect(const InetAddress& address, in_port_t port)
+        virtual void connect(const InetAddress& address, in_port_t port, const char* interface)
             throw(IOException) = 0;
 
         // Connects this socket to the specified port number on the
         // specified host
-        virtual void connect(const SocketAddress& address, time_t timeout)
+        virtual void connect(const SocketAddress& address, time_t timeout, const char* interface)
             throw(IOException) = 0;
 
         // Connects this socket to the specified port on the named host
-        virtual void connect(const char* host, in_port_t port)
+        virtual void connect(const char* host, in_port_t port, const char* interface)
             throw(IOException) = 0;
 
     public:
         // Creates either a stream or a datagram socket
-        virtual void create(bool stream)
+        virtual void create(bool stream, bool ipv6=false)
             throw(IOException) = 0;
 
         // Returns an input stream for this socket
@@ -156,7 +156,8 @@ class SocketImpl : public virtual SocketOptions
 
     protected:
         // The IP address of the remote end of this socket
-        InetAddress _address;
+        //InetAddress _address;
+        InetAddress* _address;
 
         // The file descriptor object for this socket
         FileDescriptor _fd;

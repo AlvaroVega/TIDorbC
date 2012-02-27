@@ -51,7 +51,8 @@
 
 
 
-char* TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_object_id(const char* corbaloc_URL) // Never Called?
+char* TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_object_id(const char* corbaloc_URL,
+                                                                const char* iface) // Never Called?
   throw(CORBA::ORB::InvalidName)
 {
   string url = corbaloc_URL;
@@ -98,7 +99,7 @@ char* TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_object_id(const char* corb
 
     // Parser version and listen_point
     version = TIDorb::core::comm::iiop::Corbaloc::parse_version(version_str);
-    listen_point = TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(listenpoint_str);
+    listen_point = TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(listenpoint_str, iface);
 
     delete listen_point;
 
@@ -114,7 +115,8 @@ char* TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_object_id(const char* corb
 
 
 TIDorb::core::iop::IOR*
-TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_IOR(const char* corbaloc_URL)
+TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_IOR(const char* corbaloc_URL,
+                                                    const char* iface)
   throw(CORBA::ORB::InvalidName)
 {
   string url = corbaloc_URL;
@@ -166,7 +168,7 @@ TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_IOR(const char* corbaloc_URL)
 
     // Parser version and listen_point
     version = TIDorb::core::comm::iiop::Corbaloc::parse_version(version_str);
-    listen_point = TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(listenpoint_str);
+    listen_point = TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(listenpoint_str, iface);
 
     // Add to components a new SSLComponent with a listenpoint port as SSL
     SSLIOP::SSL ssl(CSIIOP::Integrity | CSIIOP::Confidentiality |  CSIIOP::NoDelegation,

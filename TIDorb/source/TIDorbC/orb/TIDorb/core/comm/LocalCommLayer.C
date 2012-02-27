@@ -55,24 +55,8 @@ TIDorb::core::comm::LocalCommLayer::LocalCommLayer(TIDorb::core::TIDORB* orb)
 {
   m_max_response_blocked_time = conf.max_blocked_time;
   m_qos_enabled = conf.qos_enabled;
-
-  pPOAImpl = NULL;
-  poaManager = NULL;
-
 }
 
-void TIDorb::core::comm::LocalCommLayer::get_poa_stuff()
-{
-  // Performance improvement: init some common staff
-  if (!pPOAImpl) {
-
-    pPOAImpl =  
-      dynamic_cast<TIDorb::core::poa::POAImpl *>(_orb->init_POA());
-    
-    poaManager =
-      (TIDorb::core::poa::POAManagerImpl*)(pPOAImpl->the_POAManager());
-  }
-}
 
 
 bool 
@@ -80,12 +64,22 @@ TIDorb::core::comm::LocalCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
                                                   const TIDorb::core::PolicyContext& policy_context)
   throw(TIDorb::core::ForwardRequest, CORBA::SystemException)
 {
-  if (!pPOAImpl)
-    get_poa_stuff();
   try {
+
+    CORBA::ULongLong timeout = m_max_response_blocked_time;
+    
+    if (m_qos_enabled) {
+      if (&policy_context != NULL) {
+        timeout =  
+          TIDorb::core::messaging::QoS::checkRequestTime(_orb, policy_context);
+      }
+    }
 
     TIDorb::core::poa::POAKey* poaKey = ior->object_key()->get_key();
 
+    // Creating LocalLocateRequest
+    TIDorb::core::poa::POAImpl* pPOAImpl = 
+      dynamic_cast<TIDorb::core::poa::POAImpl *>(_orb->init_POA());
     TIDorb::core::poa::LocalLocateRequest_ref localLocateRequest =
       new TIDorb::core::poa::LocalLocateRequest(poaKey, pPOAImpl);
 
@@ -94,6 +88,10 @@ TIDorb::core::comm::LocalCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
     // Check if the the thread that invoked the request is an ExecThread
 
     TIDThr::Thread* this_thread = TIDThr::Thread::currentThread();
+
+    TIDorb::core::poa::POAManagerImpl* poaManager =
+      (TIDorb::core::poa::POAManagerImpl*)(pPOAImpl->the_POAManager());
+    
 
     TIDorb::core::poa::ExecThread* exec_thread = 
       (TIDorb::core::poa::ExecThread*)(this_thread);
@@ -104,14 +102,6 @@ TIDorb::core::comm::LocalCommLayer::object_exists(TIDorb::core::iop::IOR* ior,
                                                                 poaManager);
     } else { // application invocation
       // Invoking poaManager
-
-      CORBA::ULongLong timeout = m_max_response_blocked_time;
-      if (m_qos_enabled) {
-        if (&policy_context != NULL) {
-          timeout =  
-            TIDorb::core::messaging::QoS::checkRequestTime(_orb, policy_context);
-        }
-      }
 
       localLocateRequest->_add_ref(); /* new reference in POAManager request queue */
 
@@ -276,8 +266,19 @@ void TIDorb::core::comm::LocalCommLayer::send_request(TIDorb::core::RequestImpl*
                                                       TIDorb::core::iop::IOR* ior)
   throw(TIDorb::core::ForwardRequest, CORBA::SystemException)
 {
-  if (!pPOAImpl)
-    get_poa_stuff();
+
+  CORBA::ULongLong timeout = m_max_response_blocked_time;
+    
+  if (m_qos_enabled) {
+    
+    TIDorb::core::PolicyContext* policy_context = request->getPolicyContext();
+    
+    if (policy_context != NULL) {
+      timeout =  
+        TIDorb::core::messaging::QoS::checkRequestTime(_orb, policy_context);
+    }
+  }
+  
   
   TIDorb::core::poa::POAKey* poaKey = ior->object_key()->get_key();
 
@@ -286,13 +287,17 @@ void TIDorb::core::comm::LocalCommLayer::send_request(TIDorb::core::RequestImpl*
     new TIDorb::core::LocalServerRequest(request);
 
   // Creating LocalRequest
+  TIDorb::core::poa::POAImpl * pPOAImpl =  
+    dynamic_cast<TIDorb::core::poa::POAImpl *>(_orb->init_POA());
   TIDorb::core::poa::LocalRequest_ref localRequest = 
     new TIDorb::core::poa::LocalRequest(poaKey, pPOAImpl, serverRequest);
 
   localRequest->setSerial(_orb->getRequestCounter()->next());
 
-  if(!request->with_response()) { // is Oneway?
+  if(!request->with_response()) {
     // Invoking poaManager
+    TIDorb::core::poa::POAManagerImpl* poaManager = 
+      (TIDorb::core::poa::POAManagerImpl*)(pPOAImpl->the_POAManager());
     localRequest->_add_ref(); /* new reference in POAManager request queue */
     poaManager->put(localRequest);
   } else {
@@ -300,15 +305,16 @@ void TIDorb::core::comm::LocalCommLayer::send_request(TIDorb::core::RequestImpl*
 
     TIDThr::Thread* this_thread = TIDThr::Thread::currentThread();
  
+    TIDorb::core::poa::POAManagerImpl* poaManager = 
+      (TIDorb::core::poa::POAManagerImpl*)(pPOAImpl->the_POAManager());
+
     TIDorb::core::poa::ExecThread* exec_thread = (TIDorb::core::poa::ExecThread*)(this_thread);
 
+
+    // Check if exec_thread belongs to POAManager thread pool of request
     bool thread_in_manager = false;
-
     if (exec_thread) {
-      
       TIDorb::core::poa::POAImpl* current_poa = pPOAImpl; // localRequest->get_current_POA();
-
-      // Check if exec_thread belongs to POAManager thread pool of request
       if (localRequest->isFinalPOA()){
 
         PortableServer::POAManager_ptr aux_nextPOAManager = 
@@ -349,17 +355,8 @@ void TIDorb::core::comm::LocalCommLayer::send_request(TIDorb::core::RequestImpl*
                                                                  localRequest, 
                                                                  poaManager);
     } else { // application invocation
-
-      CORBA::ULongLong timeout = m_max_response_blocked_time;
-      if (m_qos_enabled) {
-        TIDorb::core::PolicyContext* policy_context = request->getPolicyContext();
-        if (policy_context != NULL) {
-          timeout =  
-            TIDorb::core::messaging::QoS::checkRequestTime(_orb, policy_context);
-        }
-      }
-
       // Invoking poaManager
+
       localRequest->_add_ref(); /* new reference in POAManager request queue */
 
       poaManager->put(localRequest);

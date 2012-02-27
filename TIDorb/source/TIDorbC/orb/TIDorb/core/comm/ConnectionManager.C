@@ -465,10 +465,10 @@ void TIDorb::core::comm::ConnectionManager::new_connection(Connection* conn)
 void TIDorb::core::comm::ConnectionManager::remove_listen_points(Connection* conn)
 {
     
-    const Connection::ListenPointSet& points = conn->get_listen_points();
+    const TIDorb::core::comm::iiop::ListenPointSet& points = conn->get_listen_points();
 //     cerr << "conn->addresses.points.size() " << conn->addresses.size() << endl;
 //     cerr << "points.size() " << points.size() << endl;
-    Connection::ListenPointSet::iterator it = points.begin();
+    TIDorb::core::comm::iiop::ListenPointSet::iterator it = points.begin();
     Connection* conn_aux = NULL;
     ConnectionMapIteratorT connIt;
     
@@ -711,7 +711,8 @@ TIDorb::core::comm::ConnectionManager::open_miop_client_connection(
       msg << "trying open_miop_client_connection at " << listen_point.toString();
       _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data());
     }
-    TIDSocket::InetSocketAddress inet(listen_point._host, listen_point._port);
+    const TIDorb::core::ConfORB& conf = _orb->conf();
+    TIDSocket::InetSocketAddress inet(listen_point._host, listen_point._port,conf.prefer_ipv6);
     is_multicast = inet.getAddress().isMulticastAddress();
   } catch(...) {
   }
@@ -744,7 +745,8 @@ TIDorb::core::comm::ConnectionManager::open_miop_server_connection(
       msg << "trying open_miop_server_connection at " << listen_point.toString();
       _orb->print_trace(TIDorb::util::TR_DEBUG, msg.str().data());
     }
-    TIDSocket::InetSocketAddress inet(listen_point._host, listen_point._port);
+    const TIDorb::core::ConfORB& conf = _orb->conf();
+    TIDSocket::InetSocketAddress inet(listen_point._host, listen_point._port,conf.prefer_ipv6);
     is_multicast = inet.getAddress().isMulticastAddress();
   } catch(...) {
   }

@@ -86,11 +86,13 @@ class PlainSocketImpl : public virtual SocketImpl,
 
         // Bind this socket to the specified port number on the
         // specified host
-        void bind(const InetAddress& host, in_port_t port)
+        void bind(const InetAddress& host, in_port_t port, 
+                  const char* interface = NULL)
             throw(SocketException);
 
         // Bind a datagram socket to a local port and address
-        void bind(in_port_t lport, const InetAddress& laddr)
+        void bind(in_port_t lport, const InetAddress& laddr, 
+                  const char* interface = NULL)
             throw(SocketException);
 
         // Close this socket
@@ -99,25 +101,28 @@ class PlainSocketImpl : public virtual SocketImpl,
 
         // Connect this socket to the specified port number on the
         // specified host
-        void connect(const InetAddress& address, in_port_t port)
+        void connect(const InetAddress& address, in_port_t port,
+                     const char* interface = NULL)
             throw(SocketException);
 
         // Connect this socket to the specified port number on the
         // specified host (timeout in milliseconds)
-        void connect(const SocketAddress& address, time_t timeout)
+        void connect(const SocketAddress& address, time_t timeout,
+                     const char* interface = NULL)
             throw(SocketException);
 
         // Connect this socket to the specified port number on the
         // named host
-        void connect(const char* host, in_port_t port)
+        void connect(const char* host, in_port_t port,
+                     const char* interface = NULL)
             throw(SocketException);
 
         // Create either a stream or a datagram socket
-        void create(bool stream)
+        void create(bool stream, bool ipv6=false)
             throw(SocketException);
 
         // Create a datagram socket
-        void create()
+        void create(bool ipv6=false)
             throw(SocketException);
 
         // Disconnect a datagram socket from its remote destination
@@ -182,7 +187,7 @@ class PlainSocketImpl : public virtual SocketImpl,
             throw(IOException, PortUnreachableException);
 
         // Send the datagram packet
-        void send(DatagramPacket& i)
+        void send(DatagramPacket& i, const char* interface = NULL)
             throw(IOException, PortUnreachableException);
 
         // Send one byte of urgent data on the socket
@@ -245,8 +250,9 @@ class PlainSocketImpl : public virtual SocketImpl,
         // Get struct sockaddr from pair (InetAddress,port)
         static void toSockAddr(const InetAddress& inet,
                                in_port_t          port,
-                               struct sockaddr&   sock,
-                               socklen_t&         size)
+                               struct sockaddr_storage& sock, // v2
+                               socklen_t&         size,
+                               const char*        interface = NULL)
             throw();
 
         // Get struct sockaddr initialized to null socket address

@@ -30,14 +30,14 @@ class SocketChannel : public virtual SelectableChannel
             throw(SystemException);
 
         // Connects this channel's socket
-        bool connect(const SocketAddress& remote)
+        bool connect(const SocketAddress& remote,const char* interface)
             throw(AlreadyConnectedException, ConnectionPendingException,
                   ClosedChannelException, AsynchronousCloseException,
                   ClosedByInterruptException, UnresolvedAddressException,
                   UnsupportedAddressTypeException, IOException);
 
         // Finishes the process of connecting a socket channel
-        bool finishConnect()
+        bool finishConnect(const char* interface)
             throw(NoConnectionPendingException,
                   ClosedChannelException, AsynchronousCloseException,
                   ClosedByInterruptException, IOException);
@@ -77,7 +77,7 @@ class SocketChannel : public virtual SelectableChannel
 
         // Opens a socket channel and connects it to a remote address
         // (caller must delete SocketChannel object)
-        static SocketChannel* open(const SocketAddress& remote)
+        static SocketChannel* open(const SocketAddress& remote,const char* interface)
             throw(AsynchronousCloseException, ClosedByInterruptException,
                   UnresolvedAddressException, UnsupportedAddressTypeException,
                   IOException);
@@ -107,7 +107,7 @@ class SocketChannel : public virtual SelectableChannel
 
     private:
         // Pending connection address
-        struct sockaddr  _sockaddr;
+        struct sockaddr_storage _sockaddr;
         socklen_t        _socksize;
 };
 

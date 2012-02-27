@@ -63,7 +63,7 @@ class MIOPCorbaloc
 {
 
 public:
-  static TIDorb::core::iop::IOR* get_IOR(const char* corbaloc_URL)
+  static TIDorb::core::iop::IOR* get_IOR(const char* corbaloc_URL,const char* iface)
     throw(CORBA::ORB::InvalidName);
 
   static const char* get_group_object_id(const TIDorb::core::comm::miop::ProfileMIOP* profile);

@@ -61,16 +61,19 @@ class InetSocketAddress : public SocketAddress
 {
     public:
         // Create a socket address from an IP address and a port number
-        InetSocketAddress(const InetAddress* inaddr, in_port_t port)
+        InetSocketAddress(const InetAddress* inaddr, in_port_t port, 
+                          bool ipv6 = false)
             throw(IllegalArgumentException);
 
         // Create a socket address where the IP address is the wildcard address
         // and the port number a specified value
-        InetSocketAddress(in_port_t port)
+        InetSocketAddress(in_port_t port, 
+                          bool ipv6 = false)
             throw(IllegalArgumentException);
 
         // Create a socket address from a hostname and a port number
-        InetSocketAddress(const char* hostname, in_port_t port)
+        InetSocketAddress(const char* hostname, in_port_t port, 
+                          bool ipv6 = false)
             throw(IllegalArgumentException);
 
         // Destroy the InetSocketAddress
@@ -102,9 +105,11 @@ class InetSocketAddress : public SocketAddress
             throw();
 
     protected:
-        InetAddress _addr;
-        in_port_t   _port;
-        bool        _resolved;
+        //InetAddress _addr;
+        InetAddress* _addr;
+        in_port_t    _port;
+        bool         _resolved;
+        bool         _ipv6;
 
     private:
         // Object initialization

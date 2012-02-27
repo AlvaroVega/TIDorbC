@@ -152,7 +152,7 @@ TIDorb::core::security::sas::SASManager::validate_SASContextBody(
   TIDThr::Synchronized synchro(*this);
 
 
-  // Evaluate body maching with ¿ORB conf &  ? 
+  // Evaluate body maching with ï¿½ORB conf &  ? 
   // Returns an ContextError or an CompleteEstablishContext
 
   CSI::SASContextBody_ptr return_body = new CSI::SASContextBody();

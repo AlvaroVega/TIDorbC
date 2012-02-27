@@ -67,7 +67,7 @@ DatagramSocketImplFactory* DatagramSocket::_factory = NULL;
 //
 // Constructor
 //
-DatagramSocket::DatagramSocket()
+DatagramSocket::DatagramSocket(const char* interface, bool ipv6)
     throw(SocketException, SystemException)
 {
     // New implementation object from factory, if defined
@@ -75,16 +75,17 @@ DatagramSocket::DatagramSocket()
                           :  new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_DGRAM socket
-    _impl->create();
+    _impl->create(_ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
     try
     {
-        InetSocketAddress inet(PlainSocketImpl::ANY_PORT);
-        bind((SocketAddress*) &inet);
+        InetSocketAddress inet(PlainSocketImpl::ANY_PORT, _ipv6);
+        bind((SocketAddress*) &inet, interface);
     }
     catch(IllegalArgumentException& e)
     {
@@ -98,7 +99,7 @@ DatagramSocket::DatagramSocket()
 //
 // Constructor
 //
-DatagramSocket::DatagramSocket(in_port_t port)
+DatagramSocket::DatagramSocket(in_port_t port, const char* interface, bool ipv6)
     throw(SocketException, SystemException)
 {
     // New implementation object from factory, if defined
@@ -106,16 +107,17 @@ DatagramSocket::DatagramSocket(in_port_t port)
                           :  new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_DGRAM socket
-    _impl->create();
+    _impl->create(ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
     try
     {
-        InetSocketAddress inet(port);
-        bind((SocketAddress*) &inet);
+        InetSocketAddress inet(port, _ipv6);
+        bind((SocketAddress*) &inet,interface);
     }
     catch(IllegalArgumentException& e)
     {
@@ -129,7 +131,8 @@ DatagramSocket::DatagramSocket(in_port_t port)
 //
 // Constructor
 //
-DatagramSocket::DatagramSocket(in_port_t port, const InetAddress& localAddr)
+DatagramSocket::DatagramSocket(in_port_t port, const InetAddress& localAddr, 
+                               const char* interface, bool ipv6)
     throw(SocketException, SystemException)
 {
     // New implementation object from factory, if defined
@@ -137,16 +140,17 @@ DatagramSocket::DatagramSocket(in_port_t port, const InetAddress& localAddr)
                           :  new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_DGRAM socket
-    _impl->create();
+    _impl->create(_ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
     try
     {
-        InetSocketAddress inet(&localAddr, port);
-        bind((SocketAddress*) &inet);
+        InetSocketAddress inet(&localAddr, port, _ipv6);
+        bind((SocketAddress*) &inet,interface);
     }
     catch(IllegalArgumentException& e)
     {
@@ -160,7 +164,8 @@ DatagramSocket::DatagramSocket(in_port_t port, const InetAddress& localAddr)
 //
 // Constructor
 //
-DatagramSocket::DatagramSocket(const SocketAddress* bindAddr)
+DatagramSocket::DatagramSocket(const SocketAddress* bindAddr, 
+                               const char* interface, bool ipv6)
     throw(SocketException, SystemException)
 {
     // New implementation object from factory, if defined
@@ -168,9 +173,10 @@ DatagramSocket::DatagramSocket(const SocketAddress* bindAddr)
                           :  new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_DGRAM socket
-    _impl->create();
+    _impl->create(_ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
@@ -178,7 +184,7 @@ DatagramSocket::DatagramSocket(const SocketAddress* bindAddr)
     {
         try
         {
-            bind(bindAddr);
+            bind(bindAddr,interface);
         }
         catch(IllegalArgumentException& e)
         {
@@ -193,16 +199,17 @@ DatagramSocket::DatagramSocket(const SocketAddress* bindAddr)
 //
 // Constructor
 //
-DatagramSocket::DatagramSocket(const DatagramSocketImpl* impl)
+DatagramSocket::DatagramSocket(const DatagramSocketImpl* impl, bool ipv6)
     throw(SocketException, SystemException)
 {
     // Use implementation object reference
     _impl    = (DatagramSocketImpl*) impl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Create a SOCK_DGRAM socket
-    _impl->create();
+    _impl->create(_ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 }
 
@@ -256,11 +263,11 @@ void DatagramSocket::setDatagramSocketImplFactory(
 //
 // bind()
 //
-void DatagramSocket::bind(const SocketAddress* addr)
+void DatagramSocket::bind(const SocketAddress* addr,const char* interface)
     throw(SocketException, IllegalArgumentException)
 {
-    // InetSocketAddress a la que nos asociamos (cualquier IP, cualquier puerto)
-    InetSocketAddress bindaddr(PlainSocketImpl::ANY_PORT);
+	  // InetSocketAddress a la que nos asociamos (cualquier IP, cualquier puerto)
+    InetSocketAddress bindaddr(PlainSocketImpl::ANY_PORT, _ipv6);
     InetSocketAddress* bindaddrptr = &bindaddr;
 
     // Comprueba si addr es referencia a un objeto InetSocketAddress; en
@@ -280,7 +287,7 @@ void DatagramSocket::bind(const SocketAddress* addr)
         Synchronized synchronized(_sync);
         {
             // Asocia el socket a la direccion InetSocketAddress
-            _impl->bind(bindaddrptr->getPort(), bindaddrptr->getAddress());
+            _impl->bind(bindaddrptr->getPort(), bindaddrptr->getAddress(),interface);
             _status |= TID_SOCKET_STATUS_BOUND;
         }
     }
@@ -319,11 +326,11 @@ void DatagramSocket::close()
 //
 // connect()
 //
-void DatagramSocket::connect(const InetAddress& address, in_port_t port)
+void DatagramSocket::connect(const InetAddress& address, in_port_t port,const char* interface)
     throw(SocketException, IllegalArgumentException)
 {
     InetSocketAddress sock(&address, port);
-    connect(sock);
+    connect(sock,interface);
 }
 
 
@@ -332,7 +339,7 @@ void DatagramSocket::connect(const InetAddress& address, in_port_t port)
 //
 // connect()
 //
-void DatagramSocket::connect(const SocketAddress& addr)
+void DatagramSocket::connect(const SocketAddress& addr,const char* interface)
     throw(SocketException, IllegalArgumentException)
 {
     // Comprueba si addr es referencia a un objeto InetSocketAddress
@@ -348,9 +355,13 @@ void DatagramSocket::connect(const SocketAddress& addr)
     {
         Synchronized synchronized(_sync);
         {
-            _remoteaddr = addrptr->getAddress();
+        	//_remoteaddr = addrptr->getAddress();
+            if (_remoteaddr)
+              delete _remoteaddr;
+            _remoteaddr = addrptr->getAddress().clone();
             _remoteport = addrptr->getPort();
-            _impl->connect(_remoteaddr, _remoteport);
+            //_impl->connect(_remoteaddr, _remoteport);
+            _impl->connect(*_remoteaddr, _remoteport,interface);
             _status |= TID_SOCKET_STATUS_CONNECTED;
         }
     }
@@ -434,7 +445,7 @@ const InetAddress* DatagramSocket::getInetAddress()
         {
             Synchronized synchronized(_sync);
             {
-                inet = &_remoteaddr;
+                inet = &(*_remoteaddr);
             }
         }
         catch(...)
@@ -602,7 +613,7 @@ SocketAddress* DatagramSocket::getRemoteSocketAddress()
         {
             Synchronized synchronized(_sync);
             {
-                sock = new InetSocketAddress(&_remoteaddr, _remoteport);
+                sock = new InetSocketAddress(&(*_remoteaddr), _remoteport);
             }
         }
         catch(TIDThr::Exception& e)
@@ -801,10 +812,10 @@ void DatagramSocket::receive(DatagramPacket& p)
 //
 // send()
 //
-void DatagramSocket::send(DatagramPacket& p)
+void DatagramSocket::send(DatagramPacket& p,const char* interface)
     throw(IOException, PortUnreachableException, IllegalBlockingModeException)
 {
-    // Comprueba el modo de bloqueo del canal asociado, si existe
+	  // Comprueba el modo de bloqueo del canal asociado, si existe
     if (_channel && ! _channel->isBlocking())
     {
          throw IllegalBlockingModeException(
@@ -812,7 +823,7 @@ void DatagramSocket::send(DatagramPacket& p)
     }
 
     // Invoca a la operacion de DatagramSocketImpl
-    _impl->send(p);
+    _impl->send(p,interface);
 }
 
 

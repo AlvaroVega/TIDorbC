@@ -53,6 +53,9 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#ifdef __linux
+#include <net/if.h>
+#endif //__linux
 #if (defined __darwin || defined __CYGWIN__ || defined __ANDROID__ || defined __mips)
    #include <sys/ioctl.h>
 
@@ -94,6 +97,7 @@ PlainSocketImpl::PlainSocketImpl()
     // _address
     // _port
     _timeout = 0;
+    _address = NULL;
 
     // Captura de SIGPIPE para evitar finalizacion del proceso
     signal(SIGPIPE, SIG_IGN);
@@ -135,7 +139,25 @@ void* PlainSocketImpl::getOption(int optID, size_t& result_size) const
             result_size = sizeof(InetAddress);
             break;
         }
+        //mcpg
+        case SocketOptions::_IPV6_MULTICAST_IF:
+        case SocketOptions::_IPV6_MULTICAST_IF2:
+        {
+            optlevel = IPPROTO_IPV6;
+            optname  = IPV6_MULTICAST_IF;
 
+            struct in_addr addr;
+            optval = (void*) &addr;
+            optlen = (socklen_t) sizeof(addr);
+            if (::getsockopt((int) _fd, optlevel, optname, optval, &optlen))
+            {
+                throw SocketException("getOption() error", errno);
+            }
+
+            result = (void*) toInetAddress(optval, optlen);
+            result_size = sizeof(InetAddress);
+            break;
+        }
         case SocketOptions::_IP_MULTICAST_LOOP:
         {
             optlevel = IPPROTO_IP;
@@ -153,7 +175,24 @@ void* PlainSocketImpl::getOption(int optID, size_t& result_size) const
             result_size = sizeof(bool);
             break;
         }
+        //mcpg
+        case SocketOptions::_IPV6_MULTICAST_LOOP:
+        {
+            optlevel = IPPROTO_IPV6;
+            optname  = IPV6_MULTICAST_LOOP;
 
+            unsigned char loop;
+            optval = (void*) &loop;
+            optlen = (socklen_t) sizeof(loop);
+            if (::getsockopt((int) _fd, optlevel, optname, optval, &optlen))
+            {
+                throw SocketException("getOption() error", errno);
+            }
+
+            result = (void*) toBool(optval, optlen);
+            result_size = sizeof(bool);
+            break;
+        }
         case SocketOptions::_IP_TOS:
         {
             optlevel = IPPROTO_IP;
@@ -378,11 +417,45 @@ void PlainSocketImpl::setOption(int optID, const void* value, size_t size)
             }
             break;
         }
+        
+        //mcpg
+        case SocketOptions::_IPV6_MULTICAST_IF:
+        case SocketOptions::_IPV6_MULTICAST_IF2:
+        {
+            optlevel = IPPROTO_IPV6;
+            optname  = IPV6_MULTICAST_IF;
+
+            struct in_addr addr;
+            optval = (void*) &addr;
+            optlen = (socklen_t) sizeof(addr);
+            fromInetAddress(value, size, optval, optlen);
+            if (::setsockopt((int) _fd, optlevel, optname, optval, optlen))
+            {
+                throw SocketException("setOption() error", errno);
+            }
+            break;
+        }
 
         case SocketOptions::_IP_MULTICAST_LOOP:
         {
             optlevel = IPPROTO_IP;
             optname  = IP_MULTICAST_LOOP;
+
+            unsigned char loop;
+            optval = (void*) &loop;
+            optlen = (socklen_t) sizeof(loop);
+            fromBool(value, size, optval, optlen);
+            if (::setsockopt((int) _fd, optlevel, optname, optval, optlen))
+            {
+                throw SocketException("setOption() error", errno);
+            }
+            break;
+        }
+        //mcpg
+        case SocketOptions::_IPV6_MULTICAST_LOOP:
+        {
+            optlevel = IPPROTO_IPV6;
+            optname  = IPV6_MULTICAST_LOOP;
 
             unsigned char loop;
             optval = (void*) &loop;
@@ -571,7 +644,7 @@ void PlainSocketImpl::accept(SocketImpl* s)
     throw(IOException)
 {
     // Variables auxiliares
-    int flags = 0;
+    int flags;
     int error;
     int new_fd;
 
@@ -649,7 +722,10 @@ void PlainSocketImpl::accept(SocketImpl* s)
     s->_fd        = (FileDescriptor) new_fd;
     s->_timeout   = _timeout;
     s->_localport = _localport;
-    s->_address   = inet->getAddress();
+    //s->_address   = inet->getAddress();
+    if (s->_address)
+      delete s->_address;
+    s->_address   = inet->getAddress().clone();
     s->_port      = inet->getPort();
     delete inet;
 }
@@ -678,25 +754,25 @@ size_t PlainSocketImpl::available()
 //
 // bind()
 //
-void PlainSocketImpl::bind(const InetAddress& host, in_port_t port)
+void PlainSocketImpl::bind(const InetAddress& host, in_port_t port, const char* interface)
     throw(SocketException)
 {
-    // Obtiene una estructura sockaddr a partir de (host,port)
-    struct sockaddr sock;
+	  // Obtiene una estructura sockaddr a partir de (host,port)
+    struct sockaddr_storage sock;
     socklen_t       size;
-    toSockAddr(host, port, sock, size);
-
+    toSockAddr(host, port, sock, size, interface);
+    
     // Asocia sockaddr al socket
-    if (::bind((int) _fd, &sock, size))
+    if (::bind((int) _fd, (struct sockaddr*)&sock, size))
     {
         throw SocketException("bind() error", errno);
     }
-
+    
     // Puerto local al que se asocia el socket
     if (port == ANY_PORT)
     {
         size = (socklen_t) sizeof(sock);
-        if (::getsockname((int) _fd, &sock, &size))
+        if (::getsockname((int) _fd, (struct sockaddr*)&sock, &size))
         {
             throw SocketException("bind() error", errno);
         }
@@ -713,10 +789,10 @@ void PlainSocketImpl::bind(const InetAddress& host, in_port_t port)
 //
 // bind()
 //
-void PlainSocketImpl::bind(in_port_t lport, const InetAddress& laddr)
+void PlainSocketImpl::bind(in_port_t lport, const InetAddress& laddr, const char* interface)
     throw(SocketException)
 {
-    bind(laddr, lport);
+    bind(laddr, lport, interface);
 }
 
 
@@ -739,30 +815,33 @@ void PlainSocketImpl::close()
 //
 // connect()
 //
-void PlainSocketImpl::connect(const InetAddress& address, in_port_t port)
+void PlainSocketImpl::connect(const InetAddress& address, in_port_t port,const char* interface)
     throw(SocketException)
 {
-    // Obtiene una estructura sockaddr a partir de (address,port)
-    struct sockaddr sock;
+	  // Obtiene una estructura sockaddr a partir de (address,port)
+    struct sockaddr_storage sock;
     socklen_t       size;
-    toSockAddr(address, port, sock, size);
+    toSockAddr(address, port, sock, size, interface);
 
     // Intenta la conexion
-    if (::connect((int) _fd, &sock, size))
+    if (::connect((int) _fd, (struct sockaddr*)&sock, size))
     {
         throw SocketException("connect() error", errno);
     }
 
     // Averigua el puerto al que a quedado ligado el socket
     size = (socklen_t) sizeof(sock);
-    if (::getsockname((int) _fd, &sock, &size))
+    if (::getsockname((int) _fd, (struct sockaddr*)&sock, &size))
     {
         throw SocketException("connect() error", errno);
     }
 
     // localport y host:port al que se ha conectado el socket
     _localport = (in_port_t) ntohs(((struct sockaddr_in*) &sock)->sin_port);
-    _address   = address;
+    //_address   = address;
+    if (_address) 
+      delete _address;
+    _address   = address.clone();
     _port      = port;
 }
 
@@ -772,10 +851,10 @@ void PlainSocketImpl::connect(const InetAddress& address, in_port_t port)
 //
 // connect()
 //
-void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout)
+void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout,const char* interface)
     throw(SocketException)
 {
-    // Particulariza address como referencia a un objeto InetSocketAddress
+	  // Particulariza address como referencia a un objeto InetSocketAddress
     const InetSocketAddress* addrptr =
         dynamic_cast<const InetSocketAddress*>(&address);
 
@@ -785,9 +864,9 @@ void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout)
     }
 
     // Obtiene una estructura sockaddr a partir de (host,port)
-    struct sockaddr sock;
+    struct sockaddr_storage sock;
     socklen_t       size;
-    toSockAddr(addrptr->getAddress(), addrptr->getPort(), sock, size);
+    toSockAddr(addrptr->getAddress(), addrptr->getPort(), sock, size, interface);
 
     // Convierte timeout (milisegundos) en una estructura timeval, siempre que
     // sea distinto de 0. Un puntero timeval* apuntara a esta estructura o bien
@@ -818,7 +897,7 @@ void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout)
     }
 
     // Intenta establecer la conexion
-    error = ::connect((int) _fd, &sock, size);
+    error = ::connect((int) _fd, (struct sockaddr*)&sock, size);
     if (error)
     {
         if (errno == EINPROGRESS)
@@ -866,14 +945,17 @@ void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout)
 
     // Averigua el puerto al que a quedado ligado el socket
     size = (socklen_t) sizeof(sock);
-    if (::getsockname((int) _fd, &sock, &size))
+    if (::getsockname((int) _fd, (struct sockaddr*)&sock, &size))
     {
         throw SocketException("connect() error", errno);
     }
 
     // localport y host:port al que se ha conectado el socket
     _localport = (in_port_t) ntohs(((struct sockaddr_in*) &sock)->sin_port);
-    _address   = addrptr->getAddress();
+    //_address   = addrptr->getAddress();
+    if (_address)
+      delete _address;
+    _address   = addrptr->getAddress().clone();
     _port      = addrptr->getPort();
 }
 
@@ -883,35 +965,37 @@ void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout)
 //
 // connect()
 //
-void PlainSocketImpl::connect(const char* host, in_port_t port)
+void PlainSocketImpl::connect(const char* host, in_port_t port,const char* interface)
     throw(SocketException)
 {
     try
     {
-        // Resuelve la direccion IP del host
-        InetSocketAddress addr(host, port);
-
-        // Obtiene una estructura sockaddr a partir de (host,port)
-        struct sockaddr sock;
+    	  // Resuelve la direccion IP del host
+    	  InetSocketAddress addr(host, port);
+    	  
+    	  // Obtiene una estructura sockaddr a partir de (host,port)
+        struct sockaddr_storage sock;
         socklen_t       size;
-        toSockAddr(addr.getAddress(), addr.getPort(), sock, size);
+        toSockAddr(addr.getAddress(), addr.getPort(), sock, size, interface);
 
         // Intenta la conexion
-        if (::connect((int) _fd, &sock, size))
+        if (::connect((int) _fd, (struct sockaddr*)&sock, size))
         {
             throw SocketException("connect() error", errno);
         }
-
         // Averigua el puerto al que a quedado ligado el socket
         size = (socklen_t) sizeof(sock);
-        if (::getsockname((int) _fd, &sock, &size))
+        if (::getsockname((int) _fd, (struct sockaddr*)&sock, &size))
         {
             throw SocketException("connect() error", errno);
         }
 
         // localport y host:port al que se ha conectado el socket
         _localport = (in_port_t) ntohs(((struct sockaddr_in*) &sock)->sin_port);
-        _address   = addr.getAddress();
+        //_address   = addr.getAddress();
+        if (_address)
+          delete _address;
+        _address   = addr.getAddress().clone();
         _port      = addr.getPort();
     }
     catch(IllegalArgumentException& e)
@@ -926,12 +1010,17 @@ void PlainSocketImpl::connect(const char* host, in_port_t port)
 //
 // create()
 //
-void PlainSocketImpl::create(bool stream)
+void PlainSocketImpl::create(bool stream, bool ipv6)
     throw(SocketException)
 {
     // Crea un nuevo socket
     int type = (stream) ? SOCK_STREAM : SOCK_DGRAM;
-    int s = ::socket(AF_INET, type, 0);
+    int s;
+
+    if (ipv6)
+      s = ::socket(AF_INET6, type, 0);
+    else
+      s = ::socket(AF_INET, type, 0);
 
     // Comprueba errores
     if (s == -1)
@@ -949,10 +1038,10 @@ void PlainSocketImpl::create(bool stream)
 //
 // create()
 //
-void PlainSocketImpl::create()
+void PlainSocketImpl::create(bool ipv6)
     throw(SocketException)
 {
-    create(false);
+    create(false, ipv6);
 }
 
 
@@ -1090,7 +1179,8 @@ void PlainSocketImpl::join(const InetAddress& inetaddr)
         InetSocketAddress mcastaddr(&inetaddr, ANY_PORT);
 
         // Get NetworkInterface object with wildcard address
-        InetAddress any;
+        //InetAddress any;
+        Inet4Address any; // TODO
         netIf = NetworkInterface::getByInetAddress(any);
 
         joinGroup(mcastaddr, *netIf);
@@ -1150,7 +1240,8 @@ void PlainSocketImpl::leave(const InetAddress& inetaddr)
         InetSocketAddress mcastaddr(&inetaddr, ANY_PORT);
 
         // Get NetworkInterface object with wildcard address
-        InetAddress any;
+        //InetAddress any;
+        Inet4Address any; // TODO
         netIf = NetworkInterface::getByInetAddress(any);
 
         leaveGroup(mcastaddr, *netIf);
@@ -1278,10 +1369,10 @@ void PlainSocketImpl::receive(DatagramPacket& i)
 //
 // send()
 //
-void PlainSocketImpl::send(DatagramPacket& i)
+void PlainSocketImpl::send(DatagramPacket& i,const char* interface)
     throw(IOException, PortUnreachableException)
 {
-    struct sockaddr to;
+	  struct sockaddr_storage to;
     socklen_t       tolen;
 
     // Check destination
@@ -1293,20 +1384,18 @@ void PlainSocketImpl::send(DatagramPacket& i)
 
     // Get struct sockaddr from datagram packet
     const InetAddress* inet = i.getAddress();
-    toSockAddr(*inet, port, to, tolen);
-
+    toSockAddr(*inet, port, to, tolen, interface);
     // Data buffer
     unsigned char* buf = (unsigned char*) i.getData();
     buf += i.getOffset();
 
     // Send data
     size_t length = i.getLength();
-    ssize_t nwrite = ::sendto((int) _fd, buf, length, 0, &to, tolen);
+    ssize_t nwrite = ::sendto((int) _fd, buf, length, 0, (struct sockaddr*)&to, tolen);
     if (nwrite == -1)
     {
         throw IOException("send() error", errno);
     }
-
     // Update datagram packet
     try
     {
@@ -1429,6 +1518,7 @@ bool PlainSocketImpl::getBoolOption(const SocketOptions* socket, int optID)
     switch(optID)
     {
         case SocketOptions::_IP_MULTICAST_LOOP:
+        case SocketOptions::_IPV6_MULTICAST_LOOP:
 	case SocketOptions::_SO_BROADCAST:
 	case SocketOptions::_SO_KEEPALIVE:
 	case SocketOptions::_SO_OOBINLINE:
@@ -1675,17 +1765,43 @@ InetSocketAddress* PlainSocketImpl::toInetSocketAddress(const void* buffer,
                                                         socklen_t   bufflen)
     throw(SocketException)
 {
-    in_port_t port = (in_port_t)ntohs(((struct sockaddr_in*) buffer)->sin_port);
-    in_addr_t addr = ((struct sockaddr_in*) buffer)->sin_addr.s_addr;
-    size_t    len  = sizeof(addr);
+    //mcpg - in_port_t port = (in_port_t)ntohs(((struct sockaddr_in*) buffer)->sin_port);
+    //mcpg - in_addr_t addr = ((struct sockaddr_in*) buffer)->sin_addr.s_addr;
+    //mcpg - size_t    len  = sizeof(addr);
 
     InetAddress*       inet = NULL;
     InetSocketAddress* sock = NULL;
+    const unsigned char *addr;
+    in_port_t port;
+    size_t    len;
     try
     {
-        inet = InetAddress::getByAddress((const unsigned char*) &addr, len);
-        sock = new InetSocketAddress(inet, port);
-        delete inet;
+    	if (bufflen == sizeof(struct sockaddr_in))
+      {
+        //inet = InetAddress::getByAddress((const unsigned char*) &addr, len);
+        struct sockaddr_in *sin = (sockaddr_in *)buffer;
+        if (sin)
+        {
+        	in_addr_t addr_t = sin->sin_addr.s_addr;
+        	addr = (const unsigned char *)&addr_t;
+	        port = sin->sin_port;
+	        len = 16;
+        }
+      }
+      else
+      {
+      	struct sockaddr_in6 *sin6 = (sockaddr_in6 *)buffer;
+       	if (sin6)
+       	{
+       		struct in6_addr *addr6 = &sin6->sin6_addr;
+	         addr = (const unsigned char *)addr6->s6_addr;
+	         port = sin6->sin6_port;
+	         len = 48;
+        }
+      }
+      inet = InetAddress::getByAddress(addr, len);
+      sock = new InetSocketAddress(inet, port);
+      delete inet;
     }
     catch (UnknownHostException& e)
     {
@@ -1830,7 +1946,8 @@ void PlainSocketImpl::toMulticastReq(const SocketAddress&    addr,
 
     // Direcciones IP del grupo multicast y de la interfaz local de recepcion
     const InetAddressList& list = netIf.getInetAddresses();
-    in_addr_t local = *((in_addr_t*) (list[0].getAddress(len)));
+    //in_addr_t local = *((in_addr_t*) (list[0].getAddress(len)));
+    in_addr_t local = *((in_addr_t*) (list[0]->getAddress(len)));
     in_addr_t mcast = *((in_addr_t*) addrptr->getAddress().getAddress(len));
 
     // Inicializacion de ip_mreq
@@ -1846,20 +1963,41 @@ void PlainSocketImpl::toMulticastReq(const SocketAddress&    addr,
 //
 void PlainSocketImpl::toSockAddr(const InetAddress& inet,
                                  in_port_t          port,
-                                 struct sockaddr&   sock,
-                                 socklen_t&         size)
+                                 struct sockaddr_storage& sock,
+                                 socklen_t&         size,
+                                 const char*        interface)
     throw()
 {
-    // Obtiene la direccion de "inet" en formato network order
+	  // Obtiene la direccion de "inet" en formato network order
     size_t len;
     void* addr = (void*) inet.getAddress(len);
-
-    // Completa la estructura sockaddr
-    size = (socklen_t) sizeof(sockaddr_in);
-    bzero((void*) &sock, size);
-    bcopy((const void*) addr, &(((sockaddr_in*) &sock)->sin_addr), len);
-    ((sockaddr_in*) &sock)->sin_family = AF_INET;
-    ((sockaddr_in*) &sock)->sin_port   = htons(port);
+    
+    if (len == sizeof(in_addr_t) ) { // IPv4
+      
+      // Completa la estructura sockaddr
+      size = (socklen_t) sizeof(sockaddr_in);
+      bzero((void*) &sock, size);
+      bcopy((const void*) addr, &(((sockaddr_in*) &sock)->sin_addr), len);
+      ((sockaddr_in*) &sock)->sin_family = AF_INET;
+      ((sockaddr_in*) &sock)->sin_port   = htons(port);
+ 
+    } else { // IPv6    // Obtiene la direccion de "inet" en formato network order
+    	
+      // Completa la estructura sockaddr
+      size = (socklen_t) sizeof(sockaddr_in6);
+      bzero((void*) &sock, size);
+      //Para que al incluir el parametro  -ORB_ip_address el servidor no de una excepcion
+      bcopy((const void*) addr, &(((sockaddr_in6*) &sock)->sin6_addr), len);    // Obtiene la direccion de "inet" en formato network order
+      
+      //memcpy((void*)(&((sockaddr_in6*)&sock)->sin6_addr), (const void*)addr, sizeof(struct in6_addr));
+      //inet_pton(AF_INET6, (const char*)addr, &((sockaddr_in6*) &sock)->sin6_addr);
+      ((sockaddr_in6*) &sock)->sin6_family = AF_INET6;
+      ((sockaddr_in6*) &sock)->sin6_port   = htons(port);
+#ifdef __linux
+      if (interface != NULL)
+        ((sockaddr_in6*) &sock)->sin6_scope_id = if_nametoindex(interface);
+#endif //__linux
+    }
 }
 
 

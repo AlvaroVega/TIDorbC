@@ -120,7 +120,8 @@ const InetAddressList& NetworkInterface::getInetAddresses() const
 char* NetworkInterface::getName()
     throw()
 {
-    return _ip_list[0].getHostAddress();
+    //return _ip_list[0].getHostAddress();
+    return (_ip_list[0])->getHostAddress();
 }
 
 
@@ -133,7 +134,8 @@ NetworkInterface* NetworkInterface::getByInetAddress(const InetAddress& addr)
     throw(SocketException)
 {
     NetworkInterface* netIf = new NetworkInterface;
-    netIf->_ip_list.push_back(addr);
+    //netIf->_ip_list.push_back(addr);
+    netIf->_ip_list.push_back(addr.clone());
 
     return netIf;
 }

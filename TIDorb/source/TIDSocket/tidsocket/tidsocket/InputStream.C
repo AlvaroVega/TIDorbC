@@ -142,7 +142,7 @@ int InputStream::read()
     int value = 0;
 
     unsigned char* b = (unsigned char*) &value;
-    ssize_t len = sizeof(unsigned char);
+    size_t len = sizeof(unsigned char);
 
     if (read(b, sizeof(value), 0, len) != len)
     {

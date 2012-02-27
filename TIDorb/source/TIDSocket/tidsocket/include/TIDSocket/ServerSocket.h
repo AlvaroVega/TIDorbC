@@ -40,21 +40,23 @@ class ServerSocket : public virtual RefCounter
 
     public:
         // Creates an unbound server socket
-        ServerSocket()
+        ServerSocket(bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Creates a server socket on a specified port
-        ServerSocket(in_port_t port)
+        ServerSocket(in_port_t port, const char* interface = NULL, bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Creates a server socket and binds it to the specified local port
         // number, with the specified backlog
-        ServerSocket(in_port_t port, int backlog)
+        ServerSocket(in_port_t port, int backlog, const char* interface = NULL, 
+                     bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Creates a server socket with the specified port, listen backlog,
         // and local IP address to bind to
-        ServerSocket(in_port_t port, int backlog, const InetAddress* addr)
+        ServerSocket(in_port_t port, int backlog, const InetAddress* addr, 
+                     const char* interface = NULL, bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Destroys the server socket
@@ -73,11 +75,11 @@ class ServerSocket : public virtual RefCounter
             throw(IOException, IllegalBlockingModeException);
 
         // Binds the server socket to a specific address (IP address and port)
-        void bind(const SocketAddress* endpoint)
+        void bind(const SocketAddress* endpoint, const char* interface = NULL)
             throw(IOException, IllegalArgumentException);
 
         // Binds the server socket to a specific address (IP address and port)
-        void bind(const SocketAddress* endpoint, int backlog)
+        void bind(const SocketAddress* endpoint, int backlog, const char* interface = NULL)
             throw(IOException, IllegalArgumentException);
 
         // Closes this socket
@@ -150,6 +152,7 @@ class ServerSocket : public virtual RefCounter
         SocketImpl*                _impl;
         ServerSocketChannel*       _channel;
         long                       _status;
+        bool                       _ipv6;
 
     protected:
         static SocketImplFactory*  _factory;

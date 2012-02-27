@@ -87,8 +87,10 @@ namespace TIDSocket
 {
 
 
+class Inet4Address;
+class Inet6Address;
 class InetAddress;
-typedef vector<InetAddress> InetAddressList;
+typedef vector<InetAddress*> InetAddressList;
 
 
 class InetAddress
@@ -100,23 +102,27 @@ class InetAddress
     friend class InetSocketAddress;
     friend class PlainSocketImpl;
     friend class SocketImpl;
+    friend class Inet4Address;
+    friend class Inet6Address;
 
     public:
         // Destructor
         virtual ~InetAddress()
             throw();
 
-        // Assign operator
-        InetAddress& operator= (const InetAddress& addr)
-            throw();
+/*         // Assign operator */
+/*         virtual InetAddress& operator= (const InetAddress& addr) */
+/*             throw() = 0; */
 
         // Equals operator
         bool operator== (const InetAddress& addr)
             throw();
+/*         virtual bool operator== (const InetAddress& addr) */
+/*             throw() = 0; */
 
         // Return the raw IP address of this InetAddress object
-        const unsigned char* getAddress(size_t& out_len) const
-            throw();
+        virtual const unsigned char* getAddress(size_t& out_len) const
+            throw() = 0;
 
         // Get the host name for this IP address
         const char* getHostName()
@@ -124,8 +130,8 @@ class InetAddress
 
         // Return the IP address string in textual presentation
         // (caller must delete returned string)
-        char* getHostAddress()
-            throw();
+        virtual char* getHostAddress()
+            throw() = 0;
 
         // Get the fully qualified domain name for this IP address
         // (caller must delete returned string)
@@ -133,46 +139,54 @@ class InetAddress
             throw();
 
         // Utility routine to check if the InetAddress in a wildcard address
-        bool isAnyLocalAddress() const
-            throw();
+        virtual bool isAnyLocalAddress() const
+            throw() = 0;
+
+        // Utility routine to check if the InetAddress is an IPv4 compatible IPv6 address
+        virtual bool isIPv4CompatibleAddress() const
+            throw() = 0;
 
         // Utility routine to check if the InetAddress is an link local address
-        bool isLinkLocalAddress() const
-            throw();
+        virtual bool isLinkLocalAddress() const
+            throw() = 0;
 
         // Utility routine to check if the InetAddress is a loopback address
-        bool isLoopbackAddress() const
-            throw();
+        virtual bool isLoopbackAddress() const
+            throw() = 0;
 
         // Utility routine to check if the multicast address has global scope
-        bool isMCGlobal() const
-            throw();
+        virtual bool isMCGlobal() const
+            throw() = 0;
 
         // Utility routine to check if the multicast address has link scope
-        bool isMCLinkLocal() const
-            throw();
+        virtual bool isMCLinkLocal() const
+            throw() = 0;
 
         // Utility routine to check if the multicast address has node scope
-        bool isMCNodeLocal() const
-            throw();
+        virtual bool isMCNodeLocal() const
+            throw() = 0;
 
         // Utility routine to check if the multicast address has organization
         // scope
-        bool isMCOrgLocal() const
-            throw();
+        virtual bool isMCOrgLocal() const
+            throw() = 0;
 
         // Utility routine to check if the multicast address has site scope
-        bool isMCSiteLocal() const
-            throw();
+        virtual bool isMCSiteLocal() const
+            throw() = 0;
 
         // Utility routine to check if the InetAddress is an IP multicast
         // address
-        bool isMulticastAddress() const
-            throw();
+        virtual bool isMulticastAddress() const
+            throw() = 0;
 
         // Utility routine to check if the InetAddress is a site local address
-        bool isSiteLocalAddress() const
-            throw();
+        virtual bool isSiteLocalAddress() const
+            throw() = 0;
+
+        // Utility routine to clone the InetAddress 
+        virtual InetAddress* clone() const  
+            throw() = 0;          
 
     public:
         // Return the local host
@@ -203,7 +217,7 @@ class InetAddress
                                          const unsigned char* addr, size_t len)
             throw(UnknownHostException);
 
-    private:
+    public:
         // Constructor
         InetAddress()
             throw();
@@ -214,7 +228,7 @@ class InetAddress
 
     protected:
         // IP address
-        struct in_addr _ip;
+        //struct in_addr _ip;
 
         // Host's name, or "" if unspecified
         string _hostname;

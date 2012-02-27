@@ -91,14 +91,9 @@ TIDorb::core::init()
   TIDorb::core::TIDORB::st_init_mutex =
     TIDorb::core::TIDORB::create_init_mutex();
   
-  TIDorb::core::TIDORB::st_version = "6.4.3";
+  TIDorb::core::TIDORB::st_version = "6.5.0rc1";
   
-  TIDorb::core::TIDORB::st_orb_instances = TIDorb::core::TIDORB::ORBTable();
-
   TIDorb::core::TIDORB::st_initialized = true;
-
-  TIDorb::core::ORBServices::st_service_code_table =
-    TIDorb::core::ORBServices::int_service_code_table();
 }
 
 
@@ -477,7 +472,7 @@ CORBA::Object_ptr TIDorb::core::TIDORB::tidorb_url_to_object(const char* str) th
 
   try
   {
-    ior = TIDorb::core::comm::iiop::Corbaloc::get_IOR(str);
+    ior = TIDorb::core::comm::iiop::Corbaloc::get_IOR(str,m_conf.iface);
   }
   catch(const CORBA::Exception& e)
   {
@@ -495,7 +490,7 @@ CORBA::Object_ptr TIDorb::core::TIDORB::iiop_url_to_object(const char* str) thro
 
   try
   {
-    ior = TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(str);
+    ior = TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(str,m_conf.iface);
   }
   catch(const CORBA::Exception& e)
   {
@@ -517,7 +512,7 @@ CORBA::Object_ptr TIDorb::core::TIDORB::miop_url_to_object(const char* str) thro
 
   try
   {
-    ior = TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(str);
+    ior = TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(str,m_conf.iface);
   }
   catch(const CORBA::Exception& e)
   {
@@ -539,7 +534,7 @@ CORBA::Object_ptr TIDorb::core::TIDORB::ssliop_url_to_object(const char* str) th
 
   try
   {
-    ior = TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_IOR(str);
+    ior = TIDorb::core::comm::ssliop::SSLIOPCorbaloc::get_IOR(str, m_conf.iface);
   }
   catch(const CORBA::Exception& e)
   {

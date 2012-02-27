@@ -92,23 +92,23 @@ bool DatagramSocketImpl::operator== (const DatagramSocketImpl& s)
 //
 // connect()
 //
-void DatagramSocketImpl::connect(const InetAddress& address, in_port_t port)
+void DatagramSocketImpl::connect(const InetAddress& address, in_port_t port, const char* interface)
     throw(SocketException)
 {
     // Get a sockaddr struct from pair (address,port)
-    struct sockaddr sock;
+    struct sockaddr_storage sock;
     socklen_t       size;
-    PlainSocketImpl::toSockAddr(address, port, sock, size);
+    PlainSocketImpl::toSockAddr(address, port, sock, size,interface);
 
     // Try connection
-    if (::connect((int) _fd, &sock, size))
+    if (::connect((int) _fd, (struct sockaddr*)&sock, size))
     {
         throw SocketException("connect() error", errno);
     }
 
     // Get port number to which the socket is bound
     size = (socklen_t) sizeof(sock);
-    if (::getsockname((int) _fd, &sock, &size))
+    if (::getsockname((int) _fd, (struct sockaddr*)&sock, &size))
     {
         throw SocketException("connect() error", errno);
     }

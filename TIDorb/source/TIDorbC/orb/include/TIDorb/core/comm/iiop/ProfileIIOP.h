@@ -103,6 +103,8 @@ public:
 	
   const TIDorb::core::comm::iiop::ListenPoint& getListenPoint() const;
 
+  const TIDorb::core::comm::iiop::VectorListenPoint& getListenPoints() const;
+
   // FT extensions
   const TIDorb::core::comm::iiop::ListenPoint& getAnyListenPoint() const;
   // end FT extensions

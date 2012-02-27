@@ -62,29 +62,33 @@ class Socket : public virtual RefCounter
 
     public:
         // Create an unconnected socket, with the system-default SocketImpl
-        Socket()
+        Socket(bool ipv6=false)
             throw(IOException, SystemException);
 
         // Create a stream socket and connects it to the specified port number
         // at the specified IP address
-        Socket(const InetAddress& address, in_port_t port)
+        Socket(const InetAddress& address,   in_port_t port, 
+               const char* interface = NULL, bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Create a socket and connects it to the specified remote address on
         // the specified remote port
         Socket(const InetAddress& address,   in_port_t port,
-               const InetAddress& localAddr, in_port_t localPort)
+               const InetAddress& localAddr, in_port_t localPort,
+               const char* interface = NULL, bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Create a stream socket and connects it to the specified port number
         // on the named host
-        Socket(const char* host, in_port_t port)
+        Socket(const char* host, in_port_t port, const char* interface = NULL,
+               bool ipv6 = false)
             throw(UnknownHostException, IOException, SystemException);
 
         // Create a socket and connects it to the specified remote host on the
         // specified remote port
         Socket(const char* host,             in_port_t port,
-               const InetAddress& localAddr, in_port_t localPort)
+               const InetAddress& localAddr, in_port_t localPort, 
+               const char* interface = NULL, bool ipv6 = false)
             throw(IOException, SystemException);
 
         // Destroy the socket
@@ -104,7 +108,7 @@ class Socket : public virtual RefCounter
 
     public:
         // Bind the socket to a local address
-        void bind(const SocketAddress* bindpoint)
+        void bind(const SocketAddress* bindpoint, const char* interface = NULL)
             throw(IOException, IllegalArgumentException);
 
         // Close this socket
@@ -112,12 +116,13 @@ class Socket : public virtual RefCounter
             throw(IOException);
 
         // Connect this socket to the server
-        void connect(const SocketAddress& endpoint)
+        void connect(const SocketAddress& endpoint, const char* interface = NULL)
             throw(IllegalBlockingModeException, IllegalArgumentException,
                   IOException);
 
         // Connect this socket to the server with a specified timeout value
-        void connect(const SocketAddress& endpoint, time_t timeout)
+        void connect(const SocketAddress& endpoint, time_t timeout,
+                     const char* interface = NULL)
             throw(IllegalBlockingModeException, IllegalArgumentException,
                   IOException);
 
@@ -281,6 +286,7 @@ class Socket : public virtual RefCounter
         SocketImpl*               _impl;
         SocketChannel*            _channel;
         long                      _status;
+        bool                      _ipv6;
 
     protected:
         static SocketImplFactory* _factory;

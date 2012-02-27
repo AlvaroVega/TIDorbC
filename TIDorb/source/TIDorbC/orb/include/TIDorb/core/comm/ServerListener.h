@@ -53,10 +53,10 @@ namespace comm {
     bool do_shutdown;
 
     /**
-     * Listen point where the ServerSocket will be listening. This point(host,port)
+     * Listen point set where the ServerSocket will be listening. This point(host,port)
      * will be used to create de local IOR's.
      */
-    TIDorb::core::comm::iiop::ListenPoint listen_point;
+    TIDorb::core::comm::iiop::ListenPointSet listen_points;
 
     TIDorb::core::TIDORB_ref _orb;
 
@@ -73,7 +73,7 @@ namespace comm {
         
     void shutdown();
         
-    const TIDorb::core::comm::iiop::ListenPoint& get_listen_point();
+    const TIDorb::core::comm::iiop::ListenPointSet& get_listen_points();
     TIDorb::core::iop::IOR* createIOR(const char* id, TIDorb::core::poa::POAKey* key);
 
         

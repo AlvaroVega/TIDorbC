@@ -58,8 +58,6 @@
 #include "TIDorb/core/comm/LockList.h"
 #include "TIDorb/core/comm/FragmentedMessagesRepository.h"
 
-#include <set>
-
 #ifdef TIDORB_HAVE_NAMESPACE_STD
   using namespace std;
 #endif
@@ -114,8 +112,6 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
 
   public:
   
-    typedef set<TIDorb::core::comm::iiop::ListenPoint> ListenPointSet;
-    
     /**
      * Client connection mode.
      */
@@ -194,7 +190,7 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
      * Server Object Listen Points assotiated.
      */        
      
-     ListenPointSet addresses;
+    TIDorb::core::comm::iiop::ListenPointSet addresses;
      
     //TIDorb::core::util::HashedLinkedList<TIDorb::core::comm::iiop::ListenPoint,
     //                                     TIDorb::core::comm::iiop::ListenPoint>* addresses;
@@ -301,7 +297,7 @@ class Connection : public TIDThr::RecursiveMutex, public TIDorb::core::util::Rem
     /**
      * @return the listen points associated to this connection
      */
-    const ListenPointSet& get_listen_points()
+    const TIDorb::core::comm::iiop::ListenPointSet& get_listen_points()
     {
         return addresses;
     }

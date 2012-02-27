@@ -58,15 +58,17 @@ class MulticastSocket : public virtual DatagramSocket
 
     public:
         // Create a multicast socket
-        MulticastSocket()
+        MulticastSocket( const char* interface, bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Create a multicast socket and bind it to a specific port
-        MulticastSocket(in_port_t port)
+        MulticastSocket(in_port_t port, const char* interface, 
+                        bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Create a multicast socket bound to the specified socket address
-        MulticastSocket(const SocketAddress* bindAddr)
+        MulticastSocket(const SocketAddress* bindAddr, const char* interface, 
+                        bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Destroys the multicast socket
@@ -135,7 +137,7 @@ class MulticastSocket : public virtual DatagramSocket
 
     private:
         // Object initialization
-        void init(const SocketAddress* bindAddr)
+        void init(const SocketAddress* bindAddr, const char* interface)
             throw(SocketException);
 
 };

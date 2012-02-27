@@ -145,16 +145,24 @@ TIDorb::core::comm::MulticastConnection::server_connection(TIDorb::core::comm::C
   TIDSocket::NetworkInterface* netIf  = NULL;
 
 
-  const TIDorb::core::ConfORB& conf = mngr->orb()->conf();
   try {
     // create the multicast socket
 
     // resolve multicast group address
-    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
+    //TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
+    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port, mngr->orb()->conf().prefer_ipv6);
     if (addr.isUnresolved() || !addr.getAddress().isMulticastAddress()) {
       throw CORBA::COMM_FAILURE("Invalid multicast group address", 0, CORBA::COMPLETED_NO);
     }
-    socket = new TIDSocket::MulticastSocket(&addr);
+    const char* interface=NULL;
+    if (mngr->orb()->conf().prefer_ipv6)
+    {
+      string point = listen_point._host;
+      string::size_type colon_position = point.find('%');
+      if (colon_position != string::npos)
+        interface = CORBA::string_dup(point.substr(colon_position + 1).c_str());
+    }
+    socket = new TIDSocket::MulticastSocket(&addr,interface,mngr->orb()->conf().prefer_ipv6); // FIX
  
 
     // Check if interface for incoming MIOP messages has been defined...
@@ -165,7 +173,7 @@ TIDorb::core::comm::MulticastConnection::server_connection(TIDorb::core::comm::C
       delete incoming_ip;
       incoming_ip = NULL;
     } else {
-      const char* incoming_ip_name = conf.multicast_incoming_interface;
+      const char* incoming_ip_name = mngr->orb()->conf().multicast_incoming_interface;
       if (incoming_ip_name) { // As a ORB init param
         incoming_ip = TIDSocket::InetAddress::getByName(incoming_ip_name);
         netIf = TIDSocket::NetworkInterface::getByInetAddress(*incoming_ip);
@@ -211,11 +219,21 @@ TIDorb::core::comm::MulticastConnection::client_connection(TIDorb::core::comm::C
   TIDSocket::MulticastSocket* socket  = NULL;
 
   try {
+  	const char* interface=NULL;
+    if (mngr->orb()->conf().prefer_ipv6)
+    {
+      string point = listen_point._host;
+      string::size_type colon_position = point.find('%');
+      if (colon_position != string::npos)
+        interface = CORBA::string_dup(point.substr(colon_position + 1).c_str());
+    }
+    
     // create the multicast socket
-    socket = new TIDSocket::MulticastSocket();
+    socket = new TIDSocket::MulticastSocket(interface,mngr->orb()->conf().prefer_ipv6);
 
     // resolve multicast group address
-    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
+    //TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
+    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port, mngr->orb()->conf().prefer_ipv6);
     if (addr.isUnresolved() || !addr.getAddress().isMulticastAddress()) {
       delete socket;
       throw CORBA::COMM_FAILURE("Invalid multicast group address", 0, CORBA::COMPLETED_NO);

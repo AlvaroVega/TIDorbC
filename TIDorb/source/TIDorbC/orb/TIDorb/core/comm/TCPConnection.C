@@ -124,6 +124,7 @@ const char* TIDorb::core::comm::TCPConnection::toString()
         }
       case SERVER_MODE:
         {
+          const TIDorb::core::ConfORB& conf = _orb->conf();
           buffer << "Server" << " thread(" << TIDThr::Thread::getCurrentThreadId() << ")";
           TIDSocket::InetSocketAddress* addr = 
             (TIDSocket::InetSocketAddress*)(socket->getRemoteSocketAddress());
@@ -182,7 +183,20 @@ TIDorb::core::comm::TCPConnection::client_connection(TIDorb::core::comm::Connect
 {
   try {
     // create the socket
-    TIDSocket::Socket* socketed = new TIDSocket::Socket((const char*) listen_point._host, listen_point._port);
+    
+    //Get parameter ipv6
+    char* interface = NULL;
+    const TIDorb::core::ConfORB& conf = mngr->orb()->conf();
+    if (conf.prefer_ipv6)
+    {
+      string point = listen_point._host;
+      string::size_type colon_position = point.find('%');
+      if (colon_position != string::npos)
+        interface = CORBA::string_dup(point.substr(colon_position + 1).c_str());
+    }
+   
+    TIDSocket::Socket* socketed = new TIDSocket::Socket((const char*) listen_point._host, listen_point._port,interface,conf.prefer_ipv6);
+
     TIDorb::core::comm::Connection* conn = new TIDorb::core::comm::TCPConnection(mngr, socketed);
 
     conn->mode = CLIENT_MODE;

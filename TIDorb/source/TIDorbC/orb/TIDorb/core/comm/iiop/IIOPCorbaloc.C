@@ -51,7 +51,8 @@
 
 
 
-char* TIDorb::core::comm::iiop::IIOPCorbaloc::get_object_id(const char* corbaloc_URL) // Never Called?
+char* TIDorb::core::comm::iiop::IIOPCorbaloc::get_object_id(const char* corbaloc_URL, 
+                                                            const char* iface) // Never Called?
   throw(CORBA::ORB::InvalidName)
 {
   string url = corbaloc_URL;
@@ -100,7 +101,7 @@ char* TIDorb::core::comm::iiop::IIOPCorbaloc::get_object_id(const char* corbaloc
 
     // Parser version and listen_point
     version = Corbaloc::parse_version(version_str);
-    listen_point = Corbaloc::parse_listenpoint(listenpoint_str);
+    listen_point = Corbaloc::parse_listenpoint(listenpoint_str,iface);
 
     delete listen_point;
 
@@ -116,7 +117,7 @@ char* TIDorb::core::comm::iiop::IIOPCorbaloc::get_object_id(const char* corbaloc
 
 
 TIDorb::core::iop::IOR*
-TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(const char* corbaloc_URL)
+TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(const char* corbaloc_URL,const char* iface)
   throw(CORBA::ORB::InvalidName)
 {
   string url = corbaloc_URL;
@@ -170,7 +171,7 @@ TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(const char* corbaloc_URL)
 
     // Parser version and listen_point
     version = Corbaloc::parse_version(version_str);
-    listen_point = Corbaloc::parse_listenpoint(listenpoint_str);
+    listen_point = Corbaloc::parse_listenpoint(listenpoint_str,iface);
 
     // Create Profiles
     profiles.push_back(new TIDorb::core::comm::iiop::ProfileIIOP(version, *listen_point,

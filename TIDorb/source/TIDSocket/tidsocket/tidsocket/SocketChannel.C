@@ -104,7 +104,7 @@ SocketChannel::~SocketChannel()
 //
 // connect()
 //
-bool SocketChannel::connect(const SocketAddress& remote)
+bool SocketChannel::connect(const SocketAddress& remote,const char* interface)
     throw(AlreadyConnectedException, ConnectionPendingException,
           ClosedChannelException, AsynchronousCloseException,
           ClosedByInterruptException, UnresolvedAddressException,
@@ -156,7 +156,7 @@ bool SocketChannel::connect(const SocketAddress& remote)
             if (isBlocking())
             {
                 // Intenta la conexion
-                _socket->connect(remote);
+                _socket->connect(remote,interface);
 
                 // Modifica el estado
                 Synchronized synchronized(_sync);
@@ -171,11 +171,12 @@ bool SocketChannel::connect(const SocketAddress& remote)
             PlainSocketImpl::toSockAddr(remoteptr->getAddress(),
                                         remoteptr->getPort(),
                                         _sockaddr,
-                                        _socksize);
+                                        _socksize,
+                                        interface);
 
             // Conexion no bloqueante
             int fd = (int) _socket->_impl->getFileDescriptor();
-            error = ::connect(fd, &_sockaddr, _socksize);
+            error = ::connect(fd, (struct sockaddr*)&_sockaddr, _socksize);
             if (error && (errno != EINPROGRESS))
             {
                 throw IOException("connect() error", errno);
@@ -204,7 +205,7 @@ bool SocketChannel::connect(const SocketAddress& remote)
 //
 // finishConnect
 //
-bool SocketChannel::finishConnect()
+bool SocketChannel::finishConnect(const char* interface)
     throw(NoConnectionPendingException, ClosedChannelException,
           AsynchronousCloseException, ClosedByInterruptException, IOException)
 {
@@ -234,11 +235,11 @@ bool SocketChannel::finishConnect()
                 try
                 {
                     // Recupera los datos de la conexion
-                    remote = PlainSocketImpl::toInetSocketAddress(&_sockaddr,
+                    remote = PlainSocketImpl::toInetSocketAddress((struct sockaddr*)&_sockaddr,
                                                                   _socksize);
 
                     // Reintenta la conexion con los datos de connect()
-                    _socket->connect(*remote);
+                    _socket->connect(*remote,interface);
                     delete remote;
 
                     // Modifica el estado
@@ -258,7 +259,7 @@ bool SocketChannel::finishConnect()
 
             // Conexion no bloqueante
             int fd = (int) _socket->_impl->getFileDescriptor();
-            error = ::connect(fd, &_sockaddr, _socksize);
+            error = ::connect(fd, (struct sockaddr*)&_sockaddr, _socksize);
 
             if (error &&
                 errno != EINPROGRESS && errno != EALREADY && errno != EISCONN)
@@ -528,14 +529,14 @@ SocketChannel* SocketChannel::open()
 //
 // static open()
 //
-SocketChannel* SocketChannel::open(const SocketAddress& sock)
+SocketChannel* SocketChannel::open(const SocketAddress& sock,const char* interface)
     throw(AsynchronousCloseException, ClosedByInterruptException,
           UnresolvedAddressException, UnsupportedAddressTypeException,
           IOException)
 {
     // Crea un nuevo canal
     SocketChannel* channel = open();
-    channel->connect(sock);
+    channel->connect(sock,interface);
     return channel;
 }
 

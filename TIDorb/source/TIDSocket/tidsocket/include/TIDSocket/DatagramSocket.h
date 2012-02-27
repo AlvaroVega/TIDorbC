@@ -61,22 +61,25 @@ class DatagramSocket : public virtual TIDThr::RefCounter
     public:
         // Constructs a datagram socket and binds it to any available port
         // on the local host machine
-        DatagramSocket()
+        DatagramSocket(const char* interface = NULL, bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Constructs a datagram socket and binds it to the specified port
         // on the local host machine
-        DatagramSocket(in_port_t port)
+        DatagramSocket(in_port_t port,const char* interface = NULL, 
+                       bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Creates a datagram socket, bound to the specified local
         // address
-        DatagramSocket(in_port_t port, const InetAddress& localAddr)
+        DatagramSocket(in_port_t port, const InetAddress& localAddr,
+                       const char* interface = false, bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Creates a datagram socket, bound to the specified local
         // socket address
-        DatagramSocket(const SocketAddress* bindAddr)
+        DatagramSocket(const SocketAddress* bindAddr,
+                       const char* interface = false, bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Destroys the datagram socket
@@ -86,7 +89,7 @@ class DatagramSocket : public virtual TIDThr::RefCounter
     protected:
         // Creates an unbound datagram socket with specified DatagramSocketImpl
         // (caller must NOT delete DatagramSocketImpl object)
-        DatagramSocket(const DatagramSocketImpl* impl)
+        DatagramSocket(const DatagramSocketImpl* impl, bool ipv6 = false)
             throw(SocketException, SystemException);
 
     public:
@@ -97,7 +100,7 @@ class DatagramSocket : public virtual TIDThr::RefCounter
 
     public:
         // Binds this DatagramSocket to a specific address and port
-        void bind(const SocketAddress* addr)
+        void bind(const SocketAddress* addr, const char* interface = false)
             throw(SocketException, IllegalArgumentException);
 
         // Closes this datagram socket
@@ -105,11 +108,12 @@ class DatagramSocket : public virtual TIDThr::RefCounter
             throw();
 
         // Connects the socket to a remote address for this socket
-        void connect(const InetAddress& address, in_port_t port)
+        void connect(const InetAddress& address, in_port_t port,
+                     const char* interface = NULL)
             throw(SocketException, IllegalArgumentException);
 
         // Connects this socket to a remote socket address
-        void connect(const SocketAddress& addr)
+        void connect(const SocketAddress& addr,const char* interface)
             throw(SocketException, IllegalArgumentException);
 
         // Disconnects the socket
@@ -194,7 +198,7 @@ class DatagramSocket : public virtual TIDThr::RefCounter
                   PortUnreachableException, IllegalBlockingModeException);
 
         // Sends a datagram packet from this socket
-        void send(DatagramPacket& p)
+        void send(DatagramPacket& p,const char* interface = NULL)
             throw(IOException,
                   PortUnreachableException, IllegalBlockingModeException);
 
@@ -227,9 +231,11 @@ class DatagramSocket : public virtual TIDThr::RefCounter
         RecursiveMutex                    _sync;
         DatagramSocketImpl*               _impl;
         DatagramChannel*                  _channel;
-        InetAddress                       _remoteaddr;
+        //InetAddress                      _remoteaddr;
+        InetAddress*                      _remoteaddr;
         in_port_t                         _remoteport;
         long                              _status;
+        bool                              _ipv6;
 
     protected:
         static DatagramSocketImplFactory* _factory;

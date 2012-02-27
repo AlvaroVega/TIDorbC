@@ -57,7 +57,7 @@ class Corbaloc {
 
 public:
 
-  static TIDorb::core::iop::IOR* get_IOR(const char* corbaloc_URL) 
+  static TIDorb::core::iop::IOR* get_IOR(const char* corbaloc_URL,const char* iface) 
     throw (CORBA::ORB::InvalidName);
     
   static char* to_URL(const TIDorb::core::iop::IOR* ior);
@@ -65,7 +65,7 @@ public:
   static const TIDorb::core::comm::iiop::Version& parse_version(const string& v) 
     throw (CORBA::ORB::InvalidName);
 
-  static TIDorb::core::comm::iiop::ListenPoint* parse_listenpoint(const string& listenp) 
+  static TIDorb::core::comm::iiop::ListenPoint* parse_listenpoint(const string& listenp, const string& iface) 
     throw (CORBA::ORB::InvalidName);
 
 protected:

@@ -55,12 +55,12 @@ namespace TIDSocket
 //
 // Constructor
 //
-MulticastSocket::MulticastSocket()
+MulticastSocket::MulticastSocket(const char* interface, bool ipv6)
     throw(SocketException, SystemException)
-    : DatagramSocket(new PlainSocketImpl)
+    : DatagramSocket(new PlainSocketImpl, ipv6)
 {
-    InetSocketAddress bindAddr(PlainSocketImpl::ANY_PORT);
-    init(&bindAddr);
+    InetSocketAddress bindAddr(PlainSocketImpl::ANY_PORT, _ipv6);
+    init(&bindAddr, interface);
 }
 
 
@@ -69,12 +69,13 @@ MulticastSocket::MulticastSocket()
 //
 // Constructor
 //
-MulticastSocket::MulticastSocket(in_port_t port)
+MulticastSocket::MulticastSocket(in_port_t port, const char* interface, 
+                                 bool ipv6)
     throw(SocketException, SystemException)
-    : DatagramSocket(new PlainSocketImpl)
+    : DatagramSocket(new PlainSocketImpl, ipv6)
 {
-    InetSocketAddress bindAddr(port);
-    init(&bindAddr);
+    InetSocketAddress bindAddr(port, ipv6);
+    init(&bindAddr, interface);
 }
 
 
@@ -83,11 +84,12 @@ MulticastSocket::MulticastSocket(in_port_t port)
 //
 // Constructor
 //
-MulticastSocket::MulticastSocket(const SocketAddress* bindAddr)
+MulticastSocket::MulticastSocket(const SocketAddress* bindAddr,
+                                 const char* interface, bool ipv6)
     throw(SocketException, SystemException)
-    : DatagramSocket(new PlainSocketImpl)
+    : DatagramSocket(new PlainSocketImpl, ipv6)
 {
-    init(bindAddr);
+    init(bindAddr,interface);
 }
 
 
@@ -107,7 +109,7 @@ MulticastSocket::~MulticastSocket()
 //
 // Object initialization
 //
-void MulticastSocket::init(const SocketAddress* bindAddr)
+void MulticastSocket::init(const SocketAddress* bindAddr,const char* interface)
     throw(SocketException)
 {
     setReuseAddress(true);
@@ -117,7 +119,7 @@ void MulticastSocket::init(const SocketAddress* bindAddr)
     {
         try
         {
-            bind(bindAddr);
+            bind(bindAddr,interface);
         }
         catch(IllegalArgumentException& e)
         {
@@ -141,7 +143,12 @@ InetAddress* MulticastSocket::getInterface()
         Synchronized synchronized(_sync);
         {
             size_t size;
-            int optID = SocketOptions::_IP_MULTICAST_IF;
+            //int optID = SocketOptions::_IP_MULTICAST_IF;
+            int optID;
+            if (_ipv6)
+              optID = SocketOptions::_IPV6_MULTICAST_IF;
+            else
+              optID = SocketOptions::_IP_MULTICAST_IF;
             return (InetAddress*) _impl->getOption(optID, size);
         }
     }
@@ -234,7 +241,7 @@ int MulticastSocket::getTimeToLive()
 //
 void MulticastSocket::joinGroup(const InetAddress& mcastaddr)
     throw(IOException)
-{
+{   
     try
     {
         Synchronized synchronized(_sync);
@@ -350,7 +357,13 @@ void MulticastSocket::setInterface(const InetAddress& inf)
         Synchronized synchronized(_sync);
         {
             size_t size = sizeof(InetAddress);
-            int optID = SocketOptions::_IP_MULTICAST_IF;
+            //mcpg
+            //int optID = SocketOptions::_IP_MULTICAST_IF;
+            int optID;
+            if (_ipv6)
+              optID = SocketOptions::_IPV6_MULTICAST_IF;
+            else
+              optID = SocketOptions::_IP_MULTICAST_IF;
             _impl->setOption(optID, (const void*) &inf, size);
         }
     }
@@ -373,7 +386,13 @@ void MulticastSocket::setLoopbackMode(bool disable)
     {
         Synchronized synchronized(_sync);
         {
-            int optID = SocketOptions::_IP_MULTICAST_LOOP;
+        	  //mcpg
+            //int optID = SocketOptions::_IP_MULTICAST_LOOP;
+            int optID;
+            if (_ipv6)
+              optID = SocketOptions::_IPV6_MULTICAST_LOOP;
+            else
+              optID = SocketOptions::_IP_MULTICAST_LOOP;
             PlainSocketImpl::setBoolOption(_impl, optID, disable);
         }
     }
@@ -393,7 +412,8 @@ void MulticastSocket::setNetworkInterface(const NetworkInterface& netIf)
     throw(SocketException)
 {
     const InetAddressList& addresses = netIf.getInetAddresses();
-    setInterface(addresses[0]);
+    //setInterface(addresses[0]);
+    setInterface(*(addresses[0]));
 }
 
 

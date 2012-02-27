@@ -63,7 +63,7 @@ class DatagramChannel : public virtual SelectableChannel
             throw(SystemException);
 
         // Connects this channel's socket
-        virtual DatagramChannel& connect(const SocketAddress& addr)
+        virtual DatagramChannel& connect(const SocketAddress& addr,const char* interface)
             throw(ClosedChannelException,
                   AsynchronousCloseException,
                   ClosedByInterruptException,
@@ -89,7 +89,7 @@ class DatagramChannel : public virtual SelectableChannel
 
         // Sends a datagram via this channel
         ssize_t send(const unsigned char* src, size_t src_len,
-                     const SocketAddress& target)
+                     const SocketAddress& target,const char* interface)
             throw(ClosedChannelException, ClosedByInterruptException,
                   AsynchronousCloseException, IOException);
 
@@ -103,13 +103,13 @@ class DatagramChannel : public virtual SelectableChannel
             throw();
 
         // Writes a datagram to this channel
-        ssize_t write(const unsigned char* src, size_t src_len)
+        ssize_t write(const unsigned char* src, size_t src_len,const char* interface)
             throw(NotYetConnectedException, IOException);
 
     public:
         // Opens a datagram channel
         // (caller must delete DatagramChannel object)
-        static DatagramChannel* open()
+        static DatagramChannel* open(const char* interface)
             throw(IOException);
 
     protected:

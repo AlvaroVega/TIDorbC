@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////
 //
-// File:        TIDSocket_InetAddress.C
-// Description: This file contains the InetAddress class methods
+// File:        InetAddress.C
+// Description: This file contains the DatagramSocket class methods
 // Rel:         01.00
 // Created:     May, 2001
 // Author:      Pablo Rodriguez Archilla      ( pra@tid.es   )
@@ -49,7 +49,9 @@
 #define INET_ADDRSTRLEN     16
 #endif
 
-
+#ifndef INET6_ADDRSTRLEN
+#define INET6_ADDRSTRLEN     46
+#endif
 
 
 #define HOSTENT_BUFFER_SIZE 1024U
@@ -69,13 +71,6 @@ namespace TIDSocket
 InetAddress::InetAddress()
     throw()
 {
-    // Any address
-    struct in_addr any = { INADDR_ANY };
-#ifndef __linux
-    *((in_addr_t*) &_ip) = *((in_addr_t*) &any);
-#else
-    *((in_addr_t*) &(_ip.s_addr)) = *((in_addr_t*) &(any.s_addr));
-#endif
     _hostname = "";
 }
 
@@ -92,39 +87,15 @@ InetAddress::~InetAddress()
 
 
 
-
-//
-// Assign operator
-//
-InetAddress& InetAddress::operator= (const InetAddress& addr)
-    throw()
-{
-#ifndef __linux
-    *((in_addr_t*) &_ip) = *((in_addr_t*) &(addr._ip));
-#else
-    *((in_addr_t*) &(_ip.s_addr)) = *((in_addr_t*) &(addr._ip.s_addr));
-#endif
-    _hostname = addr._hostname;
-    return *this;
-}
-
-
-
-
 //
 // Equals operator
 //
 bool InetAddress::operator== (const InetAddress& addr)
     throw()
 {
-#ifndef __linux
-    return ((*((in_addr_t*) &_ip) == *((in_addr_t*) &(addr._ip)))
-#else
-    return ((*((in_addr_t*) &(_ip.s_addr)) == *((in_addr_t*) &(addr._ip.s_addr)))
-#endif
-            && (_hostname == addr._hostname));
+  // TODO
+  return false;
 }
-
 
 
 
@@ -142,27 +113,6 @@ char* InetAddress::duplicate(const string& str)
     str.copy(result, len);
     return result;
 }
-
-
-
-
-//
-// getAddress()
-//
-const unsigned char* InetAddress::getAddress(size_t& out_len) const
-    throw()
-{
-    // Inicializa el valor de la longitud de la direccion
-    out_len = sizeof(_ip);
-
-    // Devuelve un puntero que apunta al comienzo de la IP como buffer de bytes
-#ifndef __linux
-    return (const unsigned char*) &_ip;
-#else
-    return (const unsigned char*) &(_ip.s_addr);
-#endif
-}
-
 
 
 
@@ -188,23 +138,6 @@ const char* InetAddress::getHostName()
 
 
 //
-// getHostAddress()
-//
-char* InetAddress::getHostAddress()
-    throw()
-{
-    // Obtiene la representacion textual de la direccion IP
-    char buffer[INET_ADDRSTRLEN];
-    string addr = inet_ntop(AF_INET, &_ip, buffer, INET_ADDRSTRLEN);
-
-    // Devuelve una copia
-    return duplicate(addr);
-}
-
-
-
-
-//
 // getCanonicalHostName()
 //
 char* InetAddress::getCanonicalHostName()
@@ -212,166 +145,46 @@ char* InetAddress::getCanonicalHostName()
 {
     // Obtiene un puntero a la direccion IP
     size_t len;
-    const unsigned char* ip_ptr = getAddress(len);
+    const unsigned char* ip_ptr = getAddress(len); // TODO: need to review: may be IPv6
 
-    // Consulta el nombre del host a partir de la direccion IP; en caso de error
-    // devuelve "" (ya que este metodo no genera ninguna excepcion a tal efecto)
-    struct hostent ht, *ht_ptr;
-    char           ht_buffer[HOSTENT_BUFFER_SIZE];
-    int            ht_error;
+    // TODO: change to getnameinfo()
+    struct sockaddr *sa;    /* input */
+    sa = (struct sockaddr*) ip_ptr;
 
-#ifdef __sun
-    ht_ptr = gethostbyaddr_r((const char*) ip_ptr, len, AF_INET,
-                             &ht, ht_buffer, HOSTENT_BUFFER_SIZE, &ht_error);
-#elif (defined __CYGWIN__ || defined __ANDROID__)
-    ht_ptr = gethostbyaddr((const char*) ip_ptr, len, AF_INET);
-    ht_error = h_errno;
-#else
-    ht_ptr = gethostbyaddr((const void*) ip_ptr, len, AF_INET);
-    ht_error = h_errno;
-#endif
+    char hbuf[NI_MAXHOST];
+    char sbuf[NI_MAXSERV];
+    
+    int error = getnameinfo(sa, len, 
+                            hbuf, NI_MAXHOST, 
+                            sbuf, NI_MAXSERV, 
+                            NI_NUMERICHOST | NI_NUMERICSERV);
 
-    string canonical = (ht_ptr) ? (const char*) ht_ptr->h_name : "";
+//     if (error != 0)
+//       throw UnknownHostException(gai_strerror(error));
+
+    string canonical = (!error) ? (const char*) hbuf : "";
+
+//     // Consulta el nombre del host a partir de la direccion IP; en caso de error
+//     // devuelve "" (ya que este metodo no genera ninguna excepcion a tal efecto)
+//     struct hostent ht, *ht_ptr;
+//     char           ht_buffer[HOSTENT_BUFFER_SIZE];
+//     int            ht_error;
+
+
+// #ifdef __sun
+//     ht_ptr = gethostbyaddr_r((const char*) ip_ptr, len, AF_INET,
+//                              &ht, ht_buffer, HOSTENT_BUFFER_SIZE, &ht_error);
+// #else
+//     ht_ptr = gethostbyaddr((const void*) ip_ptr, len, AF_INET);
+//     ht_error = h_errno;
+// #endif
+
+//     string canonical = (ht_ptr) ? (const char*) ht_ptr->h_name : "";
 
     // Devuelve una copia
     return duplicate(canonical);
 }
 
-
-
-
-//
-// isAnyLocalAddress()
-//
-bool InetAddress::isAnyLocalAddress() const
-    throw()
-{
-    struct in_addr addr = { INADDR_ANY };
-#ifndef __linux
-    return (*((in_addr_t*) &_ip) == *((in_addr_t*) &addr));
-#else
-    return (*((in_addr_t*) &(_ip.s_addr)) == *((in_addr_t*) &(addr.s_addr)));
-#endif
-}
-
-
-
-
-//
-// isLinkLocalAddress()
-//
-bool InetAddress::isLinkLocalAddress() const
-    throw()
-{
-    return false;
-}
-
-
-
-
-//
-// isLoopbackAddress()
-//
-bool InetAddress::isLoopbackAddress() const
-    throw()
-{
-    struct in_addr addr = { INADDR_LOOPBACK };
-#ifndef __linux
-    return (*((in_addr_t*) &_ip) == *((in_addr_t*) &addr));
-#else
-    return (*((in_addr_t*) &(_ip.s_addr)) == *((in_addr_t*) &(addr.s_addr)));
-#endif
-}
-
-
-
-
-//
-// isMCGlobal()
-//
-bool InetAddress::isMCGlobal() const
-    throw()
-{
-    return false;
-}
-
-
-
-
-//
-// isMCLinkLocal()
-//
-bool InetAddress::isMCLinkLocal() const
-    throw()
-{
-    return false;
-}
-
-
-
-
-//
-// isMCNodeLocal()
-//
-bool InetAddress::isMCNodeLocal() const
-    throw()
-{
-    return false;
-}
-
-
-
-
-//
-// isMCOrgLocal()
-//
-bool InetAddress::isMCOrgLocal() const
-    throw()
-{
-    return false;
-}
-
-
-
-
-//
-// isMCSiteLocal()
-//
-bool InetAddress::isMCSiteLocal() const
-    throw()
-{
-    return false;
-}
-
-
-
-
-//
-// isMulticastAddress()
-//
-bool InetAddress::isMulticastAddress() const
-    throw()
-{
-#ifndef __linux
-    in_addr_t* ip_ptr = (in_addr_t*) &_ip;
-    return (IN_MULTICAST(*ip_ptr));
-#else
-    return (IN_MULTICAST(ntohl(_ip.s_addr)));  
-#endif
-
-}
-
-
-
-
-//
-// isSiteLocalAddress()
-//
-bool InetAddress::isSiteLocalAddress() const
-    throw()
-{
-    return false;
-}
 
 
 
@@ -402,18 +215,27 @@ InetAddress* InetAddress::getLocalHost()
 InetAddress* InetAddress::getByName(const char* host)
     throw(UnknownHostException)
 {
-    InetAddress* inet = NULL;
+	InetAddress* inet = NULL;
 
     // Consulta todas las direcciones IP del host
     InetAddressList* list = InetAddress::getAllByName(host);
-    if (list->size() == 0)
+    size_t list_size = list->size();
+    
+    if (list_size == 0)
     {
         delete list;
         throw UnknownHostException("getByName() error");
     }
 
     // Copia la primera direcci�n
-    inet = new InetAddress(list->at(0));
+    //inet = new InetAddress(list->at(0));
+    inet = list->at(0);
+
+    // Descarta el resto de la lista
+    for (size_t i = 1; i < list_size; i++) {
+      InetAddress* aux = list->at(i);
+      delete aux;
+    }
     delete list;
 
     return inet;
@@ -428,82 +250,168 @@ InetAddress* InetAddress::getByName(const char* host)
 InetAddressList* InetAddress::getAllByName(const char* host)
     throw(UnknownHostException)
 {
-    InetAddressList* list = NULL;
+	InetAddressList* list = NULL;
     InetAddress*     inet = NULL;
 
     // Si host es NULL, devuelve la direcci�n de bucle local
     if (host == NULL)
-    {
-        struct in_addr loopback = { INADDR_LOOPBACK };
-        const unsigned char* addr = (const unsigned char*) &loopback;
-        size_t len = sizeof(loopback);
+      {
+        // IPv4
+        struct in_addr  loopback  = { INADDR_LOOPBACK };
+        const unsigned char* addr  = (const unsigned char*) &loopback;
+        size_t len  = sizeof(loopback);
 
         inet = InetAddress::getByAddress(addr, len);
-        list = new InetAddressList(1, *inet);
-        delete inet;
+        //list = new InetAddressList(1, *inet);
+        //delete inet;
+        list = new InetAddressList;
+        if (inet != 0)
+          list->push_back(inet);
+
+        // IPv6
+        struct in6_addr loopback6 = in6addr_loopback;
+        const unsigned char* addr6 = (const unsigned char*) &loopback6;
+        size_t len6 = sizeof(loopback6);
+
+        inet = InetAddress::getByAddress(addr6, len6);
+        if (inet != 0)
+          list->push_back(inet);
 
         return list;
     }
 
-    // Consulta la direccion IP del host
-    struct hostent ht, *ht_ptr;
-    char           ht_buffer[HOSTENT_BUFFER_SIZE];
-    int            ht_error;
 
-#ifdef __sun
-    ht_ptr = gethostbyname_r(host, &ht, ht_buffer,
-                             HOSTENT_BUFFER_SIZE, &ht_error);
-#else
-    ht_ptr = gethostbyname(host);
-//     gethostbyname_r(host, 
-//                      &ht, ht_buffer, HOSTENT_BUFFER_SIZE, 
-//                      &ht_ptr, &ht_error);
-    ht_error = h_errno;
-#endif
+    // TODO: change to getaddrinfo
 
-    if (ht_ptr == NULL)
-    {
-        char* errmsg = (char*) "Undefined error";
-        switch(ht_error)
-        {
-            case HOST_NOT_FOUND:
-                errmsg = (char*) "Host not found";
-                break;
+    struct addrinfo *res;
+    struct addrinfo hints;
+    memset(&hints, '\0', sizeof(hints));
 
-            case TRY_AGAIN:
-                errmsg = (char*) "Server fail (try again)";
-                break;
+    hints.ai_family = PF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    
+    int error = getaddrinfo(host, NULL, &hints, &res);
 
-            case NO_RECOVERY:
-                errmsg = (char*) "Non recoverable error";
-                break;
+    if (error != 0)
+       throw UnknownHostException(gai_strerror(error));
 
-            case NO_DATA:
-                errmsg = (char*) "Valid name, no data record";
-                break;
-        }
-        throw UnknownHostException(errmsg);
-    }
-
-    // Crea una lista vacia y recorre los resultados de gethostbyname()
     list = new InetAddressList;
-    for (char** ptr = ht_ptr->h_addr_list; *ptr; ptr++)
-    {
-        try
-        {
-            const unsigned char* addr = (const unsigned char*) *ptr;
-            size_t len = ht_ptr->h_length;
+    
+    for (struct addrinfo *r = res; r != NULL; r = r->ai_next) {
+      //mcpg - const unsigned char* addr = (const unsigned char*) (r->ai_addr);
+      const unsigned char* addr=NULL;
+      switch (r->ai_family) {
+        case AF_INET: {
+          struct sockaddr_in *sin = (sockaddr_in *)r->ai_addr;
+          in_addr_t addr_t = sin->sin_addr.s_addr;
+          addr = (const unsigned char *)&addr_t;
+          break;
+        }
+        case AF_INET6: {
+          struct sockaddr_in6 *sin6 = (sockaddr_in6 *)r->ai_addr;
+          struct in6_addr *addr6 = &sin6->sin6_addr;
+          addr = (const unsigned char *)addr6->s6_addr;
+      	  break;	
+        }
+      }
+      /**************
+      if (ipv6 == false)
+      {
+      	if (r->ai_family == AF_INET)
+      	{
+      		cerr << "InetAddress::getAllByName.IPv4" << endl;
+	        struct sockaddr_in *sin = (sockaddr_in *)r->ai_addr;
+	        in_addr_t addr_t = sin->sin_addr.s_addr;
+	        addr = (const unsigned char *)&addr_t;
+        }
+      }
+      else
+      {
+      	if (r->ai_family == AF_INET6)
+      	{
+      		cerr << "InetAddress::getAllByName.IPv6" << endl;
+        	struct sockaddr_in6 *sin6 = (sockaddr_in6 *)r->ai_addr;
+	        struct in6_addr *addr6 = &sin6->sin6_addr;
+	        addr = (const unsigned char *)addr6->s6_addr;
+        }
+      }
+      **********************/
+      size_t len = r->ai_addrlen;
+      if (addr != 0)
+      {
+        try {
+          inet = InetAddress::getByAddress(host, addr, len);
+        } catch(UnknownHostException) {
+          delete inet;
+        }
+      }
 
-            inet = InetAddress::getByAddress(host, addr, len);
-            list->push_back(*inet);
-            delete inet;
-        }
-        catch(UnknownHostException)
-        {
-            delete list;
-            throw;
-        }
+      if (inet != 0)
+        list->push_back(inet);
+      
     }
+
+    freeaddrinfo(res);
+
+
+
+//     // Consulta la direccion IP del host
+//     struct hostent ht, *ht_ptr;
+//     char           ht_buffer[HOSTENT_BUFFER_SIZE];
+//     int            ht_error;
+
+// #ifdef __sun
+//     ht_ptr = gethostbyname_r(host, &ht, ht_buffer,
+//                              HOSTENT_BUFFER_SIZE, &ht_error);
+// #else
+//     ht_ptr = gethostbyname(host);
+//     ht_error = h_errno;
+// #endif
+
+//     if (ht_ptr == NULL)
+//     {
+//         char* errmsg = (char*) "Undefined error";
+//         switch(ht_error)
+//         {
+//             case HOST_NOT_FOUND:
+//                 errmsg = (char*) "Host not found";
+//                 break;
+
+//             case TRY_AGAIN:
+//                 errmsg = (char*) "Server fail (try again)";
+//                 break;
+
+//             case NO_RECOVERY:
+//                 errmsg = (char*) "Non recoverable error";
+//                 break;
+
+//             case NO_DATA:
+//                 errmsg = (char*) "Valid name, no data record";
+//                 break;
+//         }
+//         throw UnknownHostException(errmsg);
+//     }
+
+//     // Crea una lista vacia y recorre los resultados de gethostbyname()
+//     list = new InetAddressList;
+//     for (char** ptr = ht_ptr->h_addr_list; *ptr; ptr++)
+//     {
+//         try
+//         {
+//             const unsigned char* addr = (const unsigned char*) *ptr;
+//             size_t len = ht_ptr->h_length;
+
+//             inet = InetAddress::getByAddress(host, addr, len);
+//             //list->push_back(*inet);
+//             //delete inet;
+//             list->push_back(inet);
+//         }
+//         catch(UnknownHostException)
+//         {
+//             delete list;
+//             throw;
+//         }
+//     }
 
     // Devuelve el resultado
     return list;
@@ -531,22 +439,53 @@ InetAddress* InetAddress::getByAddress(const char* host,
                                        const unsigned char* addr, size_t len)
     throw(UnknownHostException)
 {
-    // Comprueba la longitud de la direccion
-    if (len != sizeof(in_addr_t))
-    {
-        throw UnknownHostException("Invalid IP address");
-    }
-
-    // Crea un nuevo objeto y lo inicializa
-    InetAddress* inet = new InetAddress;
+  //mcpg - if (len == sizeof(in_addr_t)) { // IPv4
+  if (len == INET_ADDRSTRLEN) { // IPv4
+    
+    Inet4Address* inet4 = new Inet4Address;
 #ifndef __linux
-    *((in_addr_t*) &(inet->_ip)) = *((in_addr_t*) addr);
+    *((in_addr_t*) &(inet4->_ip)) = *((in_addr_t*) addr);
 #else
-    *((in_addr_t*) &(inet->_ip.s_addr)) = *((in_addr_t*) addr);
+    *((in_addr_t*) &(inet4->_ip.s_addr)) = *((in_addr_t*) addr);
 #endif
-    inet->_hostname = host;
+    inet4->_hostname = host;
+    return inet4;
 
-    return inet;
+  // mcpg - } else if ( (len > sizeof(in_addr_t)) /*&& (len <= sizeof(in6_addr))*/ ) { // IPv6
+  } else if (len > INET_ADDRSTRLEN) { //IPv6
+    
+    Inet6Address* inet6 = new Inet6Address;
+#ifndef __linux
+    *((in6_addr_t*) &(inet6->_ip)) = *((in6_addr_t*) addr);
+#else
+    *((in6_addr*) &(inet6->_ip.s6_addr)) = *((in6_addr*) addr);
+#endif
+    inet6->_hostname = host;
+    return inet6;
+
+  } else {
+
+    throw UnknownHostException("Invalid IP address");
+    return 0;
+
+  }
+
+//     // Comprueba la longitud de la direccion
+//     if (len != sizeof(in_addr_t))
+//     {
+//         throw UnknownHostException("Invalid IP address");
+//     }
+
+//     // Crea un nuevo objeto y lo inicializa
+//     InetAddress* inet = new InetAddress;
+// #ifndef __linux
+//     *((in_addr_t*) &(inet->_ip)) = *((in_addr_t*) addr);
+// #else
+//     *((in_addr_t*) &(inet->_ip.s_addr)) = *((in_addr_t*) addr);
+// #endif
+//     inet->_hostname = host;
+
+//     return inet;
 }
 
 
@@ -563,9 +502,14 @@ InetAddress* InetAddress::getByAddress(const char* host,
 ostream& operator<< (ostream& os, const TIDSocket::InetAddress& inet)
 {
     size_t len;
-    const unsigned char* addr = inet.getAddress(len);
-
-    char buffer[INET_ADDRSTRLEN];
-    os << inet_ntop(AF_INET, addr, buffer, INET_ADDRSTRLEN);
+    const unsigned char* addr = inet.getAddress(len); // TODO: need to review: may be IPv6
+    
+    if (len == sizeof(in_addr_t)) { // IPv4
+      char buffer[INET_ADDRSTRLEN];
+      os << inet_ntop(AF_INET, addr, buffer, INET_ADDRSTRLEN);
+    } else if (len == sizeof(in6_addr)) { // IPv6
+      char buffer[INET6_ADDRSTRLEN];
+      os << inet_ntop(AF_INET6, addr, buffer, INET6_ADDRSTRLEN);
+    }
     return os;
 }

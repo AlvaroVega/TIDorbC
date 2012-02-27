@@ -500,7 +500,8 @@ TIDorb::core::comm::SSLIIOPCommLayer::createIOR(const char* id,
       out->write_ushort(ssl_component->getTargetSupports());
       out->write_ushort(ssl_component->getTargetRequires());
       out->write_ulong(1);
-      out->write_string(server_listener->get_listen_point()._host); 
+      TIDorb::core::comm::iiop::ListenPointSet listenpoints = server_listener->get_listen_points();
+      out->write_string((*(listenpoints.begin()))._host); 
       out->write_ushort(ssl_component->getSSLPort());    
       TIDorb::core::cdr::BufferCDR_ref buffer = out->get_buffer();
       CORBA::ULong length = buffer->get_available_bytes();

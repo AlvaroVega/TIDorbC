@@ -64,6 +64,8 @@
 #include "TIDSocket/FileDescriptor.h"
 #include "TIDSocket/SocketAddress.h"
 #include "TIDSocket/InetAddress.h"
+#include "TIDSocket/Inet4Address.h"
+#include "TIDSocket/Inet6Address.h"
 #include "TIDSocket/InetSocketAddress.h"
 #include "TIDSocket/NetworkInterface.h"
 #include "TIDSocket/SelectionKey.h"

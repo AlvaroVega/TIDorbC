@@ -64,7 +64,7 @@ void TIDorb::core::comm::miop::MIOPCorbaloc::tokenize(const string& str, vector<
 
 
 TIDorb::core::iop::IOR*
-TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(const char* corbaloc_URL)
+TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(const char* corbaloc_URL,const char* iface)
   throw(CORBA::ORB::InvalidName)
 {
   string url = corbaloc_URL;
@@ -124,7 +124,7 @@ TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(const char* corbaloc_URL)
 
       // Get listen_point
       TIDorb::core::comm::miop::ListenPoint* listen_point = NULL;
-      listen_point = TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(listen_point_str);
+      listen_point = TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(listen_point_str,iface);
 
       // Get components
       TIDorb::core::iop::VectorTaggedComponent components;
@@ -141,7 +141,7 @@ TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(const char* corbaloc_URL)
 
       if (! group_iiop_str.empty()) {
         string iiop_corbaloc = string("corbaloc:") + group_iiop_str;
-        TIDorb::core::iop::IOR_ref ior = TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(iiop_corbaloc.c_str());
+        TIDorb::core::iop::IOR_ref ior = TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(iiop_corbaloc.c_str(),iface);
         components.push_back(new GroupIIOPProfile(*ior->profile_IIOP()));        
       }
 
@@ -157,7 +157,7 @@ TIDorb::core::comm::miop::MIOPCorbaloc::get_IOR(const char* corbaloc_URL)
     } else if (obj_address.compare(0, 4, "iiop") == 0) {
       // IIOP
       string iiop_corbaloc = string("corbaloc:") + obj_address;
-      TIDorb::core::iop::IOR_ref ior = TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(iiop_corbaloc.c_str());
+      TIDorb::core::iop::IOR_ref ior = TIDorb::core::comm::iiop::IIOPCorbaloc::get_IOR(iiop_corbaloc.c_str(),iface);
       TIDorb::core::comm::iiop::ProfileIIOP* iiop_profile = new TIDorb::core::comm::iiop::ProfileIIOP(*ior->profile_IIOP());
       profiles.push_back(iiop_profile);
 

@@ -169,11 +169,21 @@ TIDorb::core::comm::UDPConnection::server_connection(TIDorb::core::comm::Connect
 */
     // create the datagram socket
     const TIDSocket::SocketAddress* nullAddr = NULL;
-    socket = new TIDSocket::DatagramSocket(nullAddr);
+
+    const char* interface = NULL;
+    if (mngr->orb()->conf().prefer_ipv6) {
+      string point = listen_point._host;
+      string::size_type colon_position = point.find('%');
+      if (colon_position != string::npos)
+        interface = CORBA::string_dup(point.substr(colon_position + 1).c_str());
+    }
+    socket = new TIDSocket::DatagramSocket(nullAddr, interface, 
+                                           mngr->orb()->conf().prefer_ipv6);
     socket->setReuseAddress(true);
 
     // resolve unicast address
-    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
+    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port, 
+                                      mngr->orb()->conf().prefer_ipv6);
     if (addr.isUnresolved() || addr.getAddress().isMulticastAddress()) {
       delete socket;
       throw CORBA::COMM_FAILURE("Invalid unicast address", 0, CORBA::COMPLETED_NO);
@@ -208,10 +218,18 @@ TIDorb::core::comm::UDPConnection::client_connection(TIDorb::core::comm::Connect
 
   try {
     // create the datagram socket
-    socket = new TIDSocket::DatagramSocket();
-
+    const char* interface = NULL;
+    if (mngr->orb()->conf().prefer_ipv6) {
+      string point = listen_point._host;
+      string::size_type colon_position = point.find('%');
+      if (colon_position != string::npos)
+        interface = CORBA::string_dup(point.substr(colon_position + 1).c_str());
+    }
+    // create the datagram socket
+    socket = new TIDSocket::DatagramSocket(interface,mngr->orb()->conf().prefer_ipv6);
     // resolve unicast address
-    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port);
+    TIDSocket::InetSocketAddress addr(listen_point._host, listen_point._port, 
+                                      mngr->orb()->conf().prefer_ipv6);
     if (addr.isUnresolved() || addr.getAddress().isMulticastAddress()) {
       delete socket;
       throw CORBA::COMM_FAILURE("Invalid unicast address", 0, CORBA::COMPLETED_NO);
@@ -312,8 +330,7 @@ void TIDorb::core::comm::UDPConnection::send_oneway_request_async
     if (/*ior->is_ZIOP() || */assume_ziop_server) {
 
       TIDorb::core::PolicyContext* policies_context_ior = NULL;
-      
-      policies_context_ior = NULL; // NOT IOR policies ior->policies();
+      policies_context_ior = ior->policies();
 
       compressor = TIDorb::core::ziop::Ziop::getClientCompressor(
                                                               *policy_context,
@@ -694,8 +711,9 @@ void TIDorb::core::comm::UDPConnection::receive_message(){
       // Attend for compressed messages
       if (header.getCompressed()){
         TIDorb::core::comm::ziop::ZIOPMessage ziop_message(header);
-
-        ziop_message.set_body(this, buffer, input);
+        
+        ziop_message.receive_body(this, (unsigned char*) 
+                                  (receive_header_buffer->get_chunk(0)->get_buffer()));
 
         ziop_message.connect_GIOPMessage(this);
 
@@ -993,9 +1011,16 @@ void TIDorb::core::comm::UDPConnection::write(unsigned char* buffer,
   try {
     size_t numWrittenNow = 0;
     
-    TIDSocket::InetSocketAddress addr(initial_point._host, initial_point._port);
+    TIDSocket::InetSocketAddress addr(initial_point._host, initial_point._port,
+                                      _orb->conf().prefer_ipv6);
     TIDSocket::DatagramPacket datagram(buffer, buffer_size, offset, length, addr);
-
+    char* interface = NULL;
+    if (_orb->conf().prefer_ipv6) {
+      string point = initial_point._host;
+      string::size_type colon_position = point.find('%');
+      if (colon_position != string::npos)
+        interface = CORBA::string_dup(point.substr(colon_position + 1).c_str());
+    }
     while (length > 0) {
       
       socket->send(datagram);

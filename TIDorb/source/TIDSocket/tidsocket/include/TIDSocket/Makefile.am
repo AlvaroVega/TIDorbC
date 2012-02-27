@@ -18,6 +18,8 @@ inst_HEADERS = \
         IllegalBlockingModeException.h \
         IndexOutOfBoundsException.h \
         InetAddress.h \
+        Inet4Address.h \
+        Inet6Address.h \
         InetSocketAddress.h \
         InputStream.h \
         IOException.h \

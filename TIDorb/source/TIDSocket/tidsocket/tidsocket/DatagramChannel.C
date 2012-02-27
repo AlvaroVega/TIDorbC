@@ -109,7 +109,7 @@ DatagramChannel::~DatagramChannel()
 //
 // connect()
 //
-DatagramChannel& DatagramChannel::connect(const SocketAddress& addr)
+DatagramChannel& DatagramChannel::connect(const SocketAddress& addr,const char* interface)
     throw(ClosedChannelException, AsynchronousCloseException,
           ClosedByInterruptException, IOException)
 {
@@ -124,7 +124,7 @@ DatagramChannel& DatagramChannel::connect(const SocketAddress& addr)
     {
         Synchronized synchronized(_sync);
         {
-            _socket->connect(addr);
+            _socket->connect(addr,interface);
             _status |= TID_SOCKET_CHANNEL_STATUS_CONNECTED;
         }
     }
@@ -279,7 +279,7 @@ SocketAddress* DatagramChannel::receive(unsigned char* dst, size_t dst_len)
 // send()
 //
 ssize_t DatagramChannel::send(const unsigned char* src, size_t src_len,
-                          const SocketAddress& target)
+                          const SocketAddress& target,const char* interface)
     throw(ClosedChannelException, ClosedByInterruptException,
           AsynchronousCloseException, IOException)
 {
@@ -294,7 +294,7 @@ ssize_t DatagramChannel::send(const unsigned char* src, size_t src_len,
     try
     {
         DatagramPacket pack((unsigned char*) src, src_len, length, target);
-        _socket->send(pack);
+        _socket->send(pack,interface);
         nwrite = pack.getLength();
     }
     catch (IllegalArgumentException& e)
@@ -327,7 +327,7 @@ int DatagramChannel::validOps()
 //
 // write()
 //
-ssize_t DatagramChannel::write(const unsigned char* src, size_t src_len)
+ssize_t DatagramChannel::write(const unsigned char* src, size_t src_len,const char* interface)
     throw(NotYetConnectedException, IOException)
 {
     // Comprueba si esta conectado
@@ -342,7 +342,7 @@ ssize_t DatagramChannel::write(const unsigned char* src, size_t src_len)
     {
         InetSocketAddress addr(_socket->getInetAddress(), _socket->getPort());
         DatagramPacket pack((unsigned char*) src, src_len, length, addr);
-        _socket->send(pack);
+        _socket->send(pack,interface);
         nwrite = pack.getLength();
     }
     catch (IllegalArgumentException& e)
@@ -415,7 +415,7 @@ SelectionKey& DatagramChannel::implRegisterChannel(Selector& sel, int ops)
 //
 // static open()
 //
-DatagramChannel* DatagramChannel::open()
+DatagramChannel* DatagramChannel::open(const char* interface)
     throw(IOException)
 {
     DatagramChannel* channel = NULL;
@@ -425,7 +425,7 @@ DatagramChannel* DatagramChannel::open()
         channel = new DatagramChannel;
 
         // Crea un socket no conectado
-        channel->_socket = new DatagramSocket;
+        channel->_socket = new DatagramSocket(interface);
 
         // Fija el estado del canal
         channel->_status |= TID_SOCKET_CHANNEL_STATUS_OPEN;

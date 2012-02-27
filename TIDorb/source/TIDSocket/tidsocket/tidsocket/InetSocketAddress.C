@@ -49,9 +49,12 @@ namespace TIDSocket
 //
 // Constructor
 //
-InetSocketAddress::InetSocketAddress(const InetAddress* inaddr, in_port_t port)
+InetSocketAddress::InetSocketAddress(const InetAddress* inaddr, in_port_t port, 
+                                     bool ipv6)
     throw(IllegalArgumentException)
 {
+    _ipv6 = ipv6;
+
     // Inicializa el puerto
     init_port(port);
 
@@ -65,9 +68,11 @@ InetSocketAddress::InetSocketAddress(const InetAddress* inaddr, in_port_t port)
 //
 // Constructor
 //
-InetSocketAddress::InetSocketAddress(in_port_t port)
+InetSocketAddress::InetSocketAddress(in_port_t port, bool ipv6)
     throw(IllegalArgumentException)
 {
+    _ipv6 = ipv6;
+
     // Inicializa el puerto
     init_port(port);
 
@@ -81,9 +86,11 @@ InetSocketAddress::InetSocketAddress(in_port_t port)
 //
 // Constructor
 //
-InetSocketAddress::InetSocketAddress(const char* hostname, in_port_t port)
+InetSocketAddress::InetSocketAddress(const char* hostname, in_port_t port, bool ipv6)
     throw(IllegalArgumentException)
 {
+    _ipv6 = ipv6;
+
     // Inicializa el puerto
     init_port(port);
 
@@ -96,6 +103,7 @@ InetSocketAddress::InetSocketAddress(const char* hostname, in_port_t port)
     catch(...)
     {
         _resolved = false;
+        init_addr(NULL);
         return;
     }
 
@@ -113,6 +121,7 @@ InetSocketAddress::InetSocketAddress(const char* hostname, in_port_t port)
 InetSocketAddress::~InetSocketAddress()
     throw()
 {
+  delete _addr;
 }
 
 
@@ -124,7 +133,10 @@ InetSocketAddress::~InetSocketAddress()
 InetSocketAddress& InetSocketAddress::operator=(const InetSocketAddress& inaddr)
     throw()
 {
-    _addr     = inaddr._addr;
+    //_addr     = inaddr._addr;
+    if (_addr)
+      delete _addr;
+    _addr     = inaddr._addr->clone();
     _port     = inaddr._port;
     _resolved = inaddr._resolved;
     return *this;
@@ -141,7 +153,8 @@ bool InetSocketAddress::operator== (const InetSocketAddress& inaddr)
 {
     return ((_port == inaddr._port) &&
             (_resolved == inaddr._resolved) &&
-            (_resolved == false || _addr == inaddr._addr));
+ //           (_resolved == false || _addr == inaddr._addr));
+            (_resolved == false || (*_addr) == (*(inaddr._addr)) ) );
 }
 
 
@@ -153,7 +166,8 @@ bool InetSocketAddress::operator== (const InetSocketAddress& inaddr)
 const InetAddress& InetSocketAddress::getAddress() const
     throw()
 {
-    return _addr;
+    //return _addr;
+  return *_addr;
 }
 
 
@@ -170,7 +184,8 @@ const char* InetSocketAddress::getHostName()
         return NULL;
     }
 
-    return _addr.getHostName();
+    //return _addr.getHostName();
+    return _addr->getHostName();
 }
 
 
@@ -231,13 +246,19 @@ void InetSocketAddress::init_addr(const InetAddress* inaddr)
     // Si inaddr es nulo, utiliza la direccion comodin
     if (inaddr)
     {
-        _addr = *inaddr;
+        //_addr = *inaddr;
+        _addr = inaddr->clone();
     }
     else
     {
-        InetAddress* inet = new InetAddress();
-        _addr = *inet;
-        delete inet;
+        //InetAddress* inet = new InetAddress();
+        //_addr = *inet;
+//         if (_addr)
+//           delete _addr;
+      if (_ipv6)
+        _addr = new Inet6Address();
+      else
+        _addr = new Inet4Address();
     }
 
     _resolved = true;

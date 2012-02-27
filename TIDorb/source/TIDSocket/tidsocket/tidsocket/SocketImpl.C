@@ -55,7 +55,10 @@ namespace TIDSocket
 SocketImpl& SocketImpl::operator= (const SocketImpl& s)
     throw()
 {
-    _address   = s._address;
+    //_address   = s._address;
+    if (_address)
+      delete _address;
+    _address   = s._address->clone();
     _fd        = s._fd;
     _localport = s._localport;
     _port      = s._port;
@@ -72,7 +75,8 @@ SocketImpl& SocketImpl::operator= (const SocketImpl& s)
 bool SocketImpl::operator== (const SocketImpl& s)
     throw()
 {
-    return (_address   == s._address   &&
+    //return (_address   == s._address   &&
+    return (*_address  == *(s._address)   &&
             _fd        == s._fd        &&
             _localport == s._localport &&
             _port      == s._port      &&
@@ -100,7 +104,8 @@ FileDescriptor SocketImpl::getFileDescriptor() const
 const InetAddress& SocketImpl::getInetAddress() const
     throw()
 {
-    return _address;
+    //return _address;
+    return *_address;
 }
 
 

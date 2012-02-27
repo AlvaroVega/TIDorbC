@@ -144,6 +144,8 @@ TIDorb::core::ConfORB::ConfORB()
   ziop_chunk_size(DEFAULT_ZIOP_CHUNK_SIZE),
   assume_ziop_server(DEFAULT_ASSUME_ZIOP_SERVER),
 
+  prefer_ipv6(DEFAULT_PREFER_IPV6),
+  iface(CORBA::string_dup(DEFAULT_IFACE)),
 
   // Security extensions
   ssl_private_key(CORBA::string_dup(DEFAULT_SSL_PRIVATE_KEY)),
@@ -182,6 +184,7 @@ TIDorb::core::ConfORB::~ConfORB()
   //CORBA::string_free(multicast_group_iiop);
   //CORBA::string_free(multicast_group_gateway);
   // end MIOP extensions
+  CORBA::string_free(iface);
 
   CORBA::string_free(ssl_private_key);
   CORBA::string_free(ssl_certificate);
@@ -368,6 +371,11 @@ const char* TIDorb::core::ConfORB::ziop_chunk_size_name = "-ORB_ziop_chunk_size"
 const bool TIDorb::core::ConfORB::DEFAULT_ASSUME_ZIOP_SERVER = false;
 const char* TIDorb::core::ConfORB::assume_ziop_server_name = "-ORB_assume_ziop_server";
 
+const bool TIDorb::core::ConfORB::DEFAULT_PREFER_IPV6 = false;
+const char* TIDorb::core::ConfORB::prefer_ipv6_name = "-ORB_prefer_ipv6";
+
+const char* TIDorb::core::ConfORB::DEFAULT_IFACE = "eth0";
+const char* TIDorb::core::ConfORB::iface_name = "-ORB_iface";
 
 const char* TIDorb::core::ConfORB::ssl_private_key_name = "-ORB_ssl_private_key";
 const char* TIDorb::core::ConfORB::DEFAULT_SSL_PRIVATE_KEY = "";
@@ -923,6 +931,20 @@ void TIDorb::core::ConfORB::get_parameters(int& argc, char** argv, const char* o
         throw CORBA::INITIALIZE("assume_ziop_server value must be true or false.");
     }
 
+    else if (strcmp(argv[i], prefer_ipv6_name)==0) {
+      if (strcasecmp(argv[i+1], "true")==0)
+        prefer_ipv6 = true;
+      else if (strcasecmp(argv[i+1], "false")==0)
+        prefer_ipv6 = false;
+      else
+        throw CORBA::INITIALIZE("prefer_ipv6 value must be true or false.");
+    }
+    
+    else if (strcmp(argv[i], iface_name)==0) {
+      CORBA::string_free(iface);
+      iface = CORBA::string_dup(argv[i+1]);
+    }
+
     else if (strcmp(argv[i], ssl_private_key_name)==0) {
       CORBA::string_free(ssl_private_key);
       ssl_private_key = CORBA::string_dup(argv[i+1]);
@@ -1114,6 +1136,8 @@ void TIDorb::core::ConfORB::dump(ostream& os)
      << "\tqos_enabled=" << qos_enabled << endl
      << "\tziop_chunk_size=" << ziop_chunk_size << endl
      << "\tassume_ziop_server=" << assume_ziop_server << endl
+     << "\tprefer_ipv6=" << prefer_ipv6 << endl
+     << "\tiface=" << iface << endl
      << "\ttrace_level=" << trace_level << endl
      << "\ttrace_file=" << trace_file << endl
      << "\ttrace_file_size=" << trace_file_size << endl

@@ -66,16 +66,17 @@ SocketImplFactory* ServerSocket::_factory = NULL;
 //
 // Constructor
 //
-ServerSocket::ServerSocket()
+ServerSocket::ServerSocket(bool ipv6)
     throw(IOException, SystemException)
 {
     // Nuevo objeto socket
     _impl    = new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Crea un SOCK_STREAM
-    _impl->create(true);
+    _impl->create(true, _ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 }
 
@@ -85,23 +86,24 @@ ServerSocket::ServerSocket()
 //
 // Constructor
 //
-ServerSocket::ServerSocket(in_port_t port)
+ServerSocket::ServerSocket(in_port_t port, const char* interface, bool ipv6)
     throw(IOException, SystemException)
 {
     // Nuevo objeto socket utilizando la factoria, si esta definida
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Crea un SOCK_STREAM
-    _impl->create(true);
+    _impl->create(true, ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
     try
     {
-        InetSocketAddress inet(port);
-        bind((SocketAddress*) &inet);
+        InetSocketAddress inet(port, _ipv6);
+        bind((SocketAddress*) &inet, interface);
     }
     catch(IllegalArgumentException& e)
     {
@@ -115,23 +117,24 @@ ServerSocket::ServerSocket(in_port_t port)
 //
 // Constructor
 //
-ServerSocket::ServerSocket(in_port_t port, int backlog)
+ServerSocket::ServerSocket(in_port_t port, int backlog, const char* interface, bool ipv6)
     throw(IOException, SystemException)
 {
     // Nuevo objeto socket utilizando la factoria, si esta definida
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Crea un SOCK_STREAM
-    _impl->create(true);
+    _impl->create(true, ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
     try
     {
-        InetSocketAddress inet(port);
-        bind((SocketAddress*) &inet, backlog);
+        InetSocketAddress inet(port, _ipv6);
+        bind((SocketAddress*) &inet, backlog, interface);
     }
     catch(IllegalArgumentException& e)
     {
@@ -145,27 +148,27 @@ ServerSocket::ServerSocket(in_port_t port, int backlog)
 //
 // Constructor
 //
-ServerSocket::ServerSocket(in_port_t port, int backlog, const InetAddress* addr)
+ServerSocket::ServerSocket(in_port_t port, int backlog, const InetAddress* addr, 
+                           const char* interface, bool ipv6)
     throw(IOException, SystemException)
 {
     // Nuevo objeto socket utilizando la factoria, si esta definida
     _impl    = (_factory) ? _factory->createSocketImpl() : new PlainSocketImpl;
     _status  = TID_SOCKET_STATUS_UNSPECIFIED;
     _channel = NULL;
+    _ipv6    = ipv6;
 
     // Crea un SOCK_STREAM
-    _impl->create(true);
+    _impl->create(true, ipv6);
     _status |= TID_SOCKET_STATUS_CREATED;
 
     // Asocia el socket y lo pone en escucha
     try
     {
-        InetSocketAddress inet(port);
+        InetSocketAddress inet(port, _ipv6);
         if (addr)
-        {
-            inet = InetSocketAddress(addr, port);
-        }
-        bind((SocketAddress*) &inet, backlog);
+            inet = InetSocketAddress(addr, port, _ipv6);
+        bind((SocketAddress*) &inet, backlog, interface);
     }
     catch(IllegalArgumentException& e)
     {
@@ -243,10 +246,10 @@ Socket* ServerSocket::accept()
 //
 // bind()
 //
-void ServerSocket::bind(const SocketAddress* endpoint)
+void ServerSocket::bind(const SocketAddress* endpoint,const char* interface)
     throw(IOException, IllegalArgumentException)
 {
-    bind(endpoint, PlainSocketImpl::DEFAULT_BACKLOG);
+    bind(endpoint, PlainSocketImpl::DEFAULT_BACKLOG,interface);
 }
 
 
@@ -255,11 +258,11 @@ void ServerSocket::bind(const SocketAddress* endpoint)
 //
 // bind()
 //
-void ServerSocket::bind(const SocketAddress* endpoint, int backlog)
+void ServerSocket::bind(const SocketAddress* endpoint, int backlog,const char* interface)
     throw(IOException, IllegalArgumentException)
 {
     // InetSocketAddress a la que nos asociamos (cualquier IP, cualquier puerto)
-    InetSocketAddress addr(PlainSocketImpl::ANY_PORT);
+    InetSocketAddress addr(PlainSocketImpl::ANY_PORT,_ipv6);
     InetSocketAddress* addrptr = &addr;
 
     // Comprueba si endpoint es referencia a un objeto InetSocketAddress; en
@@ -279,7 +282,7 @@ void ServerSocket::bind(const SocketAddress* endpoint, int backlog)
         Synchronized synchronized(_sync);
         {
             // Asocia el socket a la direccion InetSocketAddress
-            _impl->bind(addrptr->getAddress(), addrptr->getPort());
+            _impl->bind(addrptr->getAddress(), addrptr->getPort(),interface);
             _status |= TID_SOCKET_STATUS_BOUND;
 
             // Pone el socket en escucha

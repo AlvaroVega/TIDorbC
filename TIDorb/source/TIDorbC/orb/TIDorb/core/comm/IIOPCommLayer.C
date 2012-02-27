@@ -108,8 +108,33 @@ bool TIDorb::core::comm::IIOPCommLayer::is_local(const TIDorb::core::iop::IOR& i
   if(server_listener.is_null()) // no object adapter initialized
     return false;
 
-  return (server_listener->get_listen_point() 
-          == ior.profile_IIOP()->getListenPoint());
+  // Check matching between IOR ListenPoints and server_listener ListenPoints
+  const TIDorb::core::comm::iiop::ListenPointSet& listen_points = 
+    server_listener->get_listen_points();
+  
+  TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+  TIDorb::core::comm::iiop::ListenPointSet::iterator end = listen_points.end();
+
+
+  const TIDorb::core::comm::iiop::VectorListenPoint& vlisten_points = 
+    ior.profile_IIOP()->getListenPoints();
+
+  TIDorb::core::comm::iiop::VectorListenPoint::const_iterator vend = vlisten_points.end();
+
+  while (it != end) {
+    
+    TIDorb::core::comm::iiop::VectorListenPoint::const_iterator vit = 
+      vlisten_points.begin();
+
+    while ( vit != vend)  {
+      if ( (*it) == (*vit)) 
+        return true;
+      vit++;
+    }
+    it++;
+  }
+  return false;
+
 }
 
 
@@ -683,12 +708,33 @@ TIDorb::core::comm::IIOPCommLayer::createIOR(const char* id, TIDorb::core::poa::
       new TIDorb::core::security::CSIComponent(mech_list);
   }
 
-  profiles.resize(1);
-  profiles[0] = new TIDorb::core::comm::iiop::ProfileIIOP(
-                       conf.GIOPVersion,
-                       server_listener->get_listen_point(),
+  //profiles.resize(1);
+  //profiles[0] = new TIDorb::core::comm::iiop::ProfileIIOP(
+  //                     conf.GIOPVersion,
+  //                     server_listener->get_listen_point(),
+  //                     new TIDorb::core::comm::iiop::ObjectKey(key),
+  //                     components);
+
+  const TIDorb::core::comm::iiop::ListenPointSet& listen_points = 
+    server_listener->get_listen_points();
+  
+  TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+  TIDorb::core::comm::iiop::ListenPointSet::iterator end = listen_points.end();
+  
+  profiles.resize(listen_points.size());
+  int i = 0;
+  
+  while(it != end) {
+    profiles[i] = new TIDorb::core::comm::iiop::ProfileIIOP(
+                       _orb->conf().GIOPVersion,
+                       (*it),
                        new TIDorb::core::comm::iiop::ObjectKey(key),
                        components);
+    it++;
+    i++;
+  }
+
+
 
   return new TIDorb::core::iop::IOR(id, &profiles);
 }
@@ -713,7 +759,15 @@ TIDorb::core::comm::iiop::ServiceContextList*
     TIDorb::core::comm::iiop::BiDirServiceContext* bidir_context =
       new TIDorb::core::comm::iiop::BiDirServiceContext(1);
 
-    bidir_context->listen_points.push_back(server_listener->get_listen_point());
+    const TIDorb::core::comm::iiop::ListenPointSet& listen_points = 
+      server_listener->get_listen_points();
+    
+    TIDorb::core::comm::iiop::ListenPointSet::iterator it  = listen_points.begin();
+    TIDorb::core::comm::iiop::ListenPointSet::iterator end = listen_points.end();
+    while (it != end) {
+      bidir_context->listen_points.push_back(*it);
+      it++;
+    }
 
     bidirectional_service = new TIDorb::core::comm::iiop::ServiceContextList(1);
     bidirectional_service->add(bidir_context);

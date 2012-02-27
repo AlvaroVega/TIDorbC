@@ -53,7 +53,7 @@ using std::list;
 
 
 
-TIDorb::core::iop::IOR* TIDorb::core::comm::iiop::Corbaloc::get_IOR(const char* corbaloc_URL)
+TIDorb::core::iop::IOR* TIDorb::core::comm::iiop::Corbaloc::get_IOR(const char* corbaloc_URL,const char* iface)
   throw (CORBA::ORB::InvalidName)
 {
   string url = corbaloc_URL;
@@ -108,7 +108,7 @@ TIDorb::core::iop::IOR* TIDorb::core::comm::iiop::Corbaloc::get_IOR(const char* 
 
     // Parse version and listen_point
     version = Corbaloc::parse_version(version_str);
-    listen_point = Corbaloc::parse_listenpoint(listenpoint_str);
+    listen_point = Corbaloc::parse_listenpoint(listenpoint_str,iface);
 
     // Create Profiles
     profiles.push_back(new TIDorb::core::comm::iiop::ProfileIIOP(version, *listen_point,
@@ -245,7 +245,7 @@ TIDorb::core::comm::iiop::Corbaloc::parse_version(const string& v)
 // MIOP url incoming/outgoing network interfaces extension for INDRA-SACTA
 //
 TIDorb::core::comm::iiop::ListenPoint* 
-TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(const string& listenp)
+TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(const string& listenp, const string& iface)
   throw (CORBA::ORB::InvalidName)
 {
   string host, port_str;
@@ -262,12 +262,42 @@ TIDorb::core::comm::iiop::Corbaloc::parse_listenpoint(const string& listenp)
     //cerr << "case 1: port " << port << endl;
     return  new TIDorb::core::comm::iiop::ListenPoint(host.c_str(), port);
   } else {
-    host = listenp.substr(0, colon_position);
-      
-    string::size_type colon_position2 = listenp.find(':', colon_position + 1);
+    //host = listenp.substr(0, colon_position);
+    //mcpg - begin
+    string::size_type ipv6_separator_begin = listenp.find('[');
+    string::size_type ipv6_separator_end;
+  
+    if (ipv6_separator_begin != string::npos)
+    {
+      ipv6_separator_end = listenp.find(']');
+      if (ipv6_separator_end == string::npos)
+        throw CORBA::ORB::InvalidName();
+    }
+     
+    //string::size_type colon_position2 = listenp.find(':', colon_position + 1); 
+    string::size_type colon_position2;
+    if (ipv6_separator_begin != string::npos) //IPv6
+    {
+      host=listenp.substr(ipv6_separator_begin + 1, ipv6_separator_end-1);
+      if (strcmp(host.c_str(),"::1") != 0)
+      {
+        host += "%";
+        host += iface;
+      }
+      colon_position2 = listenp.find(':', ipv6_separator_end+2);
+    }
+    else
+    {
+      host = listenp.substr(0, colon_position);
+      colon_position2 = listenp.find(':', colon_position + 1); 
+    }
+    //mcpg - end
     //cerr << "colon_position2 " << colon_position2 << endl;
     if (colon_position2 == string::npos) {
-      port = atoi(listenp.substr(colon_position + 1).c_str());
+    	if (ipv6_separator_begin != string::npos) //IPv6
+    	  port = atoi(listenp.substr(ipv6_separator_end + 2).c_str());
+    	else
+        port = atoi(listenp.substr(colon_position + 1).c_str());
       //cerr << "case 2: host " << host << endl;
       //cerr << "case 2: port " << port << endl;
       return  new TIDorb::core::comm::iiop::ListenPoint(host.c_str(), port);

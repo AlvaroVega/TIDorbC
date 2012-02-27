@@ -37,6 +37,7 @@
 
 
 #include <vector>
+#include <set>
 
 #ifdef TIDORB_HAVE_NAMESPACE_STD
   using namespace std;
@@ -44,6 +45,7 @@
 
 #ifdef __SUNPRO_LIBRARY_IOSTREAM
   using std::vector;
+  using std::set;
 #endif
 
 
@@ -56,6 +58,7 @@ namespace iiop {
   
   class ListenPoint;
   typedef vector<ListenPoint> VectorListenPoint;
+  typedef set<ListenPoint> ListenPointSet;
  
   class ObjectKey;
   typedef TIDThr::HandleT<ObjectKey> ObjectKey_ref;
