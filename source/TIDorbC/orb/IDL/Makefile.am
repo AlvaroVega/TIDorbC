@@ -9,27 +9,27 @@ SUBDIRS = \
    09_PortableGroup \
    10_Messaging \
    11_Compression \
-   12_Security \
-   .
+   12_Security
+
 if !MINIMUN
 SUBDIRS += \
    06_dynamic_any
 endif
 
-
+SUBDIRS += .
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/source/TIDThr/tidthr/include \
-	-I$(top_srcdir)/source/TIDSocket/tidsocket/include \
-	-I$(top_srcdir)/source/TIDorbC/orb/include
+        -I$(top_srcdir)/source/TIDThr/tidthr/include \
+        -I$(top_srcdir)/source/TIDSocket/tidsocket/include \
+        -I$(top_srcdir)/source/TIDorbC/orb/include
 
 
 invalid_srcs = \
    CORBA.gen/src/CORBA/TypeCode.C \
    CORBA.gen/src/CORBA/ORB.C
 
-clean-local : #clean-recursive
-	rm -rf $(idl_generateds) include
+#clean-local : #clean-recursive
+#        rm -rf $(idl_generateds) include
 
 lib_LTLIBRARIES = libTIDorbIdl.la
 
@@ -48,7 +48,6 @@ libTIDorbIdl_la_LIBADD = \
    $(top_builddir)/source/TIDorbC/orb/IDL/10_Messaging/libTIDorbIdl_Messaging.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/11_Compression/libTIDorbIdl_Compression.la \
    $(top_builddir)/source/TIDorbC/orb/IDL/12_Security/libTIDorbIdl_Security.la
-#   $(top_builddir)/source/TIDorbC/orb/IDL/01_orb/POA_CORBA/libTIDorbIdl_orb_POA_CORBA.la
 
 if !MINIMUN
 libTIDorbIdl_la_LIBADD += \
@@ -59,6 +58,6 @@ endif
 #   $(top_builddir)/source/TIDorbC/orb/IDL/01_orb/POA_CORBA/libTIDorbIdl_orb_POA_CORBA.la
 
 libTIDorbIdl_la_LDFLAGS = \
-	-avoid-version
+        -avoid-version
 
 

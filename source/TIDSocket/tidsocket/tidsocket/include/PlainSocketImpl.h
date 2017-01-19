@@ -63,6 +63,9 @@ class PlainSocketImpl : public virtual SocketImpl,
         // Constructor
         PlainSocketImpl()
             throw();
+ 
+        ~PlainSocketImpl()
+            throw();       
 
         // Fetch the value of an option
         // (caller must delete object pointed to by void* result; object's type

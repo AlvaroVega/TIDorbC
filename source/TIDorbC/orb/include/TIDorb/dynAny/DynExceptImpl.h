@@ -61,6 +61,9 @@ class DynExceptImpl : public DynStructImpl
       void _read(TIDorb::portable::InputStream& in);
       void _write(TIDorb::portable::OutputStream& out) const;
 
+      virtual ~DynExceptImpl()
+        throw (TIDThr::SystemException);        
+
    protected:
       // Empty Constructor for generate copies
       DynExceptImpl(DynamicAny::DynAnyFactory_ptr factory, TIDorb::core::TIDORB* orb)
@@ -78,7 +81,8 @@ class DynExceptImpl : public DynStructImpl
       DynExceptImpl(DynamicAny::DynAnyFactory_ptr factory, TIDorb::core::TIDORB* orb,
                     CORBA::TypeCode_ptr type, CORBA::TypeCode_ptr real_type)
          throw(CORBA::SystemException);
-
+      
+              
    protected:
       CORBA::Boolean validate_name()
          throw(CORBA::SystemException);

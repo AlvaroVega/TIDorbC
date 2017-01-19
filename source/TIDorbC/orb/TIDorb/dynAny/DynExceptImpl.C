@@ -80,6 +80,11 @@ DynExceptImpl::DynExceptImpl(DynamicAny::DynAnyFactory_ptr factory,
 {
 }
 
+DynExceptImpl::~DynExceptImpl()
+  throw (TIDThr::SystemException)
+{
+}  
+
 
 
 

@@ -43,6 +43,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 
 #ifndef INET_ADDRSTRLEN
@@ -215,7 +216,7 @@ InetAddress* InetAddress::getLocalHost()
 InetAddress* InetAddress::getByName(const char* host)
     throw(UnknownHostException)
 {
-	InetAddress* inet = NULL;
+        InetAddress* inet = NULL;
 
     // Consulta todas las direcciones IP del host
     InetAddressList* list = InetAddress::getAllByName(host);
@@ -250,7 +251,7 @@ InetAddress* InetAddress::getByName(const char* host)
 InetAddressList* InetAddress::getAllByName(const char* host)
     throw(UnknownHostException)
 {
-	InetAddressList* list = NULL;
+        InetAddressList* list = NULL;
     InetAddress*     inet = NULL;
 
     // Si host es NULL, devuelve la direcci�n de bucle local
@@ -311,28 +312,28 @@ InetAddressList* InetAddress::getAllByName(const char* host)
           struct sockaddr_in6 *sin6 = (sockaddr_in6 *)r->ai_addr;
           struct in6_addr *addr6 = &sin6->sin6_addr;
           addr = (const unsigned char *)addr6->s6_addr;
-      	  break;	
+          break;        
         }
       }
       /**************
       if (ipv6 == false)
       {
-      	if (r->ai_family == AF_INET)
-      	{
-      		cerr << "InetAddress::getAllByName.IPv4" << endl;
-	        struct sockaddr_in *sin = (sockaddr_in *)r->ai_addr;
-	        in_addr_t addr_t = sin->sin_addr.s_addr;
-	        addr = (const unsigned char *)&addr_t;
+        if (r->ai_family == AF_INET)
+        {
+                cerr << "InetAddress::getAllByName.IPv4" << endl;
+                struct sockaddr_in *sin = (sockaddr_in *)r->ai_addr;
+                in_addr_t addr_t = sin->sin_addr.s_addr;
+                addr = (const unsigned char *)&addr_t;
         }
       }
       else
       {
-      	if (r->ai_family == AF_INET6)
-      	{
-      		cerr << "InetAddress::getAllByName.IPv6" << endl;
-        	struct sockaddr_in6 *sin6 = (sockaddr_in6 *)r->ai_addr;
-	        struct in6_addr *addr6 = &sin6->sin6_addr;
-	        addr = (const unsigned char *)addr6->s6_addr;
+        if (r->ai_family == AF_INET6)
+        {
+                cerr << "InetAddress::getAllByName.IPv6" << endl;
+                struct sockaddr_in6 *sin6 = (sockaddr_in6 *)r->ai_addr;
+                struct in6_addr *addr6 = &sin6->sin6_addr;
+                addr = (const unsigned char *)addr6->s6_addr;
         }
       }
       **********************/

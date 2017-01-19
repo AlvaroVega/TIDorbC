@@ -38,6 +38,9 @@ TID_CHECK_TIDIDLC
 dnl Check for debugging feature
 dnl TID_CHECK_DEBUG
 
+dnl Check for Minimun CORBA
+TID_CHECK_MINIMUN
+
 dnl Check Compressors
 TID_CHECK_COMPRESSORS
 

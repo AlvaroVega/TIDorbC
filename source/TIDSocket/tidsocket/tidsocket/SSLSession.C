@@ -95,7 +95,8 @@ int SSLSession::getApplicationBufferSize()
 const char* SSLSession::getCipherSuite()
 {
   // TODO
-  return SSL_CIPHER_get_name(_session->cipher);
+  //return SSL_CIPHER_get_name(_session->cipher);
+  return NULL;
 }
 
 
@@ -110,20 +111,21 @@ long SSLSession::getCreationTime()
 // Returns the identifier assigned to this Session.
 SessionId SSLSession::getId()
 {
-  char* id_session = (char*) malloc((_session->session_id_length)+1);
+  // char* id_session = (char*) malloc((_session->session_id_length)+1);
 //   cerr << "SSLSession: id_length"  << _session->session_id_length << endl;
 //   cerr << "SSLSession: id"  << _session->session_id[0] << endl;
 //   cerr << "SSLSession: id"  << _session->session_id[1] << endl;
 //   cerr << "SSLSession: id"  << _session->session_id[2] << endl;
 //   cerr << "SSLSession: id"  << _session->session_id[3] << endl;
-  memcpy(id_session, _session->session_id, _session->session_id_length); 
-  id_session[_session->session_id_length] = '\0';
+  //memcpy(id_session, _session->session_id, _session->session_id_length); 
+  //id_session[_session->session_id_length] = '\0';
   
-  string res(id_session);
+  //string res(id_session);
   
-  free(id_session);
+  //free(id_session);
 
-  return res;
+  //return res;
+  return NULL;
 }
 
   

@@ -94,9 +94,9 @@ SSLContext::SSLContext( /* SSLContextSpi contextSpi, Provider provider, */
   // case SSLv2: 
   //   meth = SSLv2_method();
   //   break;
-  case SSLv3: 
-    meth = SSLv3_method();
-    break;
+  // case SSLv3: 
+  //   meth = SSLv3_method();
+  //   break;
   case SSLv23: 
     meth = SSLv23_method(); // Compatible TAO & MICO
     break;
