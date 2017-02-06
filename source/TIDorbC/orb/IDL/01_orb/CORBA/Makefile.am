@@ -243,6 +243,7 @@ idl_cpp_headers += \
         _ValueBoxDefStub.h \
         AliasDef_ext.h \
         NativeDef.h \
+        NativeDef_ext.h \
         AttributeDef.h \
         InterfaceDef.h \
         ValueMemberDef.h \
@@ -287,7 +288,8 @@ idl_cpp_headers += \
         Initializer_ext.h \
         Initializer.h \
         InitializerSeq_ext.h \
-        InitializerSeq.h
+        InitializerSeq.h \
+        _WstringDefStub.h
 endif
 
 idl_cpp_extra_headers = \

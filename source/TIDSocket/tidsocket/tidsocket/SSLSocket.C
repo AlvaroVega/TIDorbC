@@ -477,14 +477,14 @@ void SSLSocket::renegotitate() throw(IOException)
   SSL_renegotiate(_ssl);
 
   SSL_do_handshake(_ssl);
-  // if (_ssl->state != SSL_ST_OK)
-  //   throw IOException("SSLSocket: Failed to send renegotiation request");
+  if (_ssl->state != SSL_ST_OK)
+    throw IOException("SSLSocket: Failed to send renegotiation request");
 
-  // _ssl->state |= SSL_ST_ACCEPT;
+  _ssl->state |= SSL_ST_ACCEPT;
   SSL_do_handshake(_ssl);
 
-  // if (_ssl->state != SSL_ST_OK)
-  //   throw IOException("SSLSocket: Failed to complete renegotiation");
+  if (_ssl->state != SSL_ST_OK)
+    throw IOException("SSLSocket: Failed to complete renegotiation");
   /* our renegotiation is complete */
   
 }

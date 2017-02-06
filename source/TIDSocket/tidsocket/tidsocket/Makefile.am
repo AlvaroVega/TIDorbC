@@ -12,6 +12,7 @@ libtidsocket_la_LIBADD = \
   ${top_builddir}/source/TIDThr/tidthr/tidthr/libtidthr.la \
   $(SSL_LIB)
 
+
 libtidsocket_la_SOURCES = \
         DatagramChannel.C \
         DatagramPacket.C \
@@ -47,4 +48,5 @@ libtidsocket_la_SOURCES = \
 
 
 libtidsocket_la_LDFLAGS = \
+	-L$(top_builddir)/source/TIDThr/tidthr/tidthr/.libs \
 	-avoid-version

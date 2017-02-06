@@ -103,7 +103,13 @@ PlainSocketImpl::PlainSocketImpl()
     signal(SIGPIPE, SIG_IGN);
 }
 
-
+//
+// Destructor
+//
+PlainSocketImpl::~PlainSocketImpl()
+    throw()
+{
+}
 
 
 //
@@ -965,7 +971,7 @@ void PlainSocketImpl::connect(const SocketAddress& address, time_t timeout,const
 //
 // connect()
 //
-void PlainSocketImpl::connect(const char* host, in_port_t port,const char* interface)
+void PlainSocketImpl::connect(const char* host, in_port_t port, const char* interface)
     throw(SocketException)
 {
     try

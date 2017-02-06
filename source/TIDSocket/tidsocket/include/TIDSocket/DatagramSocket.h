@@ -73,13 +73,13 @@ class DatagramSocket : public virtual TIDThr::RefCounter
         // Creates a datagram socket, bound to the specified local
         // address
         DatagramSocket(in_port_t port, const InetAddress& localAddr,
-                       const char* interface = false, bool ipv6 = false)
+                       const char* interface = NULL, bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Creates a datagram socket, bound to the specified local
         // socket address
         DatagramSocket(const SocketAddress* bindAddr,
-                       const char* interface = false, bool ipv6 = false)
+                       const char* interface = NULL, bool ipv6 = false)
             throw(SocketException, SystemException);
 
         // Destroys the datagram socket
@@ -100,7 +100,7 @@ class DatagramSocket : public virtual TIDThr::RefCounter
 
     public:
         // Binds this DatagramSocket to a specific address and port
-        void bind(const SocketAddress* addr, const char* interface = false)
+        void bind(const SocketAddress* addr, const char* interface = NULL)
             throw(SocketException, IllegalArgumentException);
 
         // Closes this datagram socket
