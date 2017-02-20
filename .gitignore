@@ -1,0 +1,9 @@
+# C extensions
+*.so
+*.o
+*.lo
+*.la
+*.gcno
+
+*.in
+
